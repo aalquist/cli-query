@@ -94,7 +94,13 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
 
     actions[name] = action
 
-    #return action
+def main(mainArgs=None):
+
+    (parser, subparsers) = initmain()
+
+    actions = setupCommands(subparsers)
+
+    return execute(mainArgs, parser, actions)
 
 def initmain():
 
@@ -121,50 +127,7 @@ def initmain():
 
     return (parser, subparsers)
 
-    
-
-def main(mainArgs=None):
-
-    (parser, subparsers) = initmain()
-
-    actions = {}
-
-    arg = [ 
-                            {"name": "show-json", "help": "output json"},
-                            {"name": "use-stdin", "help": "use stdin for query"},
-                            {"name": "file", "help": "the json file for query"},
-                            {"name": "template", "help": "use template name for query"} ]
-
-    create_sub_command(
-        subparsers, "ldslist", "List all cpcode based log delivery configurations",
-        optional_arguments=copy.deepcopy(arg),
-        required_arguments=None,
-        actions=actions)
-
-    create_sub_command(
-        subparsers, "template", "prints the default yaml query template",
-        optional_arguments=[    {"name": "get", "help": "get template by name"}, 
-                                {"name": "type", "help": "the template type"}],
-        required_arguments=None,
-        actions=actions)
-    
-    create_sub_command(
-        subparsers, "netstoragelist", "List storage groups",
-        optional_arguments=copy.deepcopy(arg),
-        required_arguments=None,
-        actions=actions)
-
-    create_sub_command(
-        subparsers, "netstorageuser", "List netstorage users",
-        optional_arguments=copy.deepcopy(arg),
-        required_arguments=None,
-        actions=actions)
-    
-    create_sub_command(
-        subparsers, "groupcpcodelist", "CPCODES assigned to groups",
-        optional_arguments=copy.deepcopy(arg),
-        required_arguments=None,
-        actions=actions)
+def execute(mainArgs, parser, actions):
 
     args = None
     
@@ -202,7 +165,61 @@ def main(mainArgs=None):
 
     except Exception as e:
         print(e, file=sys.stderr)
-        return 1
+        return 1    
+
+def combineArgs(defaultArgs, AdditionalArgs = None):
+
+    newArgs = copy.deepcopy(defaultArgs)
+
+    if AdditionalArgs is not None or len(AdditionalArgs) > 0:
+        for arg in AdditionalArgs:
+            newArgs.append(arg)
+    
+    return newArgs
+
+
+def setupCommands(subparsers):
+
+    actions = {}
+
+    defaultQueryArgs = [ 
+                            {"name": "show-json", "help": "output json"},
+                            {"name": "use-stdin", "help": "use stdin for query"},
+                            {"name": "file", "help": "the json file for query"},
+                            {"name": "template", "help": "use template name for query"} ]
+
+    create_sub_command(
+        subparsers, "template", "prints the default yaml query template",
+        optional_arguments=[    {"name": "get", "help": "get template by name"}, 
+                                {"name": "type", "help": "the template type"}],
+        required_arguments=None,
+        actions=actions)
+    
+    create_sub_command(
+        subparsers, "ldslist", "List all cpcode based log delivery configurations",
+        optional_arguments=combineArgs(defaultQueryArgs, []),
+        required_arguments=None,
+        actions=actions)
+    
+    create_sub_command(
+        subparsers, "netstoragelist", "List storage groups",
+        optional_arguments=combineArgs(defaultQueryArgs, []),
+        required_arguments=None,
+        actions=actions)
+
+    create_sub_command(
+        subparsers, "netstorageuser", "List netstorage users",
+        optional_arguments=combineArgs(defaultQueryArgs, []),
+        required_arguments=None,
+        actions=actions)
+    
+    create_sub_command(
+        subparsers, "groupcpcodelist", "CPCODES assigned to groups",
+        optional_arguments=combineArgs(defaultQueryArgs, []),
+        required_arguments=None,
+        actions=actions)
+
+    return actions
 
 
 def template(args):
@@ -235,8 +252,6 @@ def template(args):
 
     print( json.dumps(obj,indent=1) )
     return return_value
-
-
 
 def ldslist(args):
 
