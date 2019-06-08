@@ -1,0 +1,13 @@
+{
+    "StorageGroupId" : "$.storageGroupId",
+    "storageGroupName" : "$.storageGroupName",
+    "Email" : "$.email",
+    "uploadAccountStatus": "$.uploadAccountStatus",
+    "ftpEnabled": "$.ftpEnabled",
+    "sshEnabled": "$.sshEnabled",
+    "rsyncEnabled": "$.rsyncEnabled",
+    "asperaEnabled": "$.asperaEnabled",
+    "hasFileManagerAccess": "$.hasFileManagerAccess",
+    "hasHttpApiAccess": "$.hasHttpApiAccess"
+    
+}

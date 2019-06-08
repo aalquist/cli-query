@@ -1,0 +1,12 @@
+{
+    "requirements": {
+      "python": "3.5.0"
+    },
+    "commands": [
+      {
+        "name": "query",
+        "version": "0.0.1",
+        "description": "Generic querying CLI for multiple end points"
+      }
+    ]
+  }

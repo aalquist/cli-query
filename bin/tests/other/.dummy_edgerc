@@ -1,0 +1,11 @@
+[default]
+client_secret = tWIrs080YS3bsMe29B2HkyMAa2qUqAvZl1WX0bAr2w==
+host = akab-DjIzMTE5ODM5NTQ1MGRkNTczNmIyZjk0.luna.akamaiapis.net
+access_token = akab-DTNiZjgxYjQ1MTE3N-MGFkNTU3NWM2ZjY4N
+client_token = akab-DTZjZThlZjFmZDY4Z-ZDRmNDNhZmM4ZDRmN
+
+[other]
+client_secret = tWIrs080YS3bsMe29B2HkyMAa2qUqAvZl1WX0bAr2w==
+host = akab-MjIzMTE5ODM5NTQ1MGRkNTczNmIyZjk0.luna.akamaiapis.net
+access_token = akab-NTNiZjgxYjQ1MTE3N-MGFkNTU3NWM2ZjY4N
+client_token = akab-OTZjZThlZjFmZDY4Z-ZDRmNDNhZmM4ZDRmN

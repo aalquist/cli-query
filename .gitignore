@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__
+*.py[cod]
+*$py.class
+*.pyc
+*.edgerc
+
+.coverage
+
+.DS_Store
+
+.vscode/*
+launch.json
+settings.json
+
+.ropeproject
+
+tmp/*
+

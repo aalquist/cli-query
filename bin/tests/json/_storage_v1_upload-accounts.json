@@ -1,0 +1,117 @@
+{
+    "items": [
+        {
+            "uploadAccountId": "value",
+            "storageGroupId": 1234568,
+            "storageGroupName" : "some_netstorage_groupname_missing_in_doc",
+            "uploadAccountStatus" : "some_status_missing_in_doc",
+            "status": "ACTIVE",
+            "isEditable": true,
+            "ftpEnabled": true,
+            "sshEnabled": true,
+            "rsyncEnabled": true, 
+            "asperaEnabled": true,
+            "hasFileManagerAccess": true,
+            "hasHttpApiAccess": true,
+            "hasPendingPropagation": true,
+            "email": "your@email.com",
+            "keys": {
+                "ftp": [
+                    {
+                        "identity": "value",
+                        "isActive": true,
+                        "lastModifiedBy": "camlanders",
+                        "lastModifiedDate": "2017-09-04T09:10:58Z"
+                    }
+                ],
+                "ssh": [
+                    {
+                        "identity": "value",
+                        "key": "ssh-rsa HASH your@hostname",
+                        "isActive": true,
+                        "lastModifiedBy": "camlanders",
+                        "lastModifiedDate": "2017-09-04T09:10:58Z"
+                    }
+                ],
+                "rsync": [
+                    {
+                        "identity": "value",
+                        "key": "value",
+                        "isActive": true,
+                        "lastModifiedBy": "camlanders",
+                        "lastModifiedDate": "2017-09-04T09:10:58Z"
+                    }
+                ],
+                "aspera": [
+                    {
+                        "identity": "value",
+                        "key": "ssh-rsa HASH your@hostname",
+                        "isActive": true,
+                        "lastModifiedBy": "camlanders",
+                        "lastModifiedDate": "2017-09-04T09:10:58Z"
+                    }
+                ],
+                "g2o": [
+                    {
+                        "identity": "value",
+                        "user": "username",
+                        "key": "value",
+                        "isActive": true,
+                        "lastModifiedBy": "camlanders",
+                        "lastModifiedDate": "2017-09-04T09:10:58Z"
+                    }
+                ]
+            },
+            "accessConfig": {
+                "hasReadOnlyAccess": false,
+                "chrootDirectory": "/456789/j",
+                "loginDirectory": "/456789/j",
+                "cpcodes": [
+                    {
+                        "cpcodeId": 456789,
+                        "subDirectoryRestrictions": [
+                            "/456789/j/k/s"
+                        ],
+                        "lastModifiedBy": "camlanders",
+                        "lastModifiedDate": "2017-09-04T09:10:58Z"
+                    }
+                ]
+            },
+            "bruteForceAttackConfig": {
+                "failedLoginThreshold": 10,
+                "lockDownDurationSeconds": 30
+            },
+            "technicalContactInfo": {
+                "newTechnicalContact": {
+                    "firstName": "j",
+                    "lastName": "j",
+                    "email": "j@j.com",
+                    "phone": {
+                        "countryCode": "+7",
+                        "areaCode": "7",
+                        "number": "767676767676"
+                    }
+                }
+            },
+            "ruleSetId": 19205,
+            "changeHistory": [
+                {
+                    "changeType": "UPLOAD_ACCOUNT",
+                    "action": "ADDED",
+                    "propagated": false,
+                    "lastModifiedBy": "camlanders",
+                    "lastModifiedDate": "2017-09-04T09:10:58Z"
+                },
+                {
+                    "changeType": "RULESET",
+                    "action": "ADDED",
+                    "propagated": false,
+                    "lastModifiedBy": "camlanders",
+                    "lastModifiedDate": "2017-09-04T09:10:58Z"
+                }
+            ],
+            "lastModifiedBy": "camlanders",
+            "lastModifiedDate": "2017-09-04T09:10:58Z"
+        }
+    ]
+}

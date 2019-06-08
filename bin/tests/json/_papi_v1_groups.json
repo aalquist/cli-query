@@ -1,0 +1,31 @@
+{
+    "accountId": "act_1-1TJZFB",
+    "accountName": "Example.com",
+    "groups": {
+        "items": [
+            {
+                "groupName": "Example.com-1-1TJZH5",
+                "groupId": "grp_41445",
+                "contractIds": [
+                    "ctr_1-1TJZFW"
+                ]
+            },
+            {
+                "groupName": "Test Sub Group 1",
+                "groupId": "grp_41444",
+                "parentGroupId": "grp_41445",
+                "contractIds": [
+                    "ctr_1-1TJZFW"
+                ]
+            },
+            {
+                "groupName": "Test Sub Group 2",
+                "groupId": "grp_41443",
+                "parentGroupId": "grp_41445",
+                "contractIds": [
+                    "ctr_1-1TJZFW"
+                ]
+            }
+        ]
+    }
+}

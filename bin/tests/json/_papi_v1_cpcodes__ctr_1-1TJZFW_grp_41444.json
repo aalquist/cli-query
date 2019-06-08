@@ -1,0 +1,17 @@
+{
+    "accountId": "act_1-1TJZFB",
+    "contractId": "ctr_1-1TJZFW",
+    "groupId": "grp_41444",
+    "cpcodes": {
+        "items": [
+            {
+                "cpcodeId": "cpc_33191",
+                "cpcodeName": "SME WAA",
+                "createdDate": "2015-03-02T15:06:13Z",
+                "productIds": [
+                    "prd_Web_App_Accel"
+                ]
+            }
+        ]
+    }
+}

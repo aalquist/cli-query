@@ -1,0 +1,302 @@
+[
+    {
+        "id": "163842",
+        "status": "active",
+        "startDate": "2013-01-02",
+        "logSource": {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "/lds-api/v3/log-sources/cpcode-products/200957-1"
+                },
+                {
+                    "rel": "cpcode-products",
+                    "href": "/lds-api/v3/log-sources/cpcode-products"
+                },
+                {
+                    "rel": "log-sources",
+                    "href": "/lds-api/v3/log-sources"
+                }
+            ],
+            "type": "cpcode-products",
+            "id": "200957-1",
+            "cpCode": "200957 - MOCK CP CODE DESCR ",
+            "products": [
+                "HTTP Content Delivery"
+            ] 
+        },
+        "aggregationDetails": {
+            "type": "byLogArrival",
+            "deliveryFrequency": {
+                "id": "1",
+                "value": "Every 24 hours",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/delivery-frequencies/1"
+                    },
+                    {
+                        "rel": "deliveryFrequencies",
+                        "href": "/lds-api/v3/log-configuration-parameters/delivery-frequencies"
+                    }
+                ]
+            }
+        },
+        "contactDetails": {
+            "mailAddresses": [
+                "jjudge@akamai.com"
+            ],
+            "contact": {
+                "id": "1-C30O",
+                "value": ". Help-Desk - phone: 617.250.3900",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/contacts/1-C30O"
+                    },
+                    {
+                        "rel": "contacts",
+                        "href": "/lds-api/v3/log-configuration-parameters/contacts"
+                    }
+                ]
+            }
+        },
+        "deliveryDetails": {
+            "type": "ftp",
+            "machine": "akainsight.upload.akamai.com",
+            "login": "insightlds",
+            "directory": "/23567/logs/200957",
+            "password": ""
+        },
+        "encodingDetails": {
+            "encoding": {
+                "id": "3",
+                "value": "GZIP",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/encodings/3"
+                    },
+                    {
+                        "rel": "encodings",
+                        "href": "/lds-api/v3/log-configuration-parameters/encodings"
+                    }
+                ]
+            }
+        },
+        "logFormatDetails": {
+            "logIdentifier": "200957",
+            "logFormat": {
+                "id": "2",
+                "value": "combined",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/log-formats/2"
+                    },
+                    {
+                        "rel": "logFormats",
+                        "href": "/lds-api/v3/log-configuration-parameters/log-formats"
+                    }
+                ]
+            }
+        },
+        "messageSize": {
+            "id": "1",
+            "value": "50 MB (approx. 300 MB uncompressed logs)",
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "/lds-api/v3/log-configuration-parameters/message-sizes/1"
+                },
+                {
+                    "rel": "messageSizes",
+                    "href": "/lds-api/v3/log-configuration-parameters/message-sizes"
+                }
+            ]
+        },
+        "links": [
+            {
+                "rel": "self",
+                "href": "/lds-api/v3/log-configuration/163842"
+            },
+            {
+                "rel": "get-log-configurations-for-log-source",
+                "href": "/lds-api/v3/log-sources/cpcode-products/200957-1/log-configurations",
+                "title": "Get Log Configurations for the same log source"
+            },
+            {
+                "rel": "get-log-configurations-for-log-source-type",
+                "href": "/lds-api/v3/log-sources/cpcode-products/log-configurations",
+                "title": "Get Log Configurations for the same log source type"
+            },
+            {
+                "rel": "update-log-configuration",
+                "href": "/lds-api/v3/log-configuration/163842",
+                "method": "PUT",
+                "title": "Update Log Configuration"
+            },
+            {
+                "rel": "delete-log-configuration",
+                "href": "/lds-api/v3/log-configuration/163842",
+                "method": "DELETE",
+                "title": "Delete Log Configuration"
+            },
+            {
+                "rel": "suspend-log-configuration",
+                "href": "/lds-api/v3/log-configuration/163842/suspend",
+                "method": "POST",
+                "title": "Suspend Log Configuration"
+            }
+        ]
+    },
+    {
+        "id": "143296",
+        "status": "suspended",
+        "startDate": "2011-04-05",
+        "endDate": "2011-04-08",
+        "logSource": {
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "/lds-api/v3/log-sources/cpcode-products/104523-1"
+                },
+                {
+                    "rel": "cpcode-products",
+                    "href": "/lds-api/v3/log-sources/cpcode-products"
+                },
+                {
+                    "rel": "log-sources",
+                    "href": "/lds-api/v3/log-sources"
+                }
+            ],
+            "type": "cpcode-products",
+            "id": "104523-1",
+            "cpCode": "104523 - MOCK CP CODE DESCR ",
+            "products": [
+                "Web Application Accelerator"
+            ]
+        },
+        "aggregationDetails": {
+            "type": "byLogArrival",
+            "deliveryFrequency": {
+                "id": "7",
+                "value": "Every 1 hour",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/delivery-frequencies/7"
+                    },
+                    {
+                        "rel": "deliveryFrequencies",
+                        "href": "/lds-api/v3/log-configuration-parameters/delivery-frequencies"
+                    }
+                ]
+            }
+        },
+        "contactDetails": {
+            "mailAddresses": [
+                "jad@akamai.com"
+            ],
+            "contact": {
+                "id": "VC-GAKY",
+                "value": "Dmitriy Danilevsky - phone: 650.627.5222",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/contacts/VC-GAKY"
+                    },
+                    {
+                        "rel": "contacts",
+                        "href": "/lds-api/v3/log-configuration-parameters/contacts"
+                    }
+                ]
+            }
+        },
+        "deliveryDetails": {
+            "type": "email",
+            "emailAddress": "jad@akamai.com"
+        },
+        "encodingDetails": {
+            "encoding": {
+                "id": "1",
+                "value": "GZIP & UUENCODED",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/encodings/1"
+                    },
+                    {
+                        "rel": "encodings",
+                        "href": "/lds-api/v3/log-configuration-parameters/encodings"
+                    }
+                ]
+            }
+        },
+        "logFormatDetails": {
+            "logIdentifier": "edgetoken",
+            "logFormat": {
+                "id": "13",
+                "value": "W3C + Edge Tokenization",
+                "links": [
+                    {
+                        "rel": "self",
+                        "href": "/lds-api/v3/log-configuration-parameters/log-formats/13"
+                    },
+                    {
+                        "rel": "logFormats",
+                        "href": "/lds-api/v3/log-configuration-parameters/log-formats"
+                    }
+                ]
+            }
+        },
+        "messageSize": {
+            "id": "1",
+            "value": "50 MB (approx. 300 MB uncompressed logs)",
+            "links": [
+                {
+                    "rel": "self",
+                    "href": "/lds-api/v3/log-configuration-parameters/message-sizes/1"
+                },
+                {
+                    "rel": "messageSizes",
+                    "href": "/lds-api/v3/log-configuration-parameters/message-sizes"
+                }
+            ]
+        },
+        "links": [
+            {
+                "rel": "self",
+                "href": "/lds-api/v3/log-configuration/143296"
+            },
+            {
+                "rel": "get-log-configurations-for-log-source",
+                "href": "/lds-api/v3/log-sources/cpcode-products/104523-1/log-configurations",
+                "title": "Get Log Configurations for the same log source"
+            },
+            {
+                "rel": "get-log-configurations-for-log-source-type",
+                "href": "/lds-api/v3/log-sources/cpcode-products/log-configurations",
+                "title": "Get Log Configurations for the same log source type"
+            },
+            {
+                "rel": "update-log-configuration",
+                "href": "/lds-api/v3/log-configuration/143296",
+                "method": "PUT",
+                "title": "Update Log Configuration"
+            },
+            {
+                "rel": "delete-log-configuration",
+                "href": "/lds-api/v3/log-configuration/143296",
+                "method": "DELETE",
+                "title": "Delete Log Configuration"
+            },
+            {
+                "rel": "resume-log-configuration",
+                "href": "/lds-api/v3/log-configuration/143296/resume",
+                "method": "POST",
+                "title": "Resume Log Configuration"
+            }
+        ]
+    }
+]

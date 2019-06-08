@@ -1,0 +1,7 @@
+{
+    "CPCODE": "$.logSource.id", 
+    "Aggregation_Frequency": "$.aggregationDetails.deliveryFrequency.value", 
+    "Status": "$[?(@.status=\"active\")].status", 
+    "Encoding": "$.encodingDetails.encoding.value", 
+    "Format": "$.logFormatDetails.logFormat.value"
+}

@@ -1,0 +1,8 @@
+{
+    "ContractId" : "$.contractId",
+    "storageGroupName" : "$.storageGroupName",
+    "domainPrefix" : "$.domainPrefix",
+    "estimatedUsageGB" : "$.estimatedUsageGB",
+    "LastModified" : "$.lastModifiedBy",
+    "Cp_Codes" : "$.cpcodes..cpcodeId"
+}

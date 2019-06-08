@@ -1,0 +1,5 @@
+{
+    "groupId" : "$.groupId",
+    "contractIds" : "$.contractIds[0]",
+    "cpcodes" : "$.cpcodes..cpcodeId"
+}
