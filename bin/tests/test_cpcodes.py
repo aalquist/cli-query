@@ -54,11 +54,50 @@ class CPCODE_Test(unittest.TestCase):
 
         response.status_code = 200
         response.reset()
-        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/_papi_v1_groups.json".format(os.getcwd()) ) )
-        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/_papi_v1_cpcodes__ctr_1-1TJZFW_grp_41445.json".format(os.getcwd()) ) )
-        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/_papi_v1_cpcodes__ctr_1-1TJZFW_grp_41444.json".format(os.getcwd()) ) )
-        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/_papi_v1_cpcodes__ctr_1-1TJZFW_grp_41443.json".format(os.getcwd()) ) )
+        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_groups.json".format(os.getcwd()) ) )
+        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFW_grp_41445.json".format(os.getcwd()) ) )
+        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFW_grp_41444.json".format(os.getcwd()) ) )
+        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFW_grp_41443.json".format(os.getcwd()) ) )
+    
+    def loadTests2(self, response):
+
+        response.status_code = 200
+        response.reset()
+        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_groups.multiple_contracts.json".format(os.getcwd()) ) )
         
+        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFB_grp_440.json".format(os.getcwd()) ) )
+        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFC_grp_441.json".format(os.getcwd()) ) )
+        
+        
+        
+        
+
+    
+
+    @patch('requests.Session')
+    def testFetchGroupCPCODESWithContractIdFilter(self, mockSessionObj):
+
+        response = MockResponse()
+        self.loadTests2(response)
+
+        session = mockSessionObj()
+        session.get.return_value = response
+
+        edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
+
+        fetch = CPCODEFetch()
+        contractIds = ["ctr_1-1TJZFB"]
+        (code, json) = fetch.fetchGroupCPCODES(edgerc = edgeRc, section="default", account_key=None, debug=False, onlycontractIds=contractIds)
+
+        self.assertEqual(code, 200)
+        self.assertEqual(len(json), 2)
+
+        self.assertEqual(json[0]["cpcodes"][0]["cpcodeId"], "cpc_33190")
+        self.assertEqual(json[0]["cpcodes"][0]["cpcodeName"], "SME WAA")
+
+        self.assertEqual(json[1]["cpcodes"][0]["cpcodeId"], "cpc_33191")
+        self.assertEqual(json[1]["cpcodes"][0]["cpcodeName"], "SME WAA")
+
 
 
     @patch('requests.Session')

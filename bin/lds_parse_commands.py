@@ -215,7 +215,7 @@ def setupCommands(subparsers):
     
     create_sub_command(
         subparsers, "groupcpcodelist", "CPCODES assigned to groups",
-        optional_arguments=combineArgs(defaultQueryArgs, []),
+        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "only-contractIds", "help": "limit the query to specific contracts"} ]),
         required_arguments=None,
         actions=actions)
 

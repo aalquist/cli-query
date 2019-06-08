@@ -26,7 +26,7 @@ from bin.fetch import Fetch_Akamai_OPENAPI_Response
 class CPCODEFetch(Fetch_Akamai_OPENAPI_Response):
 
  
-    def fetchGroupCPCODES(self, *, edgerc, section, account_key, debug=False):
+    def fetchGroupCPCODES(self, *, edgerc, section, account_key, debug=False, onlycontractIds=None):
 
         factory = CredentialFactory()
         context = factory.load(edgerc, section, account_key)
@@ -39,8 +39,22 @@ class CPCODEFetch(Fetch_Akamai_OPENAPI_Response):
         if code in [200] and "groups" in json:
 
             json = json["groups"]["items"]
-            jobsize = len(json)
+            
             returnList = []
+
+            if onlycontractIds is not None and len(onlycontractIds) > 0:
+                for groupInJson in json:
+                    groupContracts = groupInJson["contractIds"]
+                    foundContract = len(list(filter( lambda x : x in onlycontractIds, groupContracts))) > 0
+                    
+                    if foundContract:
+                        returnList.append(groupInJson)
+            
+            if len(returnList) > 0 :
+                json = returnList
+            
+
+            jobsize = len(json)   
 
             count=1
             for j in json:
@@ -67,8 +81,11 @@ class CPCODEFetch(Fetch_Akamai_OPENAPI_Response):
         result = context.session.get(url)
         code, json = self.handleResponse(result, url, debug)
 
-        if contractId != json["contractId"] or groupId != json["groupId"]:
-            raise Exception("unexpected result! expecting contractId={} but got {}. Expecting groupId={} but got {}".format(contractId,json["contractId"],groupId, json["groupId"] ))
+        if contractId != json["contractId"]:
+            raise Exception("Unexpected API response! Expecting contractId={} but got {}.".format(contractId,json["contractId"] ))
+
+        elif groupId != json["groupId"]:
+            raise Exception("Unexpected API response! Expecting groupId={} but got {}".format(groupId, json["groupId"] ))
 
         result = []
 

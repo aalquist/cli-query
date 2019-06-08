@@ -1,0 +1,23 @@
+{
+    "accountId": "act_1-1TJZFB",
+    "accountName": "Example.com",
+    "groups": {
+        "items": [
+            {
+                "groupName": "Example.com-1-1TJZH5",
+                "groupId": "grp_440",
+                "contractIds": [
+                    "ctr_0-1TJZFB"
+                ]
+            },
+            {
+                "groupName": "MoreExample.com-1-1TJZHB",
+                "groupId": "grp_441",
+                "contractIds": [
+                    "ctr_0-1TJZFC"
+                ]
+            }
+            
+        ]
+    }
+}
