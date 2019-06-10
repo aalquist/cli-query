@@ -35,6 +35,13 @@ class ParseCmdTest(unittest.TestCase):
         #print("\n###testing args: {}".format(args))
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.assertTrue(len(result) > 0 )
+        self.assertIn("template", result[0])
+
+        args = [ "help", "ldslist"]
+        #print("\n###testing args: {}".format(args))
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        self.assertTrue(len(result) > 0 )
+        self.assertIn("ldslist", result[0])
 
         args = [ "help", "not_a_command"]
         #print("\n###testing args: {}".format(args))
@@ -64,7 +71,7 @@ class ParseCmdTest(unittest.TestCase):
         outerr = StringIO()
         sys.stderr = outerr
         
-        fun(value)
+        retvalue = fun(value)
 
         output = list(out.getvalue().split("\n"))
         erroutput = list(outerr.getvalue().split("\n"))

@@ -42,6 +42,7 @@ def get_prog_name():
 
 def create_sub_command( subparsers, name, help, *, optional_arguments=None, required_arguments=None, actions=None):
 
+    actionname = name
     action = subparsers.add_parser(name=name, help=help, add_help=False)
 
     if required_arguments:
@@ -98,7 +99,7 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
         help="Account Switch Key",
         default="")
 
-    actions[name] = action
+    actions[actionname] = action
 
 def main(mainArgs=None):
 
@@ -156,7 +157,8 @@ def execute(mainArgs, parser, actions):
             helparg = args.args[0]
             
             if helparg in actions and actions[helparg]:
-                actions[helparg].print_help()
+                parser = actions[helparg]
+                parser.print_help()
             else:
                 parser.print_help(sys.stderr)
                 return 1
