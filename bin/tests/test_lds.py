@@ -38,13 +38,24 @@ class MockResponse:
 
 class Lds_Test(unittest.TestCase):
 
+    def testCPCodeNameParsing(self):
+
+        fetch = LdsFetch()
+        value = fetch.parseCPCODENameForCodeOnly("12322 - Somename")
+        self.assertEqual(value,"12322")
+
+        value = fetch.parseCPCODENameForCodeOnly("missing - Somename")
+        self.assertIsNone(value)
+
     @patch('requests.Session')
     def testMainBootStrap(self, mockSessionObj):
 
         response = MockResponse()
         response.status_code = 200
-        response.jsonObj = self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) )
 
+        fetch = LdsFetch()
+        response.jsonObj = fetch.adjustResponseJSON(self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) ))
+        
         session = mockSessionObj()
         session.get.return_value = response
 
@@ -93,7 +104,10 @@ class Lds_Test(unittest.TestCase):
 
         response = MockResponse()
         response.status_code = 200
-        response.jsonObj = self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) )
+        
+        fetch = LdsFetch()
+        response.jsonObj = fetch.adjustResponseJSON(self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) ))
+        
 
         session = mockSessionObj()
         session.get.return_value = response
@@ -124,7 +138,7 @@ class Lds_Test(unittest.TestCase):
             self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
             
 
-            self.assertEqual(302, len(finaloutput))
+            self.assertEqual(304, len(finaloutput))
             
 
         finally:
@@ -172,18 +186,12 @@ class Lds_Test(unittest.TestCase):
             
             sys.stdout = saved_stdout
             
-            self.assertIn("200957-1", line)
+            self.assertIn("200957", line)
             self.assertIn("Every 24 hours", line)
             self.assertIn("active", line)
             self.assertIn("GZIP", line)
             
-            line = finaloutput[2]
-            self.assertIn("104523-1", line)
-            self.assertIn("Every 1 hour", line)
-            self.assertIn("suspended", line)
-            self.assertIn("GZIP & UUENCODED", line)
-
-            self.assertEqual(3, len(finaloutput))
+            self.assertEqual(2, len(finaloutput))
             
 
         finally:
@@ -199,7 +207,11 @@ class Lds_Test(unittest.TestCase):
 
         response = MockResponse()
         response.status_code = 200
-        response.jsonObj = self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) )
+
+        fetch = LdsFetch()
+        
+        response.jsonObj = fetch.adjustResponseJSON(self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) ))
+
 
         session = mockSessionObj()
         session.get.return_value = response
@@ -217,6 +229,9 @@ class Lds_Test(unittest.TestCase):
 
         lds = QueryResult("ldslist")
         jsonObj = self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) )
+
+        fetch = LdsFetch()
+        jsonObj = fetch.adjustResponseJSON(jsonObj)
 
         result = lds.buildandParseExpression(jsonObj, "$[*].id")
         self.assertEqual(len(result ), 2)
@@ -353,13 +368,17 @@ class Lds_Test(unittest.TestCase):
         lds = QueryResult("ldslist")
 
         jsonObj = self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) )
+        
+        fetch = LdsFetch()
+        jsonObj = fetch.adjustResponseJSON(jsonObj)
+
         result = lds.parseCommandDefault(jsonObj)
         
-        self.assertEqual(len(result ), 3)
-        self.assertEqual(len(result[0] ), 4)
+        self.assertEqual(len(result ), 2)
+        self.assertEqual(len(result[0] ), 5)
 
         r = result[0]
-        self.assertEqual(len(r ), 4)
+        self.assertEqual(len(r ), 5)
         dataset = ["CPCODE", "Aggregation_Frequency", "Status", "Encoding"]
         self.assertIn(r[0],dataset)
         self.assertIn(r[1],dataset)
@@ -367,20 +386,14 @@ class Lds_Test(unittest.TestCase):
         self.assertIn(r[3],dataset)
         
         r = result[1]
-        self.assertEqual(len(r ), 4)
-        dataset = ["200957-1", "Every 24 hours", "GZIP", "active"]
+        self.assertEqual(len(r ), 5)
+        dataset = ["200957", "Every 24 hours", "GZIP", "active"]
         self.assertIn(r[0],dataset)
         self.assertIn(r[1],dataset)
         self.assertIn(r[2],dataset)
         self.assertIn(r[3],dataset)
 
-        r = result[2] 
-        self.assertEqual(len(r ), 4)
-        dataset = ["104523-1", "Every 1 hour", "GZIP & UUENCODED", "suspended"]
-        self.assertIn(r[0],dataset)
-        self.assertIn(r[1],dataset)
-        self.assertIn(r[2],dataset)
-        self.assertIn(r[3],dataset)
+
         
 
     def testNetStorageParseCommandDefault(self):

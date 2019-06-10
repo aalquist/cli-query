@@ -1,0 +1,6 @@
+{
+    "CPCODE" : "$.logSource.cpCodeNumber",
+    "Aggregation_Frequency" : "$.aggregationDetails.deliveryFrequency.value",
+    "Status" : "$.status",
+    "Encoding" : "$.encodingDetails.encoding.value"
+}

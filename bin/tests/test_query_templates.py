@@ -101,7 +101,7 @@ class Template_Test(unittest.TestCase):
             
             self.assertIn("default.json", jsondict)
             self.assertIn("active-gpg.json", jsondict)
-            self.assertIn("active.json", jsondict)
+            self.assertIn("all-default.json", jsondict)
             
 
         finally:
@@ -141,12 +141,10 @@ class Template_Test(unittest.TestCase):
             self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
             
             jsondict = json.loads(out.getvalue())
-            expected = self.getJSONFromFile( "{}/bin/queries/ldslist/active.json".format(os.getcwd()) )
-            
-            self.assertEqual( len(jsondict), len(expected) )
 
             for k in jsondict:
-                self.assertEqual(jsondict[k], expected[k])
+                filename = "{}/bin/queries/ldslist/{}".format(os.getcwd(),k)
+                self.assertTrue(  os.path.exists(filename) and os.path.isfile(filename))
 
             args = [
                 "template",

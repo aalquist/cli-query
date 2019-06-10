@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import re
 
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
@@ -19,6 +20,24 @@ from bin.fetch import Fetch_Akamai_OPENAPI_Response
 
 class LdsFetch(Fetch_Akamai_OPENAPI_Response):
 
+    def parseCPCODENameForCodeOnly(self, name):
+
+        regexFound = re.search(r'(\d+)\s.*', name, flags=0)
+
+        if regexFound is not None:
+            group = regexFound.group(1)
+            return group
+        else:
+            return None
+
+    def adjustResponseJSON(self, json):
+
+        for j in json:
+            if "logSource" in j and "cpCode" in j["logSource"] :
+                cpCodeNumber = self.parseCPCODENameForCodeOnly(j["logSource"]["cpCode"])
+                j["logSource"]["cpCodeNumber"] = cpCodeNumber
+        
+        return json
 
     def fetchCPCodeProducts(self, *, edgerc, section, account_key, debug=False):
 
@@ -28,7 +47,11 @@ class LdsFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.buildUrl("https://{}/lds-api/v3/log-sources/cpcode-products/log-configurations", context)
         
         result = context.session.get(url)
-        return self.handleResponse(result, url, debug)
+
+        code, json = self.handleResponse(result, url, debug)
+        json = self.adjustResponseJSON(json)
+        
+        return (code, json)
         
 
     

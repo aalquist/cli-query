@@ -1,5 +1,5 @@
 {
-    "CPCODE": "$.logSource.id", 
+    "CPCODE": "$.logSource.cpCodeNumber", 
     "Aggregation_Frequency": "$.aggregationDetails.deliveryFrequency.value", 
     "Status": "$[?(@.status=\"active\")].status", 
     "Encoding": "$.encodingDetails.encoding[?(@.value=\"GPG Encrypted\")].value", 
