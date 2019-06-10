@@ -64,67 +64,93 @@ class CPCODE_Test(unittest.TestCase):
         response.status_code = 200
         response.reset()
         response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_groups.multiple_contracts.json".format(os.getcwd()) ) )
-        
-        response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFB_grp_440.json".format(os.getcwd()) ) )
         response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFC_grp_441.json".format(os.getcwd()) ) )
         
-        
-        
-        
-
-    
 
     @patch('requests.Session')
     def testFetchGroupCPCODESWithContractIdFilter(self, mockSessionObj):
 
-        response = MockResponse()
-        self.loadTests2(response)
+        saved_stdout = sys.stdout
+        saved_stderr = sys.stderr
 
-        session = mockSessionObj()
-        session.get.return_value = response
+        try:
 
-        edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
+            out = StringIO()
+            sys.stdout = out
 
-        fetch = CPCODEFetch()
-        contractIds = ["ctr_1-1TJZFB"]
-        (code, json) = fetch.fetchGroupCPCODES(edgerc = edgeRc, section="default", account_key=None, debug=False, onlycontractIds=contractIds)
+            errout = StringIO()
+            sys.stderr = errout
 
-        self.assertEqual(code, 200)
-        self.assertEqual(len(json), 2)
+            response = MockResponse()
+            self.loadTests2(response)
 
-        self.assertEqual(json[0]["cpcodes"][0]["cpcodeId"], "cpc_33190")
-        self.assertEqual(json[0]["cpcodes"][0]["cpcodeName"], "SME WAA")
+            session = mockSessionObj()
+            session.get.return_value = response
 
-        self.assertEqual(json[1]["cpcodes"][0]["cpcodeId"], "cpc_33191")
-        self.assertEqual(json[1]["cpcodes"][0]["cpcodeName"], "SME WAA")
+            edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
 
+            fetch = CPCODEFetch()
+            contractIds = ["ctr_0-1TJZFC"]
+            (code, json) = fetch.fetchGroupCPCODES(edgerc = edgeRc, section="default", account_key=None, debug=False, onlycontractIds=contractIds)
+
+            self.assertEqual(code, 200)
+            self.assertEqual(len(json), 1)
+            self.assertEqual(len(json[0]), 4)
+            self.assertTrue( "cpcodes" in json[0] )
+            self.assertTrue( "cpcodeId" in json[0]["cpcodes"][0] )
+            self.assertTrue( "cpcodeName" in json[0]["cpcodes"][0] )
+            
+            self.assertEqual(json[0]["cpcodes"][0]["cpcodeId"], "cpc_33191")
+            self.assertEqual(json[0]["cpcodes"][0]["cpcodeName"], "SME WAA")
+       
+        finally:
+
+            sys.stdout = saved_stdout
+            sys.stderr = saved_stderr     
 
 
     @patch('requests.Session')
     def testFetchGroupCPCODES(self, mockSessionObj):
 
-        response = MockResponse()
-        self.loadTests(response)
+        saved_stdout = sys.stdout
+        saved_stderr = sys.stderr
 
-        session = mockSessionObj()
-        session.get.return_value = response
+        try:
 
-        edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
+            out = StringIO()
+            sys.stdout = out
 
-        fetch = CPCODEFetch()
-        (code, json) = fetch.fetchGroupCPCODES(edgerc = edgeRc, section="default", account_key=None, debug=False)
+            errout = StringIO()
+            sys.stderr = errout
 
-        self.assertEqual(code, 200)
-        self.assertEqual(len(json), 3)
+            response = MockResponse()
+            self.loadTests(response)
 
-        self.assertEqual(json[0]["cpcodes"][0]["cpcodeId"], "cpc_33192")
-        self.assertEqual(json[0]["cpcodes"][0]["cpcodeName"], "SME WAA")
+            session = mockSessionObj()
+            session.get.return_value = response
 
-        self.assertEqual(json[1]["cpcodes"][0]["cpcodeId"], "cpc_33191")
-        self.assertEqual(json[1]["cpcodes"][0]["cpcodeName"], "SME WAA")
+            edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
 
-        self.assertEqual(json[2]["cpcodes"][0]["cpcodeId"], "cpc_33190")
-        self.assertEqual(json[2]["cpcodes"][0]["cpcodeName"], "SME WAA")
+            fetch = CPCODEFetch()
+            (code, json) = fetch.fetchGroupCPCODES(edgerc = edgeRc, section="default", account_key=None, debug=False)
+
+            self.assertEqual(code, 200)
+            self.assertEqual(len(json), 3)
+
+            self.assertEqual(json[0]["cpcodes"][0]["cpcodeId"], "cpc_33192")
+            self.assertEqual(json[0]["cpcodes"][0]["cpcodeName"], "SME WAA")
+
+            self.assertEqual(json[1]["cpcodes"][0]["cpcodeId"], "cpc_33191")
+            self.assertEqual(json[1]["cpcodes"][0]["cpcodeName"], "SME WAA")
+
+            self.assertEqual(json[2]["cpcodes"][0]["cpcodeId"], "cpc_33190")
+            self.assertEqual(json[2]["cpcodes"][0]["cpcodeName"], "SME WAA")
+
+        finally:
+
+            sys.stdout = saved_stdout
+            sys.stderr = saved_stderr     
+
 
         self.loadTests(response)
 
@@ -133,10 +159,9 @@ class CPCODE_Test(unittest.TestCase):
                 "default",
                  "--edgerc",
                 edgeRc
-                
                 ]
 
-        (_, out) = self._testMainArgsAndGetResponseStdOutArray(args)
+        (_, out, _) = self._testMainArgsAndGetResponseStdOutArray(args)
 
         self.loadTests(response)
 
@@ -148,22 +173,23 @@ class CPCODE_Test(unittest.TestCase):
                 "--show-json"
                 ]
 
-        (_, _) = self._testMainArgsAndGetResponseStdOutArray(args)
+        (_, _, _) = self._testMainArgsAndGetResponseStdOutArray(args)
         json = out.getvalue()
         
-
-       
-        pass
-
 
     def _testMainArgsAndGetResponseStdOutArray(self, args):
 
         saved_stdout = sys.stdout
+        saved_stderr = sys.stderr
+
         finaloutput = None
 
         try:
             out = StringIO()
             sys.stdout = out
+
+            errout = StringIO()
+            sys.stderr = errout
             
             self.assertEqual(main(args), 0, "command args {} should return successcode, but returned:\n+++++\n{}\n+++++\n".format(args,out.getvalue()) )
 
@@ -173,14 +199,13 @@ class CPCODE_Test(unittest.TestCase):
            
             self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
             
-            sys.stdout = saved_stdout
-
 
         finally:
-            pass
+            
             sys.stdout = saved_stdout
+            sys.stderr = saved_stderr
 
-        return (output, out)   
+        return (output, out, errout)   
     
     
     def getJSONFromFile(self, jsonPath):

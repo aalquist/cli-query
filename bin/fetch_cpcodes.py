@@ -40,7 +40,7 @@ class CPCODEFetch(Fetch_Akamai_OPENAPI_Response):
 
             json = json["groups"]["items"]
             
-            returnList = []
+            filteredGroups = []
 
             if onlycontractIds is not None and len(onlycontractIds) > 0:
                 for groupInJson in json:
@@ -48,15 +48,16 @@ class CPCODEFetch(Fetch_Akamai_OPENAPI_Response):
                     foundContract = len(list(filter( lambda x : x in onlycontractIds, groupContracts))) > 0
                     
                     if foundContract:
-                        returnList.append(groupInJson)
+                        filteredGroups.append(groupInJson)
             
-            if len(returnList) > 0 :
-                json = returnList
+                if len(filteredGroups) > 0 :
+                    json = filteredGroups
             
 
             jobsize = len(json)   
 
             count=1
+            returnList = []
             for j in json:
 
                 returnList.append( self.getGroupCPCODES(j, context, jobsize, count, debug) )

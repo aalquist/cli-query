@@ -62,7 +62,7 @@ class Template_Test(unittest.TestCase):
 
             self.assertIn("ldslist", jsondict)
             self.assertIn("netstoragelist", jsondict)
-            self.assertIn("alerts", jsondict)
+            
             
 
         finally:
@@ -174,7 +174,7 @@ class Template_Test(unittest.TestCase):
 
             self.assertIn("ldslist", jsondict)
             self.assertIn("netstoragelist", jsondict)
-            self.assertIn("alerts", jsondict)
+           
             
            
             
