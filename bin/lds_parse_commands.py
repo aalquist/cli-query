@@ -67,6 +67,12 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
                     required=False,
                     **arg,
                     action="store_true")
+            elif name.startswith("only-") :
+                optional.add_argument("--" + name,
+                                      required=False,
+                                      nargs='+',
+                                      **arg)
+
             else:
                 optional.add_argument("--" + name,
                                       required=False,
@@ -285,7 +291,10 @@ def groupcpcodelist(args):
     fetch = CPCODEFetch()
     queryresult = QueryResult("groupcpcodelist")
 
-    (_ , jsonObj) = fetch.fetchGroupCPCODES(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
+    if args.only_contractIds is not None and len(args.only_contractIds) > 0 :
+        (_ , jsonObj) = fetch.fetchGroupCPCODES(edgerc = args.edgerc, section=args.section, account_key=args.account_key, onlycontractIds=args.only_contractIds, debug=args.debug, )  
+    else:
+        (_ , jsonObj) = fetch.fetchGroupCPCODES(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
     return handleresponse(args, jsonObj, queryresult)
 
@@ -311,7 +320,7 @@ def handleresponse(args, jsonObj, queryresult):
         else:
             
             parsed = queryresult.parseCommandDefault(jsonObj)
-
+            pass
     
         for line in parsed:
             print( json.dumps(line) )

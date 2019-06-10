@@ -152,6 +152,21 @@ class CPCODE_Test(unittest.TestCase):
             sys.stderr = saved_stderr     
 
 
+        self.loadTests2(response)
+
+        args = [ "groupcpcodelist",
+                "--section",
+                "default",
+                 "--edgerc",
+                edgeRc,
+                "--show-json",
+                "--only-contractIds",
+                "ctr_0-1TJZFC"
+
+                ]
+
+        (_, _, _, _) = self._testMainArgsAndGetResponseStdOutArray(args,1)
+
         self.loadTests(response)
 
         args = [ "groupcpcodelist",
@@ -161,7 +176,7 @@ class CPCODE_Test(unittest.TestCase):
                 edgeRc
                 ]
 
-        (_, out, _) = self._testMainArgsAndGetResponseStdOutArray(args)
+        (_, _, _, _) = self._testMainArgsAndGetResponseStdOutArray(args,3)
 
         self.loadTests(response)
 
@@ -173,11 +188,12 @@ class CPCODE_Test(unittest.TestCase):
                 "--show-json"
                 ]
 
-        (_, _, _) = self._testMainArgsAndGetResponseStdOutArray(args)
-        json = out.getvalue()
+        (_, _, _, _) = self._testMainArgsAndGetResponseStdOutArray(args,3)
+
+      
         
 
-    def _testMainArgsAndGetResponseStdOutArray(self, args):
+    def _testMainArgsAndGetResponseStdOutArray(self, args, expectedStatusMsgs = 0):
 
         saved_stdout = sys.stdout
         saved_stderr = sys.stderr
@@ -191,21 +207,33 @@ class CPCODE_Test(unittest.TestCase):
             errout = StringIO()
             sys.stderr = errout
             
-            self.assertEqual(main(args), 0, "command args {} should return successcode, but returned:\n+++++\n{}\n+++++\n".format(args,out.getvalue()) )
+            mainresult = main(args)
+            self.assertEqual(mainresult, 0, "command args {} should return successcode, but returned:\n+++++\n{}\n+++++\n".format(args,out.getvalue()) )
 
             output = list(out.getvalue().split("\n"))
             finaloutput = list(filter(lambda line: line != '', output))
 
+            erroutput = list(errout.getvalue().split("\n"))
+            finalerroutput = list(filter(lambda line: line != '', erroutput))
+
            
             self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
-            
+            self.assertEquals(len(finalerroutput), expectedStatusMsgs, "for args {} the std err message line count should be {} but got:\n {}".format(args,expectedStatusMsgs,erroutput) )
+
+        except Exception as e:
+            sys.stdout = saved_stdout
+            sys.stderr = saved_stderr
+
+            print(out.getvalue, sys.stdout)
+            print(errout.getvalue, sys.stderr)
+            raise e
 
         finally:
             
             sys.stdout = saved_stdout
             sys.stderr = saved_stderr
 
-        return (output, out, errout)   
+        return (output, finalerroutput, out, errout)   
     
     
     def getJSONFromFile(self, jsonPath):
