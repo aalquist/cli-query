@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import sys
+import re
 
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
@@ -25,6 +26,15 @@ from bin.fetch import Fetch_Akamai_OPENAPI_Response
 
 class CPCODEFetch(Fetch_Akamai_OPENAPI_Response):
 
+    def normalizeCode(self, name):
+
+        regexFound = re.search(r'^cpc_(\d+)$', name, flags=0)
+
+        if regexFound is not None:
+            group = regexFound.group(1)
+            return group
+        else:
+            return None
  
     def fetchGroupCPCODES(self, *, edgerc, section, account_key, debug=False, onlycontractIds=None):
 
@@ -95,9 +105,14 @@ class CPCODEFetch(Fetch_Akamai_OPENAPI_Response):
             cpcodesjson = json["cpcodes"]["items"]
             for jcode in cpcodesjson:
 
+                
+
                 cpcode = {}
                 for key in jcode.keys():
                     cpcode[key] = jcode[key]
+
+                value = self.normalizeCode(jcode["cpcodeId"])
+                cpcode["cpCodeNumber"] = value
                     
                 result.append(cpcode)
             
