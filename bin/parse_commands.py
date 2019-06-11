@@ -87,7 +87,7 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
     optional.add_argument(
         "--section",
         help="Section of the credentials file [$AKAMAI_EDGERC_SECTION]",
-        default="lds")
+        default="default")
 
     optional.add_argument(
         "--debug",
