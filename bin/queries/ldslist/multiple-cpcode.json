@@ -1,0 +1,6 @@
+{
+    "CPCODE": "$.logSource.cpCodeNumber", 
+    "CPCODE_Filter": "$.logSource[?(@.cpCodeNumber=\"123\"),?(@.cpCodeNumber=\"456\")].cpCodeNumber",
+    "Status": "$[?(@.status=\"active\"),?(@.status=\"suspended\")].status"
+}
+
