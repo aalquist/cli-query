@@ -24,7 +24,7 @@ from bin.fetch_cpcodes import CPCODEFetch
 from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
-from bin.lds_parse_commands import main 
+from bin.parse_commands import main 
 
 class MockResponse:
 

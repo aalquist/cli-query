@@ -20,7 +20,7 @@ import sys
 import json
 from io import StringIO
 
-from bin.lds_parse_commands import main 
+from bin.parse_commands import main 
 
 class ParseCmdTest(unittest.TestCase):
 

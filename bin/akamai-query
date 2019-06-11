@@ -33,7 +33,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 PACKAGE_PARENT = '..'
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from lds_parse_commands import main 
+from parse_commands import main 
 
 if __name__ == '__main__':
     

@@ -16,7 +16,7 @@ import unittest
 import collections
 import os
 import sys
-from bin.lds_parse_commands import handleresponse 
+from bin.parse_commands import handleresponse 
 from bin.query_result import QueryResult
 
 class Args:
