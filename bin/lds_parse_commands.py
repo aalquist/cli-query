@@ -318,7 +318,7 @@ def handleresponse(args, jsonObj, queryresult):
 
         elif args.template is not None :
 
-            templateJson = queryresult.getQuerybyName(args.template)
+            templateJson = queryresult.getQuerybyName(args.template, throwErrorIfNotFound=True)
             (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson)
             
         else:

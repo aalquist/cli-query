@@ -60,12 +60,14 @@ class QueryResult():
             return data
 
 
-    def getQuerybyName(self, argname):
+    def getQuerybyName(self, argname, throwErrorIfNotFound=False):
 
         validNames = self.listQuery()
 
         if argname in validNames:
             obj = self.getNonDefaultQuery(argname)
+        elif throwErrorIfNotFound:
+            raise Exception("query name {} not found".format(argname))
         else: 
             obj = validNames
         
