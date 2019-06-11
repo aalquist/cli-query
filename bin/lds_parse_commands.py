@@ -302,6 +302,8 @@ def groupcpcodelist(args):
 
 def handleresponse(args, jsonObj, queryresult):
 
+    notJSONOutput = False
+
     if not args.show_json:
 
         if args.use_stdin or args.file is not None :
@@ -312,20 +314,23 @@ def handleresponse(args, jsonObj, queryresult):
                 inputString = getArgFromFile(args.file)
 
             templateJson = queryresult.loadJson(inputString)
-            parsed = queryresult.parseCommandGeneric(jsonObj , templateJson)
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson)
 
         elif args.template is not None :
 
             templateJson = queryresult.getQuerybyName(args.template)
-            parsed = queryresult.parseCommandGeneric(jsonObj, templateJson)
-
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson)
+            
         else:
             
             parsed = queryresult.parseCommandDefault(jsonObj)
-            pass
-    
+
         for line in parsed:
-            print( json.dumps(line) )
+
+            if notJSONOutput:
+                print( line )
+            else:
+                print( json.dumps(line) )
 
     else: 
         print( json.dumps( jsonObj, indent=1 ) )
@@ -333,6 +338,24 @@ def handleresponse(args, jsonObj, queryresult):
 
     return 0   
 
+def flatten(queryresult, jsonObj, templateJson):
+
+    notJSONOutput = False
+    
+
+    if len(templateJson) == 1 : 
+        notJSONOutput = True
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, JoinValues=False, ReturnHeader=False)
+        
+        flattenedParsed = []
+        for p in parsed:
+            flattenedParsed.extend(p)
+        parsed = flattenedParsed
+
+    else:
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson)
+
+    return (notJSONOutput, parsed)
 
 def argFromInput(arg):
 

@@ -22,7 +22,7 @@ class LdsFetch(Fetch_Akamai_OPENAPI_Response):
 
     def parseCPCODENameForCodeOnly(self, name):
 
-        regexFound = re.search(r'(\d+)\s.*', name, flags=0)
+        regexFound = re.search(r'^(\d+)\s.*', name, flags=0)
 
         if regexFound is not None:
             group = regexFound.group(1)

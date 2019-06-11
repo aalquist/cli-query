@@ -108,6 +108,12 @@ class CPCODE_Test(unittest.TestCase):
             sys.stdout = saved_stdout
             sys.stderr = saved_stderr     
 
+    def testNormalizeCpCODES(self):
+
+        fetch = CPCODEFetch()
+        value = fetch.normalizeCode("cpc_123456")
+        self.assertEqual(value,"123456")
+
 
     @patch('requests.Session')
     def testFetchGroupCPCODES(self, mockSessionObj):

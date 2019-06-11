@@ -68,13 +68,13 @@ class Lds_Test(unittest.TestCase):
                 edgeRc,
                 "--debug",
                 "--template",
-                "default.json"
+                "all-default.json"
                 ]
 
-        self._testParseLDSCommandCombo(args)
+        self._testParseLDSCommandCombo(args,3)
 
         templatename="ldslist"
-        file = "{}/bin/queries/{}/default.json".format(os.getcwd(),templatename) 
+        file = "{}/bin/queries/{}/all-default.json".format(os.getcwd(),templatename) 
 
         args = [ templatename,
                 "--section",
@@ -86,18 +86,20 @@ class Lds_Test(unittest.TestCase):
                 file
                 ]
 
-        self._testParseLDSCommandCombo(args)
+        self._testParseLDSCommandCombo(args,3)
 
         args = [ templatename,
                 "--section",
                 "default",
-                 "--edgerc",
+                "--edgerc",
                 edgeRc,
+                "--template",
+                "all-default.json",
                 "--debug"
                 
                 ]
 
-        self._testParseLDSCommandCombo(args)
+        self._testParseLDSCommandCombo(args,3)
 
     @patch('requests.Session')
     def testJsonResponse(self, mockSessionObj):
@@ -148,7 +150,7 @@ class Lds_Test(unittest.TestCase):
     
    
 
-    def _testParseLDSCommandCombo(self, args):
+    def _testParseLDSCommandCombo(self, args, expectedLines=2):
 
         saved_stdout = sys.stdout
         saved_sterr = sys.stdout
@@ -191,7 +193,7 @@ class Lds_Test(unittest.TestCase):
             self.assertIn("active", line)
             self.assertIn("GZIP", line)
             
-            self.assertEqual(2, len(finaloutput))
+            self.assertEqual(expectedLines, len(finaloutput))
             
 
         finally:
