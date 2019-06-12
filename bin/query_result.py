@@ -15,6 +15,8 @@
 import sys
 import os
 import json
+import re
+
 from collections import OrderedDict
 
 #seems to be the most reliable jsonpath parser https://github.com/pacifica/python-jsonpath2 
@@ -185,4 +187,49 @@ class QueryResult():
                     returnList.append(matchedArray)
 
         return returnList
+
+    def extractAndReplaceCriteria(self, value, args=None):
+
+        regexFound = re.search(r'(^.*)([#]JSONPATHCRITERIA(\.[^]]+)[#])(.*$)', value, flags=0)
+
+        if regexFound is not None and args is not None and len(args) > 0:
+            prefix = regexFound.group(1)
+            criteriaName = regexFound.group(3)
+            postfix = regexFound.group(4)
+
+            jsonPathCriteria = []
+            for a in args:
+                jsonPathCriteria.append("?(@{}=\"{}\")".format(criteriaName, a))
+
+            modified = "{}{}{}".format(prefix,",".join(jsonPathCriteria),postfix)
+            return modified
+
+        else:
+            return value
+
+    def preprocessTemplate(self, templateDictObj, args = None):
+        
+        for templateKey in templateDictObj:
+            value = templateDictObj[templateKey]
+            value = self.extractAndReplaceCriteria(value, args)
+            templateDictObj[templateKey] = value
+
+        return templateDictObj
+
+    def loadTemplate(self, argtype, get, templateArgs = None):
+
+        queryType = QueryResult(argtype)
+
+        if get is None:
+            obj = queryType.listQuery()
+        else:
+
+            obj = queryType.getQuerybyName(get)
+
+            if templateArgs is not None and len(templateArgs) > 0:
+                obj = self.preprocessTemplate(obj, templateArgs)    
+
+            
+
+        return obj
 

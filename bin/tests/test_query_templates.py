@@ -16,19 +16,100 @@ import unittest
 import os
 import json
 import sys
+import re
 from io import StringIO
 
 
 from bin.query_result import QueryResult
 from bin.fetch_lds import LdsFetch
-from bin.parse_commands import main 
+from bin.parse_commands import main
+
+from bin.parse_commands import template
+
 
 from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
-
+class Args:
+    def __init__(self, show_json=False, type=None, use_stdin=False, file=None, template=None, arg_list=None, args_use_stdin=False, get=None):
+        self.show_json=show_json
+        self.use_stdin=use_stdin
+        self.type=type
+        self.file = file
+        self.template = template
+        self.arg_list = arg_list
+        self.args_use_stdin = args_use_stdin
+        self.get = get
 
 class Template_Test(unittest.TestCase):
+
+    #getArgFromSTDIN
+    @patch('bin.parse_commands.getArgFromSTDIN')
+    def testTemplate(self, parseCommands):
+        #--type ldslist --get cpcode-args.json --arg-list 123 456 --args-use-stdin
+        args = Args(type="ldslist", get="cpcode-args.json", arg_list=["123", "456"], args_use_stdin=True)
+
+        parseCommands.return_value = "789"
+
+        try:
+            saved_stdout = sys.stdout
+            saved_stderr = sys.stderr
+
+            out = StringIO()
+            sys.stdout = out
+            
+            outerr = StringIO()
+            sys.stderr = outerr
+
+            result = template(args)
+
+            outString = out.getvalue()
+            jsonDict = json.loads(outString)
+            
+            self.assertIn("CPCODE", jsonDict)
+
+            self.assertIn("123", jsonDict["CPCODE"] )
+            self.assertIn("456", jsonDict["CPCODE"] )
+            self.assertIn("789", jsonDict["CPCODE"] )
+
+            self.assertIn("Status", jsonDict)
+            self.assertEqual(len(jsonDict), 2)
+
+            errString = outerr.getvalue()
+            self.assertEqual("",errString)
+            self.assertEqual(0,result)
+
+
+        finally:
+            
+            sys.stdout = saved_stdout
+            sys.stderr = saved_stderr
+
+        
+
+    def testjSONPaths(self):
+
+        
+        template = QueryResult()
+
+        jsonConfiguration = "$.logSource[#JSONPATHCRITERIA.cpCodeNumber#].cpCodeNumber"
+
+        
+        args = ["123", "456"]
+        jsonPathGoal = "$.logSource[?(@.cpCodeNumber=\"123\"),?(@.cpCodeNumber=\"456\")].cpCodeNumber"
+        result = template.extractAndReplaceCriteria(jsonConfiguration, args)
+        self.assertEqual(jsonPathGoal, result)
+
+        
+        args = ["123"]
+        jsonPathGoal = "$.logSource[?(@.cpCodeNumber=\"123\")].cpCodeNumber"
+        result = template.extractAndReplaceCriteria(jsonConfiguration, args)
+        self.assertEqual(jsonPathGoal, result)
+
+        args = ["123"]
+        jsonPathGoal = "$.logSource.cpCodeNumber"
+        result = template.extractAndReplaceCriteria("$.logSource.cpCodeNumber", args)
+        self.assertEqual(jsonPathGoal, result)
 
     
     def testTemplateTypes(self):
@@ -85,12 +166,14 @@ class Template_Test(unittest.TestCase):
 
             outerr = StringIO()
             sys.stderr = outerr
+            result = main(args)
+
             
-            self.assertEqual(main(args), 0, "command args {} should return successcode".format(args) )
 
             output = list(out.getvalue().split("\n"))
             finaloutput = list(filter(lambda line: line != '', output))
 
+            self.assertEqual(result, 0, "command args {} should return successcode".format(args) )
            
             self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
             

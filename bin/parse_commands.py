@@ -62,13 +62,13 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             name = arg["name"]
             del arg["name"]
 
-            if name.startswith("use-") or name.startswith("show-") or name.startswith("for-"):
+            if name.startswith("use-") or name.startswith("show-") or name.startswith("for-") or ("-use-" in name ):
                 optional.add_argument(
                     "--" + name,
                     required=False,
                     **arg,
                     action="store_true")
-            elif name.startswith("only-") :
+            elif name.startswith("only-") or name.startswith("arg-list"):
                 optional.add_argument("--" + name,
                                       required=False,
                                       nargs='+',
@@ -199,7 +199,9 @@ def setupCommands(subparsers):
     create_sub_command(
         subparsers, "template", "prints the default yaml query template",
         optional_arguments=[    {"name": "get", "help": "get template by name"}, 
-                                {"name": "type", "help": "the template type"}],
+                                {"name": "type", "help": "the template type"},
+                                {"name": "args-use-stdin", "help": "use stdin for large arg lists"},
+                                {"name": "arg-list", "help": "additional args to inject into any template condition"}],
         required_arguments=None,
         actions=actions)
     
@@ -246,13 +248,20 @@ def template(args):
 
         if args.type in obj:
 
-            queryType = QueryResult(args.type)
+            templateArgs = args.arg_list
 
-            if args.get is None:
-                obj = queryType.listQuery()
-            else:
+            if templateArgs is None:
+                templateArgs = []
 
-                obj = queryType.getQuerybyName(args.get)
+            if args.args_use_stdin:
+
+                stdinStr = getArgFromSTDIN()
+                output = stdinStr.split("\n")
+                templateArgs.extend( output )
+                
+
+            obj = queryType.loadTemplate(args.type, args.get, templateArgs)
+            
         else:
             print( "template type: {} not found. ".format(args.type), file=sys.stderr )
             return_value = 1
