@@ -196,6 +196,26 @@ class CPCODE_Test(unittest.TestCase):
 
         (_, _, _, _) = self._testMainArgsAndGetResponseStdOutArray(args,3)
 
+        self.loadTests2(response)
+
+        args = [ "groupcpcodelist",
+                "--section",
+                "default",
+                 "--edgerc",
+                edgeRc,
+                "--template",
+                "cpcodes-only.json"
+                ]
+        
+        self.loadTests(response)
+        (output, _, _, _) = self._testMainArgsAndGetResponseStdOutArray(args,3)
+
+        outArray = list(filter(lambda line: line != '', output))
+        self.assertEquals(3, len( outArray))
+        self.assertIn("33192", outArray)
+        self.assertIn("33191", outArray)
+        self.assertIn("33190", outArray)
+
       
         
 
@@ -214,8 +234,7 @@ class CPCODE_Test(unittest.TestCase):
             sys.stderr = errout
             
             mainresult = main(args)
-            self.assertEqual(mainresult, 0, "command args {} should return successcode, but returned:\n+++++\n{}\n+++++\n".format(args,out.getvalue()) )
-
+            
             output = list(out.getvalue().split("\n"))
             finaloutput = list(filter(lambda line: line != '', output))
 
@@ -225,6 +244,8 @@ class CPCODE_Test(unittest.TestCase):
            
             self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
             self.assertEquals(len(finalerroutput), expectedStatusMsgs, "for args {} the std err message line count should be {} but got:\n {}".format(args,expectedStatusMsgs,erroutput) )
+            self.assertEqual(mainresult, 0, "command args {} should return successcode, but returned:\n+++++\n{}\n+++++\n".format(args,out.getvalue()) )
+
 
         except Exception as e:
             sys.stdout = saved_stdout

@@ -101,6 +101,19 @@ class Lds_Test(unittest.TestCase):
 
         self._testParseLDSCommandCombo(args,3)
 
+        args = [ templatename,
+                "--section",
+                "default",
+                "--edgerc",
+                edgeRc,
+                "--template",
+                "all-default.json",
+                "--debug"
+                
+                ]
+
+        self._testParseLDSCommandCombo(args,3)
+
     @patch('requests.Session')
     def testJsonResponse(self, mockSessionObj):
 
