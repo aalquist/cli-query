@@ -144,14 +144,21 @@ class Lds_Test(unittest.TestCase):
             out = StringIO()
             sys.stdout = out
             
-            self.assertEqual(main(args), 0, "command args {} should return successcode".format(args) )
-
-            output = list(out.getvalue().split("\n"))
-            finaloutput = list(filter(lambda line: line != '', output))
-
-           
-            self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
+            mainresult = main(args)
             
+            outputStr = out.getvalue()
+            output = list(outputStr.split("\n"))
+            finaloutput = list(filter(lambda line: line != '', output))
+            outputJson = json.loads(outputStr)
+           
+            self.assertEquals("200957", outputJson[0]["logSource"]["cpCodeNumber"])
+            self.assertEquals("104523", outputJson[1]["logSource"]["cpCodeNumber"])
+            
+
+            self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
+
+
+            self.assertEqual(mainresult, 0, "command args {} should return successcode".format(args) )
 
             self.assertEqual(304, len(finaloutput))
             
