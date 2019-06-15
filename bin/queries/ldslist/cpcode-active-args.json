@@ -1,5 +1,4 @@
 {
-    "CPCODE": "$.logSource[#JSONPATHCRITERIA.cpCodeNumber#].cpCodeNumber",
-    "Status": "$[?(@.status=\"active\")].status"
+    "CPCODE": "$[?(@.status=\"active\")].logSource[#JSONPATHCRITERIA.cpCodeNumber#].cpCodeNumber"
 }
 
