@@ -72,8 +72,8 @@ class Template_Test(unittest.TestCase):
             self.assertIn("456", jsonDict["CPCODE"] )
             self.assertIn("789", jsonDict["CPCODE"] )
 
-            self.assertIn("Status", jsonDict)
-            self.assertEqual(len(jsonDict), 2)
+            #self.assertIn("Status", jsonDict)
+            self.assertEqual(len(jsonDict), 1)
 
             errString = outerr.getvalue()
             self.assertEqual("",errString)
