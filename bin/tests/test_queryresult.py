@@ -46,7 +46,7 @@ class QueryResultTest(unittest.TestCase):
         #self.assertEqual(result[0][0], "active" )
         
         dictObj = { "Status": "$[?(@.status!=\"active\")].status"}
-        result = queryresult.parseCommandGeneric(json , dictObj, RequireAll, JoinValues, ReturnHeader, negativeMatch)  
+        result = queryresult.parseCommandGeneric(json , dictObj, RequireAll, JoinValues, ReturnHeader)  
         self.assertEqual(result[0][0], "suspended" )
 
         pass 
