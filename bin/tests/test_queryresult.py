@@ -15,6 +15,8 @@
 import unittest
 import os
 import sys
+import json
+
 from bin.query_result import QueryResult
 
 
@@ -28,9 +30,38 @@ class QueryResultTest(unittest.TestCase):
         self.assertRaises(Exception, queryresult.getQuerybyName, "doesnot_exist", throwErrorIfNotFound=True)
         pass
     
+    def testCommandGeneric(self):
         
+        queryresult = QueryResult("groupcpcodelist")
+        RequireAll = True
+        JoinValues = True
+        ReturnHeader = False
+        negativeMatch = False
+
+        json = self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) )
+
+        dictObj = { "Status": "$[?(@.status=\"active\")].status"}
+
+        #result = queryresult.parseCommandGeneric(json , dictObj, RequireAll, JoinValues, ReturnHeader)  
+        #self.assertEqual(result[0][0], "active" )
+        
+        dictObj = { "Status": "$[?(@.status!=\"active\")].status"}
+        result = queryresult.parseCommandGeneric(json , dictObj, RequireAll, JoinValues, ReturnHeader, negativeMatch)  
+        self.assertEqual(result[0][0], "suspended" )
+
+        pass 
+
+        #suspended
+
         
 
+    def getJSONFromFile(self, jsonPath):
+        
+        with open(jsonPath, 'r') as myfile:
+            jsonStr = myfile.read()
+        
+        jsonObj = json.loads(jsonStr)
+        return jsonObj
 
 if __name__ == '__main__':
     unittest.main()
