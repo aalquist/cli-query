@@ -36,7 +36,6 @@ class QueryResultTest(unittest.TestCase):
         RequireAll = True
         JoinValues = True
         ReturnHeader = False
-        negativeMatch = False
 
         json = self.getJSONFromFile( "{}/bin/tests/json/_lds-api_v3_log-sources_cpcode-products.json".format(os.getcwd()) )
 
