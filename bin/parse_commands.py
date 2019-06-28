@@ -21,8 +21,10 @@ import copy
 from bin.fetch_lds import LdsFetch
 from bin.fetch_netstorage import NetStorageFetch
 from bin.fetch_cpcodes import CPCODEFetch
+from bin.fetch_propertymanager import PropertyManagerFetch
 
 from bin.query_result import QueryResult
+
 
 
 import json
@@ -63,18 +65,24 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             del arg["name"]
 
             if name.startswith("use-") or name.startswith("show-") or name.startswith("for-") or ("-use-" in name ):
+                
+                #enable boolean/flags
                 optional.add_argument(
                     "--" + name,
                     required=False,
                     **arg,
                     action="store_true")
+
             elif name.startswith("only-") or name.startswith("arg-list"):
+                
+                #enable list args
                 optional.add_argument("--" + name,
                                       required=False,
                                       nargs='+',
                                       **arg)
 
             else:
+
                 optional.add_argument("--" + name,
                                       required=False,
                                       **arg)
@@ -172,7 +180,7 @@ def execute(mainArgs, parser, actions):
         return getattr(sys.modules[__name__], args.command.replace("-", "_"))(args)
 
     except Exception as e:
-        print(e, file=sys.stderr)
+        print(str(e), file=sys.stderr)
         return 1    
 
 def combineArgs(defaultArgs, AdditionalArgs = None):
@@ -226,6 +234,15 @@ def setupCommands(subparsers):
     create_sub_command(
         subparsers, "groupcpcodelist", "CPCODES assigned to groups",
         optional_arguments=combineArgs(defaultQueryArgs, [{"name": "only-contractIds", "help": "limit the query to specific contracts"} ]),
+        required_arguments=None,
+        actions=actions)
+
+    create_sub_command(
+        subparsers, "bulksearch", "bulk search property manager configurations",
+        optional_arguments=combineArgs(defaultQueryArgs, [
+                                                            {"name": "contractId", "help": "limit the bulk search scope to a specific contract"},
+                                                            {"name": "network", "help": "filter the bulk search result to a specific network (staging or production)"},
+                                                             ]),
         required_arguments=None,
         actions=actions)
 
@@ -294,6 +311,22 @@ def netstorageuser(args):
     queryresult = QueryResult("netstorageuser")
     
     (_ , jsonObj) = fetch.fetchNetStorageUsers(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
+
+    return handleresponse(args, jsonObj, queryresult)
+
+def bulksearch(args):
+
+    fetch = PropertyManagerFetch()
+    queryresult = QueryResult("bulksearch")
+
+    postdata = {
+                    "bulkSearchQuery": {
+                        "syntax": "JSONPATH",
+                        "match": "$..behaviors[?(@.name == 'cpCode')].options.value.id"
+                    }
+                }
+
+    (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network ,debug=args.debug)  
 
     return handleresponse(args, jsonObj, queryresult)
 

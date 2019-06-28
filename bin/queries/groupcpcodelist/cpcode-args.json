@@ -1,0 +1,5 @@
+{ 
+    "cpcodeName": "$.cpcodes[*][?(@.cpcodeId=\"cpc_0000\")].cpcodeName",
+    "cpcodeId": "$.cpcodes[*].cpcodeId"
+
+}

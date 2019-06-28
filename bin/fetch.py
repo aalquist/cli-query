@@ -23,13 +23,37 @@ from bin.credentialfactory import CredentialFactory
 
 class Fetch_Akamai_OPENAPI_Response():
 
-    def makeSwitchUrl(self, url, account_switch_key):
+   
+
+    def appendQueryStringTupple(self, url, tupleKeyPairArray = None):
+        
+        if( tupleKeyPairArray is None or len(tupleKeyPairArray) == 0):
+            raise ValueError("tupleKeyPairArray not a list or None")
+
+        for (key, value) in tupleKeyPairArray:
+            
+            if value is None:
+                continue
+
+            if '?' in url:
+                url = "{}&{}={}".format(url,key,value)
+            else:
+                url = "{}?{}={}".format(url,key,value)
+
+        return url
+
+    def appendQueryStringArg(self, url, argKeySet):
         
         if '?' in url:
-            url = "{}&{}".format(url,account_switch_key)
+            url = "{}&{}".format(url,argKeySet)
         else:
-            url = "{}?{}".format(url,account_switch_key)
+            url = "{}?{}".format(url,argKeySet)
 
+        return url
+
+    def makeSwitchUrl(self, url, account_switch_key):
+        
+        url = self.appendQueryStringArg(url,account_switch_key)
         return url
 
     def buildUrl(self, url, context, *argv):

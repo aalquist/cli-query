@@ -1,1 +1,1 @@
-{ "cpcodes" : "$.cpcodes..cpCodeNumber" }
+{ "cpcodes" : "$.cpcodes[*].cpCodeNumber" }

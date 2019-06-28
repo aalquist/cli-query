@@ -67,6 +67,21 @@ class CPCODE_Test(unittest.TestCase):
         response.appendResponse( self.getJSONFromFile( "{}/bin/tests/json/papi/_papi_v1_cpcodes__ctr_1-1TJZFC_grp_441.json".format(os.getcwd()) ) )
         
 
+    def buildTest_Number2(self, mockSessionObj):
+        response = MockResponse()
+        self.loadTests2(response)
+
+        session = mockSessionObj()
+        session.get.return_value = response
+
+        edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
+
+        fetch = CPCODEFetch()
+        contractIds = ["ctr_0-1TJZFC"]
+        (code, json) = fetch.fetchGroupCPCODES(edgerc = edgeRc, section="default", account_key=None, debug=False, onlycontractIds=contractIds)
+        return (code, json)
+
+
     @patch('requests.Session')
     def testFetchGroupCPCODESWithContractIdFilter(self, mockSessionObj):
 
@@ -81,18 +96,8 @@ class CPCODE_Test(unittest.TestCase):
             errout = StringIO()
             sys.stderr = errout
 
-            response = MockResponse()
-            self.loadTests2(response)
-
-            session = mockSessionObj()
-            session.get.return_value = response
-
-            edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
-
-            fetch = CPCODEFetch()
-            contractIds = ["ctr_0-1TJZFC"]
-            (code, json) = fetch.fetchGroupCPCODES(edgerc = edgeRc, section="default", account_key=None, debug=False, onlycontractIds=contractIds)
-
+            (code, json) = self.buildTest_Number2(mockSessionObj)
+           
             self.assertEqual(code, 200)
             self.assertEqual(len(json), 1)
             self.assertEqual(len(json[0]), 4)
