@@ -52,12 +52,12 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         if code in [200] and "results" in json:
             
-            json = self.getMatchLocationValues(json["results"], account_key=account_key, network=network)
+            json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network)
             return (code, json)
         else:
             return (code, json)
 
-    def getMatchLocationValues(self, json, account_key=None, network=None):
+    def getMatchLocationValues(self, json, edgerc=None, account_key=None, network=None):
 
         
         count = 0 
@@ -79,7 +79,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             print(" ... {} of {} properties. getting {} v{} values".format( count, jobsize, propertyName,propertyVersion), file=sys.stderr )
 
 
-            (_, propertyJson) = self.fetchPropertyVersion(propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key )
+            (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key )
 
             matchLocations = match["matchLocations"]
             matchResults = []
