@@ -271,7 +271,7 @@ def bulksearchtemplate(args):
     else:
 
         queryType = QueryResult(searchType)
-        obj = queryType.loadTemplate(searchType, args.get, serverside=serverside)
+        obj = queryType.loadTemplate(args.get, serverside=serverside)
         
 
     print( json.dumps(obj,indent=1) )
@@ -306,7 +306,7 @@ def template(args):
                 templateArgs.extend( output )
                 
 
-            obj = queryType.loadTemplate(args.type, args.get, templateArgs)
+            obj = queryType.loadTemplate(args.get, templateArgs)
             
         else:
             print( "template type: {} not found. ".format(args.type), file=sys.stderr )
@@ -349,7 +349,7 @@ def bulksearch(args):
     queryresult = QueryResult("bulksearch")
     serverside = True
 
-    postdata = queryresult.loadTemplate("bulksearch", "cpcodes.json", serverside=serverside)
+    postdata = queryresult.loadTemplate("cpcodes.json", serverside=serverside)
 
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network ,debug=args.debug)  
 

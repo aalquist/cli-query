@@ -272,8 +272,8 @@ class QueryResult():
 
         return templateDictObj
 
-    def loadTemplate(self, argtype, get, templateArgs=None, serverside=False):
-        #argtype not needed. need to refactor
+    def loadTemplate(self, get, templateArgs=None, serverside=False):
+        
         if get is None:
             obj = self.listQuery(serverside=serverside)
         else:
