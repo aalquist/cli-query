@@ -1,1 +1,6 @@
-{}
+{
+    "bulkSearchQuery": {
+        "syntax": "JSONPATH",
+        "match": "$..behaviors[?(@.name == 'cpCode')].options.value.id"
+    }
+}

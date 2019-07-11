@@ -248,6 +248,9 @@ def setupCommands(subparsers):
         optional_arguments=combineArgs(defaultQueryArgs, [
                                                             {"name": "contractId", "help": "limit the bulk search scope to a specific contract"},
                                                             {"name": "network", "help": "filter the bulk search result to a specific network (staging or production)"},
+                                                            {"name": "use_searchstdin", "help": "get bulksearch json from stdin"}, 
+                                                            {"name": "searchfile", "help": "get bulksearch from json file"}, 
+                                                            {"name": "searchname", "help": "get bulksearch by name"}, 
                                                              ]),
         required_arguments=None,
         actions=actions)
@@ -349,11 +352,28 @@ def bulksearch(args):
     queryresult = QueryResult("bulksearch")
     serverside = True
 
-    postdata = queryresult.loadTemplate("cpcodes.json", serverside=serverside)
+    if args.use_searchstdin or args.searchfile is not None :
+        if (args.use_searchstdin):
+            inputString = getArgFromSTDIN()
+        else: 
+            inputString = getArgFromFile(args.searchfile)
+
+        postdata = queryresult.loadJson(inputString)
+    
+    elif args.searchname is not None :
+        postdata = queryresult.loadTemplate(args.searchname, serverside=serverside)
+
+    else:
+        postdata = queryresult.loadTemplate("default.json", serverside=serverside)
 
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network ,debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, enableSTDIN=False)
+
+def getBulkSearchJSONQuery(args, queryresult, enableSTDIN = True):
+    pass
+    
+
 
 def groupcpcodelist(args):
 
@@ -367,15 +387,15 @@ def groupcpcodelist(args):
 
     return handleresponse(args, jsonObj, queryresult)
 
-def handleresponse(args, jsonObj, queryresult):
+def handleresponse(args, jsonObj, queryresult, enableSTDIN = True):
 
     notJSONOutput = False
 
     if not args.show_json:
 
-        if args.use_stdin or args.file is not None :
+        if (enableSTDIN and args.use_stdin) or args.file is not None :
             
-            if args.use_stdin:
+            if (enableSTDIN and args.use_stdin):
                 inputString = getArgFromSTDIN()
             else: 
                 inputString = getArgFromFile(args.file)
