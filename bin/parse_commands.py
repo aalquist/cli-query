@@ -370,11 +370,6 @@ def bulksearch(args):
 
     return handleresponse(args, jsonObj, queryresult, enableSTDIN=False)
 
-def getBulkSearchJSONQuery(args, queryresult, enableSTDIN = True):
-    pass
-    
-
-
 def groupcpcodelist(args):
 
     fetch = CPCODEFetch()
