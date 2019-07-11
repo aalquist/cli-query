@@ -30,7 +30,7 @@ class QueryResult():
 
     def getQueryType(self):
        return self.name
-
+    
     def buildParseExp(self, paths):
         
         try:
@@ -61,13 +61,36 @@ class QueryResult():
             data = self.loadJson(jsonStr)
             return data
 
+    def getQueryPath(self, dir_path = None, fileName = None, serverside=False, topLevelOnly=False):
 
-    def getQuerybyName(self, argname, throwErrorIfNotFound=False):
+        if dir_path is None:
+            raise ValueError("dir_path can't be None")
 
-        validNames = self.listQuery()
+        if topLevelOnly is True:
+            return os.path.join(dir_path, "queries" )
+            
+        if serverside is False:
+
+            if fileName is None :
+                return os.path.join(dir_path, "queries", self.getQueryType() )
+
+            else:
+                return os.path.join(dir_path, "queries", self.getQueryType(), fileName )
+        else:
+
+            if fileName is None :
+                return os.path.join(dir_path, "queries", self.getQueryType(), "serverside" )
+
+            else:
+                return os.path.join(dir_path, "queries", self.getQueryType(), "serverside", fileName )
+
+
+    def getQuerybyName(self, argname, throwErrorIfNotFound=False, serverside=False):
+
+        validNames = self.listQuery(serverside=serverside)
 
         if argname in validNames:
-            obj = self.getNonDefaultQuery(argname)
+            obj = self.getNonDefaultQuery(argname, serverside=serverside)
         elif throwErrorIfNotFound:
             raise Exception("query name {} not found".format(argname))
         else: 
@@ -75,15 +98,17 @@ class QueryResult():
         
         return obj
 
-    def listQueryTypes(self):
+    def listServersideQueryTypes(self):
+
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        queriesdir = os.path.join(dir_path, "queries" )
+
+        queriesdir = self.getQueryPath(dir_path=dir_path, serverside= True) 
         queriesdir = os.listdir(queriesdir)
 
         returnlist = []
 
         for f in queriesdir:
-            fullname = os.path.join(dir_path, "queries", f)
+            fullname = self.getQueryPath(dir_path=dir_path, fileName=f, serverside=True)
 
             if os.path.isdir(fullname):
                 returnlist.append(f)
@@ -91,15 +116,46 @@ class QueryResult():
 
         return returnlist
 
-    def listQuery(self):
+    def listQueryTypes(self, serverside=False):
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        ldsdir = os.path.join(dir_path, "queries", self.getQueryType() )
-        listdir = os.listdir(ldsdir)
+
+        if serverside == True:
+            queriesdir = self.getQueryPath(dir_path=dir_path, serverside=True) 
+        else:
+            queriesdir = self.getQueryPath(dir_path=dir_path, topLevelOnly = True) 
+
+        queriesdir = os.listdir(queriesdir)
+
+        returnlist = []
+
+        for f in queriesdir:
+
+            if serverside == True:
+                fullname = self.getQueryPath(dir_path=dir_path, fileName=f, serverside=True)
+
+                if os.path.isfile(fullname):
+                    returnlist.append(f)
+
+            else: 
+
+                fullname = self.getQueryPath(dir_path=dir_path, fileName=f, topLevelOnly=True)
+
+                if os.path.isdir(fullname):
+                    returnlist.append(f)
+            
+
+        return returnlist
+
+    def listQuery(self, serverside=False):
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        
+        querydir = self.getQueryPath(dir_path=dir_path, serverside=serverside)
+        listdir = os.listdir(querydir)
 
         returnlist = []
 
         for f in listdir:
-            fullname = os.path.join(dir_path, "queries", self.getQueryType(), f)
+            fullname = self.getQueryPath(dir_path=dir_path, fileName=f, serverside=serverside)
 
             if os.path.isfile(fullname):
                 returnlist.append(f)
@@ -107,14 +163,14 @@ class QueryResult():
 
         return returnlist
 
-    def getNonDefaultQuery(self, name):
+    def getNonDefaultQuery(self, name, serverside=False):
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        queryjson = os.path.join(dir_path, "queries", self.getQueryType(), name )
+        queryjson = self.getQueryPath(dir_path=dir_path, fileName=name, serverside=serverside)
         return self.getJsonQueryFile(queryjson)
 
     def getDefaultJsonQuery(self):
         dir_path = os.path.dirname(os.path.realpath(__file__))
-        queryjson = os.path.join(dir_path, "queries", self.getQueryType(), "default.json")
+        queryjson = self.getQueryPath(dir_path=dir_path, fileName="default.json")
         return self.getJsonQueryFile(queryjson)
     
     def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True):
@@ -216,17 +272,15 @@ class QueryResult():
 
         return templateDictObj
 
-    def loadTemplate(self, argtype, get, templateArgs = None):
-
-        queryType = QueryResult(argtype)
-
+    def loadTemplate(self, argtype, get, templateArgs=None, serverside=False):
+        #argtype not needed. need to refactor
         if get is None:
-            obj = queryType.listQuery()
+            obj = self.listQuery(serverside=serverside)
         else:
 
-            obj = queryType.getQuerybyName(get)
+            obj = self.getQuerybyName(get, serverside=serverside)
 
-            if templateArgs is not None and len(templateArgs) > 0:
+            if serverside == False and templateArgs is not None and len(templateArgs) > 0:
                 obj = self.preprocessTemplate(obj, templateArgs)    
 
             

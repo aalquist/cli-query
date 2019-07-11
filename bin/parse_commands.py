@@ -205,7 +205,7 @@ def setupCommands(subparsers):
                             {"name": "template", "help": "use template name for query"} ]
 
     create_sub_command(
-        subparsers, "template", "prints the default yaml query template",
+        subparsers, "template", "prints a query template",
         optional_arguments=[    {"name": "get", "help": "get template by name"}, 
                                 {"name": "type", "help": "the template type"},
                                 {"name": "args-use-stdin", "help": "use stdin for large arg lists"},
@@ -213,6 +213,12 @@ def setupCommands(subparsers):
         required_arguments=None,
         actions=actions)
     
+    create_sub_command(
+        subparsers, "bulksearchtemplate", "prints a bulk search template",
+        optional_arguments=[    {"name": "get", "help": "get template by name"}],
+        required_arguments=None,
+        actions=actions)
+
     create_sub_command(
         subparsers, "ldslist", "List all cpcode based log delivery configurations",
         optional_arguments=combineArgs(defaultQueryArgs, []),
@@ -246,7 +252,30 @@ def setupCommands(subparsers):
         required_arguments=None,
         actions=actions)
 
+    
+
     return actions
+
+def bulksearchtemplate(args):
+
+    return_value = 0    
+    searchType = "bulksearch"
+    serverside = True
+
+    if args.get is None:
+
+        print( "template name is required. here is a list of options", file=sys.stderr )
+        queryType = QueryResult(searchType)
+        obj = queryType.listQueryTypes(serverside=serverside)
+
+    else:
+
+        queryType = QueryResult(searchType)
+        obj = queryType.loadTemplate(searchType, args.get, serverside=serverside)
+        
+
+    print( json.dumps(obj,indent=1) )
+    return return_value
 
 
 def template(args):
@@ -318,13 +347,9 @@ def bulksearch(args):
 
     fetch = PropertyManagerFetch()
     queryresult = QueryResult("bulksearch")
+    serverside = True
 
-    postdata = {
-                    "bulkSearchQuery": {
-                        "syntax": "JSONPATH",
-                        "match": "$..behaviors[?(@.name == 'cpCode')].options.value.id"
-                    }
-                }
+    postdata = queryresult.loadTemplate("bulksearch", "cpcodes.json", serverside=serverside)
 
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network ,debug=args.debug)  
 
