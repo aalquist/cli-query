@@ -34,13 +34,8 @@ class GenerateReadMeCommands():
         args = [ "help"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
-        
-        print("## Template Utility")
-        args = [ "help", "template"]
-        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
-        print(result.getvalue())
 
-        print("## Querying LDS")
+        print("## Querying Log Delivery Service (LDS)")
         args = [ "help", "ldslist"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
@@ -60,6 +55,11 @@ class GenerateReadMeCommands():
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
+        print("## Generic Query Template Utility")
+        args = [ "help", "template"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        self.printHelpTest(result.getvalue())
+
         print("## Querying Property Mangager Configurations")
         args = [ "help", "bulksearch"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
@@ -74,9 +74,9 @@ class GenerateReadMeCommands():
 
     def printHelpTest(self, value):
         print()
-        print("```bash ")
+        print("``` ")
         print(value)
-        print("```")
+        print("``` ")
 
 
     def redirectOutputToArray(self, fun, value, ignoreNewLines = True):

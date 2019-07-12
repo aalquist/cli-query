@@ -6,7 +6,7 @@ CLI-Query is a command line interface indended to simplify the interaction of mu
 
 ## Help Text
 
-```bash 
+``` 
 usage: akamai query help [command] [--version]
                                    {help,template,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,groupcpcodelist,bulksearch}
                                    ...
@@ -28,31 +28,10 @@ positional arguments:
 optional arguments:
   --version             show program's version number and exit
 
-```
-## Template Utility
-usage: akamai query [command] template [--get GET] [--type TYPE]
-                                       [--args-use-stdin]
-                                       [--arg-list ARG_LIST [ARG_LIST ...]]
-                                       [--edgerc EDGERC] [--section SECTION]
-                                       [--debug] [--account-key ACCOUNT_KEY]
+``` 
+## Querying Log Delivery Service (LDS)
 
-optional arguments:
-  --get GET             get template by name
-  --type TYPE           the template type
-  --args-use-stdin      use stdin for large arg lists
-  --arg-list ARG_LIST [ARG_LIST ...]
-                        additional args to inject into any template condition
-  --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
-  --section SECTION     Section of the credentials file
-                        [$AKAMAI_EDGERC_SECTION]
-  --debug               DEBUG mode to generate additional logs for
-                        troubleshooting
-  --account-key ACCOUNT_KEY
-                        Account Switch Key
-
-## Querying LDS
-
-```bash 
+``` 
 usage: akamai query [command] ldslist [--show-json] [--use-stdin]
                                       [--file FILE] [--template TEMPLATE]
                                       [--edgerc EDGERC] [--section SECTION]
@@ -71,10 +50,10 @@ optional arguments:
   --account-key ACCOUNT_KEY
                         Account Switch Key
 
-```
+``` 
 ## Querying Netstorage NS4
 
-```bash 
+``` 
 usage: akamai query [command] netstoragelist [--show-json] [--use-stdin]
                                              [--file FILE]
                                              [--template TEMPLATE]
@@ -95,10 +74,10 @@ optional arguments:
   --account-key ACCOUNT_KEY
                         Account Switch Key
 
-```
+``` 
 ## Querying Netstorage Users
 
-```bash 
+``` 
 usage: akamai query [command] netstorageuser [--show-json] [--use-stdin]
                                              [--file FILE]
                                              [--template TEMPLATE]
@@ -119,10 +98,10 @@ optional arguments:
   --account-key ACCOUNT_KEY
                         Account Switch Key
 
-```
+``` 
 ## Querying Control Center Group CPCodes
 
-```bash 
+``` 
 usage: akamai query [command] groupcpcodelist [--show-json] [--use-stdin]
                                               [--file FILE]
                                               [--template TEMPLATE]
@@ -146,10 +125,34 @@ optional arguments:
   --account-key ACCOUNT_KEY
                         Account Switch Key
 
-```
+``` 
+## Generic Query Template Utility
+
+``` 
+usage: akamai query [command] template [--get GET] [--type TYPE]
+                                       [--args-use-stdin]
+                                       [--arg-list ARG_LIST [ARG_LIST ...]]
+                                       [--edgerc EDGERC] [--section SECTION]
+                                       [--debug] [--account-key ACCOUNT_KEY]
+
+optional arguments:
+  --get GET             get template by name
+  --type TYPE           the template type
+  --args-use-stdin      use stdin for large arg lists
+  --arg-list ARG_LIST [ARG_LIST ...]
+                        additional args to inject into any template condition
+  --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
+  --section SECTION     Section of the credentials file
+                        [$AKAMAI_EDGERC_SECTION]
+  --debug               DEBUG mode to generate additional logs for
+                        troubleshooting
+  --account-key ACCOUNT_KEY
+                        Account Switch Key
+
+``` 
 ## Querying Property Mangager Configurations
 
-```bash 
+``` 
 usage: akamai query [command] bulksearch [--show-json] [--use-stdin]
                                          [--file FILE] [--template TEMPLATE]
                                          [--contractId CONTRACTID]
@@ -183,10 +186,10 @@ optional arguments:
   --account-key ACCOUNT_KEY
                         Account Switch Key
 
-```
+``` 
 ## Bulk Search Template Utility
 
-```bash 
+``` 
 usage: akamai query [command] bulksearchtemplate [--get GET] [--edgerc EDGERC]
                                                  [--section SECTION] [--debug]
                                                  [--account-key ACCOUNT_KEY]
@@ -200,3 +203,5 @@ optional arguments:
                         troubleshooting
   --account-key ACCOUNT_KEY
                         Account Switch Key
+
+``` 
