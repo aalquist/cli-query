@@ -46,6 +46,8 @@ RUN coverage --version
 COPY . /cli-test
 
 WORKDIR /cli-test
+
+RUN cat requirements.txt
 RUN pip3 install -r requirements.txt
 
 RUN git init

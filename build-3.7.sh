@@ -14,15 +14,15 @@ docker build -f python3.7.Dockerfile -t $DOCKERNAME:$commitId .
 #docker run -v $(pwd):/cli-test --rm $NAME  python3 runtests.py
 #echo "docker run -v $(pwd):/cli-test --rm $NAME  /bin/bash"
 
-echo 'running docker run -v $(pwd):/cli-test --rm $NAME python3 runtests.py'
-docker run -v $(pwd):/cli-test --rm $NAME python3 runtests.py
+echo "running docker run -v $(pwd):/cli-test --rm $NAME python3 runtests.py"
+docker run -v $(pwd):/cli-test --rm $DOCKERNAME:$commitId python3 runtests.py
 
-echo 'running docker run -v $(pwd):/cli-test --rm $NAME $CMD_NAME help'
-docker run -v $(pwd):/cli-test --rm $NAME $CMD_NAME help
+echo "running docker run -v $(pwd):/cli-test --rm $NAME $CMD_NAME help"
+docker run -v $(pwd):/cli-test --rm $DOCKERNAME:$commitId $CMD_NAME help
 
 #echo 'running docker run -v $(pwd):/cli-test --rm $NAME akamai lds help list'
 #docker run -v $(pwd):/cli-test --rm $NAME $CMD_NAME help list
 
 cat bin/$NAME | docker run --name testpy2$NAME -i --rm python:2.7.15-stretch 
 
-docker rmi $DOCKERNAME:$commitId
+#docker rmi $DOCKERNAME:$commitId
