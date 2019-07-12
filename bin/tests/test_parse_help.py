@@ -31,11 +31,11 @@ class ParseCmdTest(unittest.TestCase):
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.assertTrue(len(result) > 0 )
         
-        args = [ "help", "template"]
+        args = [ "help", "filtertemplate"]
         #print("\n###testing args: {}".format(args))
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.assertTrue(len(result) > 0 )
-        self.assertIn("template", result[0])
+        self.assertIn("filtertemplate", result[0])
 
         args = [ "help", "ldslist"]
         #print("\n###testing args: {}".format(args))

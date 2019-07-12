@@ -24,7 +24,7 @@ from bin.query_result import QueryResult
 from bin.fetch_lds import LdsFetch
 from bin.parse_commands import main
 
-from bin.parse_commands import template
+from bin.parse_commands import filtertemplate
 
 
 from unittest.mock import patch
@@ -61,7 +61,7 @@ class Template_Test(unittest.TestCase):
             outerr = StringIO()
             sys.stderr = outerr
 
-            result = template(args)
+            result = filtertemplate(args)
 
             outString = out.getvalue()
             jsonDict = json.loads(outString)
@@ -114,7 +114,7 @@ class Template_Test(unittest.TestCase):
     
     def testTemplateTypes(self):
 
-        args = [ "template"]
+        args = [ "filtertemplate"]
 
         saved_stdout = sys.stdout
         saved_stderr = sys.stderr
@@ -153,7 +153,7 @@ class Template_Test(unittest.TestCase):
 
     def testTemplateNames(self):
 
-        args = [ "template", "--type", "ldslist"]
+        args = [ "filtertemplate", "--type", "ldslist"]
 
         saved_stdout = sys.stdout
         saved_stderr = sys.stderr
@@ -196,7 +196,7 @@ class Template_Test(unittest.TestCase):
 
        
         args = [
-                "template",
+                "filtertemplate",
                 "--type",
                 "ldslist",
                 "--get",
@@ -230,7 +230,7 @@ class Template_Test(unittest.TestCase):
                 self.assertTrue(  os.path.exists(filename) and os.path.isfile(filename))
 
             args = [
-                "template",
+                "filtertemplate",
                 "--type",
                 "wrong_name",
                 "--get",

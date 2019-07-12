@@ -200,22 +200,28 @@ def setupCommands(subparsers):
 
     defaultQueryArgs = [ 
                             {"name": "show-json", "help": "output json"},
-                            {"name": "use-stdin", "help": "use stdin for query"},
+                            {"name": "use-filterstdin", "help": "use stdin for query"},
                             {"name": "file", "help": "the json file for query"},
                             {"name": "template", "help": "use template name for query"} ]
 
+    bulkSearchQueryArgs = [ 
+                            {"name": "show-json", "help": "output json"},
+                            {"name": "use-filterstdin", "help": "get filter json from stdin"}, 
+                            {"name": "filterfile", "help": "the json file to filter results from bulksearch"},
+                            {"name": "filtername", "help": "template name to filter results from bulksearch"} ]
+
     create_sub_command(
-        subparsers, "template", "prints a query template",
-        optional_arguments=[    {"name": "get", "help": "get template by name"}, 
-                                {"name": "type", "help": "the template type"},
+        subparsers, "filtertemplate", "prints a filter template",
+        optional_arguments=[    {"name": "get", "help": "get template details"}, 
+                                {"name": "type", "help": "the templates by filter type"},
                                 {"name": "args-use-stdin", "help": "use stdin for large arg lists"},
                                 {"name": "arg-list", "help": "additional args to inject into any template condition"}],
         required_arguments=None,
         actions=actions)
     
     create_sub_command(
-        subparsers, "bulksearchtemplate", "prints a bulk search template",
-        optional_arguments=[    {"name": "get", "help": "get template by name"}],
+        subparsers, "bulksearchtemplate", "prints a bulksearch template",
+        optional_arguments=[ {"name": "get", "help": "get template by name"}],
         required_arguments=None,
         actions=actions)
 
@@ -245,7 +251,7 @@ def setupCommands(subparsers):
 
     create_sub_command(
         subparsers, "bulksearch", "bulk search property manager configurations",
-        optional_arguments=combineArgs(defaultQueryArgs, [
+        optional_arguments=combineArgs(bulkSearchQueryArgs, [
                                                             {"name": "contractId", "help": "limit the bulk search scope to a specific contract"},
                                                             {"name": "network", "help": "filter the bulk search result to a specific network (staging or production)"},
                                                             {"name": "use_searchstdin", "help": "get bulksearch json from stdin"}, 
@@ -281,7 +287,7 @@ def bulksearchtemplate(args):
     return return_value
 
 
-def template(args):
+def filtertemplate(args):
 
     return_value = 0    
 
@@ -352,6 +358,9 @@ def bulksearch(args):
     queryresult = QueryResult("bulksearch")
     serverside = True
 
+    if args.use_searchstdin and args.use_filterstdin:
+        raise ValueError("Both args.use_searchstdin and args.use_filterstdin maynot be True")
+    
     if args.use_searchstdin or args.searchfile is not None :
         if (args.use_searchstdin):
             inputString = getArgFromSTDIN()
@@ -368,7 +377,7 @@ def bulksearch(args):
 
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network ,debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult, enableSTDIN=False)
+    return handleresponse(args, jsonObj, queryresult)
 
 def groupcpcodelist(args):
 
@@ -386,21 +395,49 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True):
 
     notJSONOutput = False
 
+    #normalize args
+    vargs = vars(args)
+
+    if "use_filterstdin" in vargs and args.use_filterstdin:
+        use_stdin = True
+
+    else:
+        use_stdin = False
+
+    if ("file" in vargs and args.file is not None):
+        file = args.file
+
+    elif ("filterfile" in vargs and args.filterfile is not None):
+        file = args.filterfile
+
+    else:
+        file = None
+
+    if "template" in vargs and args.template is not None:
+        template = args.template
+    
+    elif "filtername" in vargs and args.filtername is not None:
+        template = args.filtername
+        
+    else:
+        template = None
+
+
     if not args.show_json:
 
-        if (enableSTDIN and args.use_stdin) or args.file is not None :
+        if (enableSTDIN and use_stdin) or (file is not None) :
             
-            if (enableSTDIN and args.use_stdin):
+            if (enableSTDIN and use_stdin):
                 inputString = getArgFromSTDIN()
             else: 
-                inputString = getArgFromFile(args.file)
+                inputString = getArgFromFile(file)
 
             templateJson = queryresult.loadJson(inputString)
             (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson)
 
-        elif args.template is not None :
+        elif template is not None :
 
-            templateJson = queryresult.getQuerybyName(args.template, throwErrorIfNotFound=True)
+            templateJson = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
             (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson)
             
         else:

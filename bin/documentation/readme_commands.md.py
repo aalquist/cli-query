@@ -26,9 +26,20 @@ from bin.parse_commands import main
 
 class GenerateReadMeCommands():
 
+    def readFile(self, fileName):
+
+        with open(fileName, 'r') as myfile:
+                fileString = myfile.read()
+            
+        return fileString
+
     def main(self):
 
         os.environ['AKAMAI_CLI'] = "True"
+        
+        
+        print(self.readFile(os.path.join(SCRIPT_DIR, "header.md")) )
+
 
         print("## Help Text")
         args = [ "help"]
@@ -55,8 +66,8 @@ class GenerateReadMeCommands():
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
-        print("## Generic Query Template Utility")
-        args = [ "help", "template"]
+        print("## Generic Filter Template Utility")
+        args = [ "help", "filtertemplate"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
