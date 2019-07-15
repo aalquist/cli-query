@@ -130,6 +130,7 @@ optional arguments:
 
 ``` 
 usage: akamai query [command] filtertemplate [--get GET] [--type TYPE]
+                                             [--filterfile FILTERFILE]
                                              [--args-use-stdin]
                                              [--arg-list ARG_LIST [ARG_LIST ...]]
                                              [--edgerc EDGERC]
@@ -139,9 +140,13 @@ usage: akamai query [command] filtertemplate [--get GET] [--type TYPE]
 optional arguments:
   --get GET             get template details
   --type TYPE           the templates by filter type
-  --args-use-stdin      use stdin for large arg lists
+  --filterfile FILTERFILE
+                        define your own template. Intended to be used with one
+                        of the arg list flags
+  --args-use-stdin      use stdin as alternative to arg-list param
   --arg-list ARG_LIST [ARG_LIST ...]
-                        additional args to inject into any template condition
+                        additional args for a JSONPath condition:
+                        #JSONPATHCRITERIA.somekey#
   --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
   --section SECTION     Section of the credentials file
                         [$AKAMAI_EDGERC_SECTION]
