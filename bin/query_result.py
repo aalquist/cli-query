@@ -272,10 +272,17 @@ class QueryResult():
 
         return templateDictObj
 
-    def loadTemplate(self, get, templateArgs=None, serverside=False):
+    def loadTemplate(self, get, templateArgs=None, serverside=False, templatefile=None):
         
-        if get is None:
+        if templatefile is not None:
+
+            obj = self.getJsonQueryFile(templatefile)
+            if serverside == False and templateArgs is not None and len(templateArgs) > 0:
+                obj = self.preprocessTemplate(obj, templateArgs)    
+
+        elif get is None:
             obj = self.listQuery(serverside=serverside)
+
         else:
 
             obj = self.getQuerybyName(get, serverside=serverside)

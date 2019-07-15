@@ -123,7 +123,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         edgerc = self.edgerc
         
-        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Production", debug=True)
+        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Production", debug=False)
 
         self.assertEquals(1, len(json))
         results = json[0]["matchLocationResults"]
@@ -135,7 +135,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         for mockJson in self.allstagingresponses:
             response.appendResponse(self.getJSONFromFile(mockJson))
 
-        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=True)
+        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
 
         self.assertEquals(1, len(json))
         results = json[0]["matchLocationResults"]

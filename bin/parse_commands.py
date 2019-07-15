@@ -17,6 +17,7 @@ import sys
 import os
 import json
 import copy 
+import traceback
 
 from bin.fetch_lds import LdsFetch
 from bin.fetch_netstorage import NetStorageFetch
@@ -180,7 +181,11 @@ def execute(mainArgs, parser, actions):
         return getattr(sys.modules[__name__], args.command.replace("-", "_"))(args)
 
     except Exception as e:
-        print(str(e), file=sys.stderr)
+        print("Unexpected Exception: {}".format(str(e)), file=sys.stderr)
+
+        if "debug" in vars(args) and args.debug is not None and args.debug == True:
+            traceback.print_exc()
+
         return 1    
 
 def combineArgs(defaultArgs, AdditionalArgs = None):
@@ -214,8 +219,9 @@ def setupCommands(subparsers):
         subparsers, "filtertemplate", "prints a filter template",
         optional_arguments=[    {"name": "get", "help": "get template details"}, 
                                 {"name": "type", "help": "the templates by filter type"},
-                                {"name": "args-use-stdin", "help": "use stdin for large arg lists"},
-                                {"name": "arg-list", "help": "additional args to inject into any template condition"}],
+                                {"name": "filterfile", "help": "define your own template. Intended to be used with one of the arg list flags"},
+                                {"name": "args-use-stdin", "help": "use stdin as alternative to arg-list param"},
+                                {"name": "arg-list", "help": "additional args for a JSONPath condition: #JSONPATHCRITERIA.somekey#"}],
         required_arguments=None,
         actions=actions)
     
@@ -291,17 +297,18 @@ def filtertemplate(args):
 
     return_value = 0    
 
-    if args.type is None:
+    if args.type is None and args.filterfile is None:
         print( "template type is required. here is a list of options", file=sys.stderr )
         queryType = QueryResult(args.type)
         obj = queryType.listQueryTypes()
 
     else:
 
+        
         queryType = QueryResult(args.type)
         obj = queryType.listQueryTypes()
 
-        if args.type in obj:
+        if args.type in obj or args.filterfile is not None:
 
             templateArgs = args.arg_list
 
@@ -314,9 +321,13 @@ def filtertemplate(args):
                 output = stdinStr.split("\n")
                 templateArgs.extend( output )
                 
+            if "filterfile" in vars(args) and args.filterfile is not None:
+                obj = queryType.loadTemplate(args.get, templateArgs=templateArgs, templatefile=args.filterfile)
+            else:
+                obj = queryType.loadTemplate(args.get, templateArgs=templateArgs)
 
-            obj = queryType.loadTemplate(args.get, templateArgs)
-            
+        
+        
         else:
             print( "template type: {} not found. ".format(args.type), file=sys.stderr )
             return_value = 1
