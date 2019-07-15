@@ -1,0 +1,4 @@
+{
+    "propertyName": "$[#JSONPATHCRITERIA.propertyName#].propertyName",
+    "results": "$.matchLocationResults[*]"
+}
