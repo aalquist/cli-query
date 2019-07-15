@@ -53,21 +53,23 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         if code in [200] and "results" in json:
             
+            print(" ... Found {} properties".format( len(json["results"]) , file=sys.stderr ))
+        
             json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
             return (code, json)
         else:
             return (code, json)
 
     def getMatchLocationValues(self, json, edgerc=None, account_key=None, network=None, debug=False):
-
-        
+           
         count = 0 
 
         if network is not None and ( network.startswith("p") or network.startswith("P") ) :
             json = list(filter(lambda x: x["productionStatus"] == "ACTIVE", json) )
+            print(" ... Limited properties to only production network with {} activations".format( len(json) , file=sys.stderr ))
         elif network is not None and ( network.startswith("s") or network.startswith("S") ) :
             json = list(filter(lambda x: x["stagingStatus"] == "ACTIVE", json) )
-
+            print(" ... Limited properties to only staging network with {} activations".format( len(json) , file=sys.stderr ))
         if debug == True:
             print(" ... filtered json:", file=sys.stderr )
             printjson = jsonlib.dumps(json)
