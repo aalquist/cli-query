@@ -42,7 +42,13 @@ if __name__ == '__main__':
     if len(sys.argv) > 0 : 
         args = sys.argv[1:]
 
-    if main(args) < 1:
-        exit(0)
-    else:
-        exit(1)    
+    try: 
+
+        if main(args) < 1:
+            exit(0)
+        else:
+            exit(1)    
+    
+    except KeyboardInterrupt as e:
+        print('User Cancelled')
+        exit(1)

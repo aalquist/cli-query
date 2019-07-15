@@ -15,6 +15,7 @@
 import jsonpointer
 import copy
 import sys
+import json as jsonlib
 
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
@@ -52,12 +53,12 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         if code in [200] and "results" in json:
             
-            json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network)
+            json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
             return (code, json)
         else:
             return (code, json)
 
-    def getMatchLocationValues(self, json, edgerc=None, account_key=None, network=None):
+    def getMatchLocationValues(self, json, edgerc=None, account_key=None, network=None, debug=False):
 
         
         count = 0 
@@ -67,6 +68,10 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         elif network is not None and ( network.startswith("s") or network.startswith("S") ) :
             json = list(filter(lambda x: x["stagingStatus"] == "ACTIVE", json) )
 
+        if debug == True:
+            print(" ... filtered json:", file=sys.stderr )
+            printjson = jsonlib.dumps(json)
+            print(printjson, file=sys.stderr )
 
         jobsize = len(json)
 
@@ -75,8 +80,10 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             propertyId = match["propertyId"]
             propertyVersion = match["propertyVersion"]
             propertyName = match["propertyName"]
+            productionStatus = match["productionStatus"]
+            stagingStatus = match["stagingStatus"]
 
-            print(" ... {} of {} properties. getting {} v{} values".format( count, jobsize, propertyName,propertyVersion), file=sys.stderr )
+            print(" ... {} of {} properties. getting {} v{} values. production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
 
 
             (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key )
