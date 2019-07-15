@@ -47,7 +47,7 @@ class Template_Test(unittest.TestCase):
     @patch('bin.parse_commands.getArgFromSTDIN')
     def testTemplate(self, parseCommands):
         #--type ldslist --get cpcode-args.json --arg-list 123 456 --args-use-stdin
-        args = Args(type="ldslist", get="cpcode-active-args.json", arg_list=["123", "456"], args_use_stdin=True)
+        args = Args(type="ldslist", get="arg-filter-active.json", arg_list=["123", "456"], args_use_stdin=True)
 
         parseCommands.return_value = "789"
 
