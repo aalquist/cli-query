@@ -65,11 +65,30 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
             
         ]
 
+        self.asyncAllsearchresponses = [
+            "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir),
+            "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir),
+            "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_3/versions/10/rules.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_15/versions/2/rules.json".format(self.basedir)
+            
+        ]
+
         self.allstagingresponses = [
             "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir),
             "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir)
             
         ]
+
+        self.asyncAllstagingresponses = [
+            "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir),
+            "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir),
+            "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir)
+            
+        ]
+
         pass
 
     def testURLStructure(self):
@@ -93,6 +112,60 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         url = fetch.buildBulkSearchUrl(context,groupId="groupId_123")
         self.assertIn("groupId_123", url)
+
+    @patch('requests.Session')
+    def testAsyncIntegration(self, mockSessionObj):
+        fetch = PropertyManagerFetch()
+
+        accountKey="1-abcdef"
+        
+        contractId="ctr_C-0000"
+        
+
+        postdata = {
+                        "bulkSearchQuery": {
+                            "syntax": "JSONPATH",
+                            "match": "$.behaviors[?(@.name == 'cpCode')].options.value.id"
+                        }
+                    }
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        for mockJson in self.asyncAllsearchresponses:
+            response.appendResponse(self.getJSONFromFile(mockJson))
+            
+
+        session.post.return_value = response
+        session.get.return_value = response
+        response.status_code = 202
+        response.headers = { "Location" : "https://dummy.html"}
+
+        edgerc = self.edgerc
+        
+        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Production", debug=False)
+
+        self.assertEquals(1, len(json))
+        results = json[0]["matchLocationResults"]
+        self.assertEquals(1, len(results))
+        self.assertEquals(12345,results[0])
+
+        response.reset()
+
+        for mockJson in self.asyncAllstagingresponses:
+            response.appendResponse(self.getJSONFromFile(mockJson))
+
+        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
+
+        self.assertEquals(1, len(json))
+        results = json[0]["matchLocationResults"]
+        self.assertEquals(2, len(results))
+
+        self.assertEquals(12345, results[0])
+        self.assertEquals(678910, results[1])
+        
+
+        return json
 
     @patch('requests.Session')
     def testIntegration(self, mockSessionObj):
@@ -120,6 +193,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         session.post.return_value = response
         session.get.return_value = response
         response.status_code = 200
+        response.headers = {}
 
         edgerc = self.edgerc
         

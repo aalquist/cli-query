@@ -57,6 +57,7 @@ class Fetch_Akamai_OPENAPI_Response():
         return url
 
     def buildUrl(self, url, context, *argv):
+
         url = url.format(context.base_url, *argv)
         
         if context.account_key != '' :
@@ -76,9 +77,21 @@ class Fetch_Akamai_OPENAPI_Response():
 
         status_code = result.status_code
 
-        if status_code in [200]:
-            lds_json = result.json()
-            return (status_code, lds_json)
+        if status_code in [200, 201, 202]:
+            _json = result.json()
+            return (status_code, _json)
+        
+        else: 
+            self.handleUnexpected(result, url, debug)
+
+    def handleResponseWithHeaders(self, result, url, debug):
+
+        status_code = result.status_code
+
+        if status_code in [200, 202]:
+            _json = result.json()
+            _headers = result.headers
+            return (status_code, _headers, _json)
         
         else: 
             self.handleUnexpected(result, url, debug)

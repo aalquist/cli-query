@@ -1,0 +1,15 @@
+{
+    "bulkSearchId": 5,
+    "searchTargetStatus": "PENDING",
+    "searchSubmitDate": "2018-01-18T00:00:00Z",
+    "searchUpdateDate": "2018-01-18T00:01:00Z",
+    "bulkSearchQuery": {
+        "syntax": "JSONPATH",
+        "match": "$..conditions[?(@.name == \"ext\" && \"mp3\" in @.options.value && \"mp4\" nin @.options.value)].options.value[?(@ == \"mp3\")]",
+        "bulkSearchQualifiers": [
+            "$.options[?(@.secure==\"true\")]",
+            "$..features[?(@.name==\"origin\")].options[?(@.hostname==\"old.origin.example.com\")]"
+        ]
+    }
+    
+}

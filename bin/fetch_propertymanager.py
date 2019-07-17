@@ -15,6 +15,7 @@
 import jsonpointer
 import copy
 import sys
+import time
 import json as jsonlib
 
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
@@ -27,7 +28,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
     def buildBulkSearchUrl(self, context, *, contractId=None, groupId=None):
         
-        url = self.buildUrl("https://{}/papi/v1/bulk/rules-search-requests-synch", context)
+        url = self.buildUrl("https://{}/papi/v1/bulk/rules-search-requests", context)
 
         queryArgs = [("contractId", contractId), ("groupdId", groupId)]
 
@@ -49,7 +50,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
 
         result = context.session.post(url, json=postdata, headers=headers )
-        code, json = self.handleResponse(result, url, debug)
+        code, headers, json = self.handleResponseWithHeaders(result, url, debug)
 
         if code in [200] and "results" in json:
             
@@ -57,6 +58,32 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         
             json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
             return (code, json)
+        
+        elif code in [202]:
+
+            locationURL = headers["Location"]
+            result = context.session.get(locationURL )
+            code, headers, json = self.handleResponseWithHeaders(result, url, debug)
+            status = json["searchTargetStatus"]
+
+            attempts = 0
+            while status != "COMPLETE" and attempts < 110:
+                attempts = attempts + 1
+
+                if attempts == 1:
+                    time.sleep(3)
+
+                result = context.session.get(locationURL )
+                code, headers, json = self.handleResponseWithHeaders(result, url, debug)
+                status = json["searchTargetStatus"]
+                print(" ... Waiting for search results. {}".format(status), file=sys.stderr )
+
+                if status != "COMPLETE":
+                    time.sleep(5)
+
+            json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
+            return (code, json)
+
         else:
             return (code, json)
 
@@ -66,10 +93,10 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         if network is not None and ( network.startswith("p") or network.startswith("P") ) :
             json = list(filter(lambda x: x["productionStatus"] == "ACTIVE", json) )
-            print(" ... Limited properties to only production network with {} activations".format( len(json) , file=sys.stderr ))
+            print(" ... Limiting to production network with {} ACTIVE properties".format( len(json) , file=sys.stderr ))
         elif network is not None and ( network.startswith("s") or network.startswith("S") ) :
             json = list(filter(lambda x: x["stagingStatus"] == "ACTIVE", json) )
-            print(" ... Limited properties to only staging network with {} activations".format( len(json) , file=sys.stderr ))
+            print(" ... Limiting to staging network with {} ACTIVE properties".format( len(json) , file=sys.stderr ))
         if debug == True:
             print(" ... filtered json:", file=sys.stderr )
             printjson = jsonlib.dumps(json)
@@ -85,7 +112,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             productionStatus = match["productionStatus"]
             stagingStatus = match["stagingStatus"]
 
-            print(" ... {} of {} properties. getting {} v{} values. production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+            print(" ... Getting property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
 
 
             (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key )
@@ -113,7 +140,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         result = context.session.get(url, headers=headers )
         code, json = self.handleResponse(result, url, debug)
 
-        if code in [200] and "rules" in json:
+        if code in [200, 201, 202] and "rules" in json:
 
             if propertyId != json["propertyId"]:
                 raise ValueError("Unexpected API response! Expecting propertyId={} but got {}".format(propertyId, json["propertyId"] ))
