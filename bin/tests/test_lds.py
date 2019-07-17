@@ -397,18 +397,20 @@ class Lds_Test(unittest.TestCase):
         result = lds.parseCommandDefault(jsonObj)
         
         self.assertEqual(len(result ), 2)
-        self.assertEqual(len(result[0] ), 5)
+        self.assertEqual(len(result[0] ), 7)
 
         r = result[0]
-        self.assertEqual(len(r ), 5)
-        dataset = ["CPCODE", "Aggregation_Frequency", "Status", "Encoding"]
+        self.assertEqual(len(r ), 7)
+        dataset = ["CPCODE", "Aggregation_Frequency", "Status", "Encoding", "Format", "Machine", "Directory" ]
         self.assertIn(r[0],dataset)
         self.assertIn(r[1],dataset)
         self.assertIn(r[2],dataset)
         self.assertIn(r[3],dataset)
+        self.assertIn(r[4],dataset)
+        self.assertIn(r[5],dataset)
         
         r = result[1]
-        self.assertEqual(len(r ), 5)
+        self.assertEqual(len(r ), 7)
         dataset = ["200957", "Every 24 hours", "GZIP", "active"]
         self.assertIn(r[0],dataset)
         self.assertIn(r[1],dataset)

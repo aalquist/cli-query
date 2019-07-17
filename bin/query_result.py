@@ -52,7 +52,10 @@ class QueryResult():
     
     def loadJson(self, jsonStr):
         #need OrderedDict for some python 3.5 impl 
-        data = json.loads(jsonStr, object_pairs_hook=OrderedDict)
+        try:
+            data = json.loads(jsonStr, object_pairs_hook=OrderedDict)
+        except Exception as e:
+            raise ValueError("JSONDecodeError: {}\n{}".format(e,jsonStr))
         return data
     
     def getJsonQueryFile(self, queryfile):
