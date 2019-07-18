@@ -115,7 +115,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             print(" ... Getting property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
 
 
-            (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key )
+            (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, debug=debug )
 
             matchLocations = match["matchLocations"]
             matchResults = []
