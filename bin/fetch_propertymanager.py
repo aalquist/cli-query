@@ -74,14 +74,20 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                     time.sleep(3)
 
                 result = context.session.get(locationURL )
-                code, headers, json = self.handleResponseWithHeaders(result, url, debug)
+                code, headers, json = self.handleResponseWithHeaders(result, url, debug, retry=1, context=context)
                 status = json["searchTargetStatus"]
                 print(" ... Waiting for search results. {}".format(status), file=sys.stderr )
 
                 if status != "COMPLETE":
                     time.sleep(5)
 
-            json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
+            print(" ... Found {} properties".format( len(json["results"]) , file=sys.stderr ))
+        
+            if status == "COMPLETE":
+                json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
+            else:
+                raise ValueError("Search status never encountred COMPLETE. Last Status = {}".format(status))
+
             return (code, json)
 
         else:
@@ -138,7 +144,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
 
         result = context.session.get(url, headers=headers )
-        code, json = self.handleResponse(result, url, debug)
+        code, json = self.handleResponse(result, url, debug, retry=3, context=context)
 
         if code in [200, 201, 202] and "rules" in json:
 

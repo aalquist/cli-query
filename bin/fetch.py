@@ -18,6 +18,7 @@ import requests
 import configparser
 import sys
 import json
+import time
 
 from bin.credentialfactory import CredentialFactory
 
@@ -73,7 +74,7 @@ class Fetch_Akamai_OPENAPI_Response():
         raise Exception("Unexpected Reponse Code: {} for {}".format(result.status_code, url)  )
              
     
-    def handleResponse(self, result, url, debug):
+    def handleResponse(self, result, url, debug, retry = 0, context=None):
 
         status_code = result.status_code
 
@@ -81,10 +82,29 @@ class Fetch_Akamai_OPENAPI_Response():
             _json = result.json()
             return (status_code, _json)
         
+        elif status_code in [500, 501, 502, 503]:
+            
+            if retry > 0 and context is not None and result.request.method == "GET":
+                
+                print(" ... Encountered server error {} with {} retries remaining in 15 seconds".format(status_code, retry) , file=sys.stderr )
+
+                if debug:
+                    _json = result.json()
+                    print(json.dumps(_json, indent=1 ), file=sys.stderr )
+
+                time.sleep(15)
+
+                result = context.session.get(url) 
+                retry = retry - 1
+                return self.handleResponse(result,url,debug, retry=retry, context=context)
+                
+            else: 
+                self.handleUnexpected(result, url, debug)
+
         else: 
             self.handleUnexpected(result, url, debug)
 
-    def handleResponseWithHeaders(self, result, url, debug):
+    def handleResponseWithHeaders(self, result, url, debug, retry = 0, headers=None, context=None):
 
         status_code = result.status_code
 
@@ -93,5 +113,28 @@ class Fetch_Akamai_OPENAPI_Response():
             _headers = result.headers
             return (status_code, _headers, _json)
         
+        if status_code in [500, 501, 502, 503]:
+            
+            if retry > 0 and context is not None and result.request.method == "GET":
+                time.sleep(15)
+
+                print(" ... Encountered server error {} with {} retries remaining in 15 seconds".format(status_code, retry) , file=sys.stderr )
+
+                if debug:
+                    _json = result.json()
+                    print(json.dumps(_json, indent=1 ), file=sys.stderr )
+
+                time.sleep(15)
+                retry = retry - 1
+
+                if headers is not None:
+                    result = context.session.get(url, headers=headers ) 
+                    return self.handleResponseWithHeaders(result,url,debug, retry=retry, headers=headers, context=context)
+                else:
+                    result = context.session.get(url ) 
+                    return self.handleResponseWithHeaders(result,url,debug, retry=retry, context=context)
+            else: 
+                self.handleUnexpected(result, url, debug)
+
         else: 
             self.handleUnexpected(result, url, debug)
