@@ -67,7 +67,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             status = json["searchTargetStatus"]
 
             attempts = 0
-            while status != "COMPLETE" and attempts < 110:
+            while status != "COMPLETE" and attempts < 550:
                 attempts = attempts + 1
 
                 if attempts == 1:
@@ -79,7 +79,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                 print(" ... Waiting for search results. {}".format(status), file=sys.stderr )
 
                 if status != "COMPLETE":
-                    time.sleep(5)
+                    time.sleep(7)
 
             print(" ... Found {} properties".format( len(json["results"]) , file=sys.stderr ))
         
