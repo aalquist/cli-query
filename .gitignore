@@ -16,4 +16,5 @@ settings.json
 .ropeproject
 
 tmp/*
-
+cache/*
+logs/*

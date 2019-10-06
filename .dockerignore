@@ -6,6 +6,8 @@ settings.json
 .DS_Store
 
 tmp/*
+cache/*
+logs/*
 
 **/*.pyc
 **/__pycache__
