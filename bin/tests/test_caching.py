@@ -15,13 +15,39 @@
 import unittest
 
 from bin.decorator import count_calls
+from bin.decorator import cacheFunctionCall
+
 from bin.decorator import cache
 from bin.decorator import CacheManager
 from bin.decorator import CallCount
 
 class CachingTest(unittest.TestCase):
 
-    def test_upper(self):
+    def test_caching_function_helper(self):
+
+        def oneFunc(one, two, three):
+            return "one func " + str(one) + " " + str(two) + " " + str(three)
+
+        def oneFuncShouldbeCached(one, two, three):
+            return "something wrong"
+
+        def functionError(one, two, three, four):
+            raise EnvironmentError()
+
+        cache = dict()
+        val = cacheFunctionCall(oneFunc, cache, 1,2,3)
+        self.assertEqual("one func 1 2 3", val )
+
+        val = cacheFunctionCall(oneFuncShouldbeCached, cache, 1,2,3)
+        self.assertEqual("one func 1 2 3", val )
+
+        with self.assertRaises(EnvironmentError):
+            cacheFunctionCall(functionError, cache, 1,2,3,4)
+
+        self.assertEqual(1, len(cache) )
+        
+
+    def test_caching_decorators(self):
         
         @count_calls
         @cache

@@ -18,13 +18,23 @@ import sys
 import time
 import json as jsonlib
 
+import functools
+from functools import partial
+from diskcache import Cache
+
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
 from bin.credentialfactory import CredentialFactory
 from bin.fetch import Fetch_Akamai_OPENAPI_Response
+from bin.fetch import CachedContextHandler
+
+from bin.decorator import cacheFunctionCall
 
 class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
+    def __init__(self):
+        self.cache = Cache(directory="cache/PropertyManagerFetch")
+        
 
     def buildBulkSearchUrl(self, context, *, contractId=None, groupId=None):
         
@@ -118,10 +128,16 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             productionStatus = match["productionStatus"]
             stagingStatus = match["stagingStatus"]
 
-            print(" ... Getting property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+            if productionStatus in [ "ACTIVE", "DEACTIVATED" ] or stagingStatus in [ "ACTIVE", "DEACTIVATED" ]:
+                print(" ... Getting Immutable/Cachable Property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+                (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=True, debug=debug )
+
+            else:    
+                print(" ... Getting property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+                (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=False, debug=debug )
 
 
-            (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, debug=debug )
+            
 
             matchLocations = match["matchLocations"]
             matchResults = []
@@ -134,18 +150,21 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         return json
 
+   
+        
+        
+
     
-    def fetchPropertyVersion(self, edgerc=None, section=None, account_key=None, propertyId=None, propertyVersion=None, debug=False):
+    def fetchPropertyVersion(self, edgerc=None, section=None, account_key=None, propertyId=None, propertyVersion=None, cacheResponses=False, debug=False):
 
         factory = CredentialFactory()
         context = factory.load(edgerc, section, account_key)
         url = self.buildGetPropertyUrl(context, propertyId=propertyId, propertyVersion=propertyVersion)
 
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
-
-        result = context.session.get(url, headers=headers )
-        code, json = self.handleResponse(result, url, debug, retry=3, context=context)
-
+        cachedHandler = CachedContextHandler(context, self.cache, cacheResponses=cacheResponses)
+        code, json = cachedHandler.get(url, headers=headers)
+        
         if code in [200, 201, 202] and "rules" in json:
 
             if propertyId != json["propertyId"]:

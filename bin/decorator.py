@@ -77,6 +77,16 @@ def count_calls(func=None, printOut=False):
     wrapper_count_calls.num_calls = 0
     return wrapper_count_calls
 
+def cacheFunctionCall(func, cache_dict, *args, **kwargs):
+    """pass function pointer with cache dictionary obj to add function return value to or use cache"""
+
+    cache_key = args + tuple(kwargs.items())
+
+    if cache_key not in cache_dict:
+        cache_dict[cache_key] = func(*args, **kwargs)
+    return cache_dict[cache_key]
+
+
 def cache(func=None, *, tempCache=True, directory=None):
     """Keep a cache of previous function calls"""
 
@@ -86,10 +96,7 @@ def cache(func=None, *, tempCache=True, directory=None):
 
     @functools.wraps(func)
     def wrapper_cache(*args, **kwargs):
-        cache_key = args + tuple(kwargs.items())
-        if cache_key not in wrapper_cache.cache:
-            wrapper_cache.cache[cache_key] = func(*args, **kwargs)
-        return wrapper_cache.cache[cache_key]
+        return cacheFunctionCall(func,wrapper_cache.cache, *args, **kwargs)
     
     if(tempCache):
         wrapper_cache.cache = Cache()

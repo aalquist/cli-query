@@ -22,6 +22,8 @@ import time
 
 from bin.credentialfactory import CredentialFactory
 
+from bin.decorator import cacheFunctionCall
+
 class Fetch_Akamai_OPENAPI_Response():
 
    
@@ -138,3 +140,25 @@ class Fetch_Akamai_OPENAPI_Response():
 
         else: 
             self.handleUnexpected(result, url, debug)
+
+class CachedContextHandler(Fetch_Akamai_OPENAPI_Response):
+
+    def __init__(self, context, cache=None, debug=False, cacheResponses=True):
+        self.context = context
+        self.debug = debug
+        self.cache = cache
+        self.cacheResponses = cacheResponses
+    
+    def get(self, url, headers=None):
+        value = cacheFunctionCall(self._get, self.cache, url, headers=headers)
+        return value
+
+    def _get(self, url, headers=None):
+        if headers is None :
+            result = self.context.session.get(url)
+            return self.handleResponse(result, url, self.debug, retry=3, context=self.context)
+
+        else:
+            result = self.context.session.get(url)
+            return self.handleResponse(result, url, self.debug, retry=3, context=self.context)
+    
