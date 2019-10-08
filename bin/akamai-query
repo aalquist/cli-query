@@ -37,11 +37,17 @@ from parse_commands import main
 
 if __name__ == '__main__':
     
+    print(sys.argv)
+    print(os.environ)
+
     args = None
 
     if len(sys.argv) > 0 : 
         args = sys.argv[1:]
 
+    print(sys.argv)
+    print(os.environ)
+    
     try: 
 
         if main(args) < 1:
