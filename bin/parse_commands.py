@@ -65,7 +65,7 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             name = arg["name"]
             del arg["name"]
 
-            if name.startswith("use-") or name.startswith("show-") or name.startswith("for-") or ("-use-" in name ):
+            if name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or ("-use-" in name ) or ("_use_" in name ):
                 
                 #enable boolean/flags
                 optional.add_argument(
@@ -260,7 +260,7 @@ def setupCommands(subparsers):
         optional_arguments=combineArgs(bulkSearchQueryArgs, [
                                                             {"name": "contractId", "help": "limit the bulk search scope to a specific contract"},
                                                             {"name": "network", "help": "filter the bulk search result to a specific network (staging or production)"},
-                                                            {"name": "use_searchstdin", "help": "get bulksearch json from stdin"}, 
+                                                            {"name": "use-searchstdin", "help": "get bulksearch json from stdin"}, 
                                                             {"name": "searchfile", "help": "get bulksearch from json file"}, 
                                                             {"name": "searchname", "help": "get bulksearch by name"}, 
                                                              ]),
