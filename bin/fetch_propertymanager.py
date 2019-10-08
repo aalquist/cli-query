@@ -73,7 +73,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         if code in [200] and "results" in json:
             
-            print(" ... Found {} properties".format( len(json["results"]) , file=sys.stderr ))
+            print(" ... Found {} properties".format( len(json["results"])) , file=sys.stderr )
         
             json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
             return (code, json)
@@ -118,10 +118,10 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         if network is not None and ( network.startswith("p") or network.startswith("P") ) :
             json = list(filter(lambda x: x["productionStatus"] == "ACTIVE", json) )
-            print(" ... Limiting to production network with {} ACTIVE properties".format( len(json) , file=sys.stderr ))
+            print(" ... Limiting to production network with {} ACTIVE properties".format( len(json)) , file=sys.stderr )
         elif network is not None and ( network.startswith("s") or network.startswith("S") ) :
             json = list(filter(lambda x: x["stagingStatus"] == "ACTIVE", json) )
-            print(" ... Limiting to staging network with {} ACTIVE properties".format( len(json) , file=sys.stderr ))
+            print(" ... Limiting to staging network with {} ACTIVE properties".format( len(json)) , file=sys.stderr )
         if debug == True:
             print(" ... filtered json:", file=sys.stderr )
             printjson = jsonlib.dumps(json)
@@ -138,7 +138,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             stagingStatus = match["stagingStatus"]
 
             if productionStatus in [ "ACTIVE", "DEACTIVATED" ] or stagingStatus in [ "ACTIVE", "DEACTIVATED" ]:
-                print(" ... Getting Immutable/Cachable Property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+                print(" ... Getting Immutable Property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
                 (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=True, debug=debug )
 
             else:    
