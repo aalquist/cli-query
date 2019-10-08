@@ -100,7 +100,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                 if status != "COMPLETE":
                     time.sleep(7)
 
-            print(" ... Found {} properties".format( len(json["results"]) , file=sys.stderr ))
+            print(" ... Found {} properties".format( len(json["results"])) , file=sys.stderr )
         
             if status == "COMPLETE":
                 json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
