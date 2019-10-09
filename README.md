@@ -213,3 +213,60 @@ optional arguments:
                         Account Switch Key
 
 ``` 
+### Bulk Search Built In Templates
+
+Out-of-the box bulk searches done on the endpoint. They are listed when running the command:
+
+``` 
+akamai query bulksearchtemplate 
+
+[
+ "default.json",
+ "gtm-origins.json",
+ "origins.json",
+ "cpcodes.json"
+]
+ 
+``` 
+
+default.json bulk search template finds all configuration cpcode values:
+
+``` 
+akamai query bulksearchtemplate --get default.json 
+
+{
+ "bulkSearchQuery": {
+  "syntax": "JSONPATH",
+  "match": "$..behaviors[?(@.name == 'cpCode')].options.value.id"
+ }
+}
+ 
+``` 
+
+origins.json template finds all configuration with their origin values:
+
+``` 
+akamai query bulksearchtemplate --get origins.json 
+
+{
+ "bulkSearchQuery": {
+  "syntax": "JSONPATH",
+  "match": "$..behaviors[?(@.name == 'origin')].options.hostname"
+ }
+}
+ 
+``` 
+
+gtm-origins.json template finds all configurations with gtm origins:
+
+``` 
+akamai query bulksearchtemplate --get gtm-origins.json 
+
+{
+ "bulkSearchQuery": {
+  "syntax": "JSONPATH",
+  "match": "$..behaviors[?(@.name == 'origin')].options[?(@.hostname =~ /.*akadns.net$/i)].hostname"
+ }
+}
+ 
+``` 

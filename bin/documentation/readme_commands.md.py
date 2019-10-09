@@ -36,7 +36,7 @@ class GenerateReadMeCommands():
     def main(self):
 
         os.environ['AKAMAI_CLI'] = "True"
-        
+        akamaiCMD = "akamai query"
         
         print(self.readFile(os.path.join(SCRIPT_DIR, "header.md")) )
 
@@ -80,7 +80,35 @@ class GenerateReadMeCommands():
         args = [ "help", "bulksearchtemplate"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
-        
+
+        print("### Bulk Search Built In Templates")
+        print()
+        print("Out-of-the box bulk searches done on the endpoint. They are listed when running the command:")
+        args = [ "bulksearchtemplate"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
+        self.printHelpTest(result)
+
+        print()
+        print("default.json bulk search template finds all configuration cpcode values:")
+        args = [ "bulksearchtemplate", "--get", "default.json"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
+        self.printHelpTest(result)
+
+        print()
+        print("origins.json template finds all configuration with their origin values:")
+        args = [ "bulksearchtemplate", "--get", "origins.json"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
+        self.printHelpTest(result)
+
+        print()
+        print("gtm-origins.json template finds all configurations with gtm origins:")
+        args = [ "bulksearchtemplate", "--get", "gtm-origins.json"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
+        self.printHelpTest(result)
 
 
     def printHelpTest(self, value):
