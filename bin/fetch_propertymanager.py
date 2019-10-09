@@ -87,6 +87,17 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
             attempts = 0
             while status != "COMPLETE" and attempts < 550:
+
+                if status == "ERROR":
+                    print(" ... Encountered error from bulksearch endpoint", file=sys.stderr )
+                    print(" ... fatalError message: {}".format(json["fatalError"]), file=sys.stderr )
+                    print(" ... Review your search post for possible errors:", file=sys.stderr )
+                    
+                    postJSON = jsonlib.dumps(postdata)
+                    print(postJSON, file=sys.stderr )
+                    
+                    raise ValueError("fatal bulk search error: {}".format(json["fatalError"]))
+
                 attempts = attempts + 1
 
                 if attempts == 1:
