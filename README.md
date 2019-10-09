@@ -164,7 +164,7 @@ usage: akamai query [command] bulksearch [--show-json] [--use-filterstdin]
                                          [--filtername FILTERNAME]
                                          [--contractId CONTRACTID]
                                          [--network NETWORK]
-                                         [--use_searchstdin USE_SEARCHSTDIN]
+                                         [--use-searchstdin]
                                          [--searchfile SEARCHFILE]
                                          [--searchname SEARCHNAME]
                                          [--edgerc EDGERC] [--section SECTION]
@@ -181,8 +181,7 @@ optional arguments:
                         limit the bulk search scope to a specific contract
   --network NETWORK     filter the bulk search result to a specific network
                         (staging or production)
-  --use_searchstdin USE_SEARCHSTDIN
-                        get bulksearch json from stdin
+  --use-searchstdin     get bulksearch json from stdin
   --searchfile SEARCHFILE
                         get bulksearch from json file
   --searchname SEARCHNAME
