@@ -71,7 +71,7 @@ def count_calls(func=None, printOut=False):
         count.addToKey(func.__name__)
 
         if printOut:
-            print(f"Call {wrapper_count_calls.num_calls} of {func.__name__!r}", file=sys.stderr)
+            print("Call {} of {}".format(wrapper_count_calls.num_calls, func.__name__), file=sys.stderr)
 
         return func(*args, **kwargs)
     wrapper_count_calls.num_calls = 0
