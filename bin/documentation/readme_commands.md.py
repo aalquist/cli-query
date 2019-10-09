@@ -135,7 +135,7 @@ class GenerateReadMeCommands():
         self.printHelpTest(result)
 
         print()
-        print("property.json filter returns only the property names that found the values from the bulk search. This is handy to pipe in values into your own custom scripts for further processing")
+        print("property.json filter returns only the property names that found the values from the bulk search. This is handy to pipe in property names into your own custom scripts for further processing")
         args = ["filtertemplate", "--type", "bulksearch", "--get", "property.json"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "

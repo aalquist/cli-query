@@ -320,7 +320,7 @@ akamai query filtertemplate --type bulksearch --get default.json
 
 ``` 
 
-property.json filter returns only the property names that found the values from the bulk search. This is handy to pipe in values into your own custom scripts for further processing
+property.json filter returns only the property names that found the values from the bulk search. This is handy to pipe in property names into your own custom scripts for further processing
 
 ``` 
 akamai query filtertemplate --type bulksearch --get property.json 
