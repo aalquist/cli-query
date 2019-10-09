@@ -81,9 +81,9 @@ class GenerateReadMeCommands():
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
-        print("### Bulk Search Built In Templates")
+        print("### Bulk Search Built-In Templates")
         print()
-        print("Out-of-the box bulk searches done on the endpoint. They are listed when running the command:")
+        print("Out-of-the box bulk searches done on the bulksearch endpoint. They are listed when running the command:")
         args = [ "bulksearchtemplate"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
@@ -109,6 +109,38 @@ class GenerateReadMeCommands():
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
         self.printHelpTest(result)
+
+        print("### Bulk Search Built-In Result Filters")
+
+        print()
+        print("Out-of-the box bulk result filters after getting bulksearch endpoint results. They are listed when running the command:")
+        args = ["filtertemplate", "--type", "bulksearch"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
+        self.printHelpTest(result)
+
+        print()
+        print("default.json filter returns each configuration and the value found from the bulk search")
+        args = ["filtertemplate", "--type", "bulksearch", "--get", "default.json"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()}"
+        self.printHelpTest(result)
+
+        print()
+        print("result.json filter returns only the value found from the bulk search. This is handy to pipe in values into your own custom scripts for further processing")
+        args = ["filtertemplate", "--type", "bulksearch", "--get", "default.json"]
+
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()}"
+        self.printHelpTest(result)
+
+        print()
+        print("property.json filter returns only the property names that found the values from the bulk search. This is handy to pipe in values into your own custom scripts for further processing")
+        args = ["filtertemplate", "--type", "bulksearch", "--get", "property.json"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
+        self.printHelpTest(result)
+
 
 
     def printHelpTest(self, value):

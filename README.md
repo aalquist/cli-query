@@ -12,7 +12,6 @@ akamai install https://github.com/aalquist/cli-query
 
 ```
 
-
 ## Help Text
 
 ``` 
@@ -223,9 +222,9 @@ optional arguments:
                         Account Switch Key
 
 ``` 
-### Bulk Search Built In Templates
+### Bulk Search Built-In Templates
 
-Out-of-the box bulk searches done on the endpoint. They are listed when running the command:
+Out-of-the box bulk searches done on the bulksearch endpoint. They are listed when running the command:
 
 ``` 
 akamai query bulksearchtemplate 
@@ -277,6 +276,57 @@ akamai query bulksearchtemplate --get gtm-origins.json
   "syntax": "JSONPATH",
   "match": "$..behaviors[?(@.name == 'origin')].options[?(@.hostname =~ /.*akadns.net$/i)].hostname"
  }
+}
+ 
+``` 
+### Bulk Search Built-In Result Filters
+
+Out-of-the box bulk result filters after getting bulksearch endpoint results. They are listed when running the command:
+
+``` 
+akamai query filtertemplate --type bulksearch 
+
+[
+ "result.json",
+ "arg-filter-configname-result.json",
+ "property.json",
+ "default.json",
+ "arg-filter-configname.json"
+]
+ 
+``` 
+
+default.json filter returns each configuration and the value found from the bulk search
+
+``` 
+akamai query filtertemplate --type bulksearch --get default.json 
+
+{
+ "propertyName": "$.propertyName",
+ "results": "$.matchLocationResults[*]"
+}
+
+``` 
+
+result.json filter returns only the value found from the bulk search. This is handy to pipe in values into your own custom scripts for further processing
+
+``` 
+akamai query filtertemplate --type bulksearch --get default.json 
+
+{
+ "propertyName": "$.propertyName",
+ "results": "$.matchLocationResults[*]"
+}
+
+``` 
+
+property.json filter returns only the property names that found the values from the bulk search. This is handy to pipe in values into your own custom scripts for further processing
+
+``` 
+akamai query filtertemplate --type bulksearch --get property.json 
+
+{
+ "results": "$.propertyName"
 }
  
 ``` 
