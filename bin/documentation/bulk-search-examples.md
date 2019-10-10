@@ -151,6 +151,7 @@ Both Output:
 ```
 
 ### More Bulk Searches - Built-In Origin Example:
+Get all the configurations and origin values using the default filter.
 
 ```
 akamai query bulksearch --network Production --searchname origins.json
@@ -167,6 +168,24 @@ Output:
 ["configuration_4", "origin-4.example.com"]
 
 ```
+
+Get all origin values in a flattened list:
+
+```
+akamai query bulksearch --network Production --searchname origins.json --filtername result.json
+
+```
+
+Output:
+
+```
+origin-1.example.com
+origin-2.example.com
+origin-3.example.com
+origin-4.example.com
+
+```
+
 
 ### More Bulk Searches - Built-In GTM Origin Example:
 
