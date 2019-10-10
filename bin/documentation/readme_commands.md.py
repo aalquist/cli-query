@@ -110,7 +110,7 @@ class GenerateReadMeCommands():
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
         self.printHelpTest(result)
 
-        print("### Bulk Search Built In Filters")
+        print("### Bulk Search Built-In Filters")
 
         print()
         print("Filters limit the bulks earch results. The built-in options are listed when running this command:")
@@ -128,7 +128,7 @@ class GenerateReadMeCommands():
 
         print()
         print("result.json filter returns only the value found from the bulk search. This is handy to pipe in values into your own custom scripts for further processing")
-        args = ["filtertemplate", "--type", "bulksearch", "--get", "default.json"]
+        args = ["filtertemplate", "--type", "bulksearch", "--get", "result.json"]
 
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()}"
@@ -141,6 +141,7 @@ class GenerateReadMeCommands():
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
         self.printHelpTest(result)
 
+        print(self.readFile(os.path.join(SCRIPT_DIR, "bulk-search-examples.md")) )
 
 
     def printHelpTest(self, value):
