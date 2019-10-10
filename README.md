@@ -433,13 +433,13 @@ In the example below, I copied one of the built-in filters and added 3 more colu
 Create My Custom Filter:
 
 ```
-'{
+{
  "PropertyName": "$.propertyName",
  "PropertyVersion": "$.propertyVersion",
  "ProductionStatus": "$.productionStatus",
  "StagingStatus": "$.stagingStatus",
  "results": "$.matchLocationResults[*]"
-}'
+}
 ```
 
 Option 1: Pipe In My Custom Filter using STDIN:
