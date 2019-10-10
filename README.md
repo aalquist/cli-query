@@ -537,7 +537,7 @@ Output:
 ```
 
 ### Build Bulk Searches
-Using the developer.akamai.com documentation, you can find a few [bulk search examples](https://developer.akamai.com/api/core_features/property_manager/v1.html#samplebulkupdates) to run.
+Using the [developer.akamai.com](developer.akamai.com) API documentation, you can find a few [bulk search examples](https://developer.akamai.com/api/core_features/property_manager/v1.html#samplebulkupdates) to run.
 
 
 Option 1:
