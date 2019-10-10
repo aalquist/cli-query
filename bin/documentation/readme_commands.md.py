@@ -90,14 +90,14 @@ class GenerateReadMeCommands():
         self.printHelpTest(result)
 
         print()
-        print("default.json bulk search template finds all configuration cpcode values:")
+        print("default.json bulk search template finds all configuration's and their cpcode values:")
         args = [ "bulksearchtemplate", "--get", "default.json"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
         self.printHelpTest(result)
 
         print()
-        print("origins.json template finds all configuration with their origin values:")
+        print("origins.json template finds all configuration and their origins:")
         args = [ "bulksearchtemplate", "--get", "origins.json"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "

@@ -238,7 +238,7 @@ akamai query bulksearchtemplate
  
 ``` 
 
-default.json bulk search template finds all configuration cpcode values:
+default.json bulk search template finds all configuration's and their cpcode values:
 
 ``` 
 akamai query bulksearchtemplate --get default.json 
@@ -252,7 +252,7 @@ akamai query bulksearchtemplate --get default.json
  
 ``` 
 
-origins.json template finds all configuration with their origin values:
+origins.json template finds all configuration and their origins:
 
 ``` 
 akamai query bulksearchtemplate --get origins.json 
