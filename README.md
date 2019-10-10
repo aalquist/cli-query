@@ -279,7 +279,7 @@ akamai query bulksearchtemplate --get gtm-origins.json
 }
  
 ``` 
-### Bulk Search Built In Filters
+### Bulk Search Built-In Filters
 
 Filters limit the bulks earch results. The built-in options are listed when running this command:
 
@@ -311,10 +311,9 @@ akamai query filtertemplate --type bulksearch --get default.json
 result.json filter returns only the value found from the bulk search. This is handy to pipe in values into your own custom scripts for further processing
 
 ``` 
-akamai query filtertemplate --type bulksearch --get default.json 
+akamai query filtertemplate --type bulksearch --get result.json 
 
 {
- "propertyName": "$.propertyName",
  "results": "$.matchLocationResults[*]"
 }
 
