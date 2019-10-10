@@ -204,3 +204,40 @@ Output:
 ["configuration_4", "origin-4.example.com.akadns.net"]
 
 ```
+
+### Build Bulk Searches
+Using the developer.akamai.com documentation, you can find a few [bulk search examples](https://developer.akamai.com/api/core_features/property_manager/v1.html#samplebulkupdates) to run.
+
+
+Option 1:
+Pipe in bulk search JSON via STDIN
+
+```
+akamai query bulksearch --network Production --use-searchstdin << TEXT_BLOCK
+{"bulkSearchQuery":{"syntax":"JSONPATH","match":"$..behaviors[?(@.name == 'sureRoute')].options.testObjectUrl" }}
+TEXT_BLOCK
+
+```
+
+Option 2:
+Save bulk search JSON to file and pass json file as argument  
+
+```
+cat > mysearch.json << TEXT_BLOCK
+{"bulkSearchQuery":{"syntax":"JSONPATH","match":"$..behaviors[?(@.name == 'sureRoute')].options.testObjectUrl" }}
+TEXT_BLOCK
+
+akamai query bulksearch --network Production --searchfile mysearch.json 
+
+```
+
+Both Output:
+
+```
+["propertyName", "results"]
+["configuration_1", "/Akamai/sureroute-test-object.html"]
+["configuration_2", "/Akamai/sureroute-test-object.html"]
+["configuration_3", "/Akamai/sureroute-test-object.html,/Akamai/sureroute-test-object.html"]
+["configuration_4", "/Akamai/sureroute-test-object.html"]
+
+```
