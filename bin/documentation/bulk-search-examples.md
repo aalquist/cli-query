@@ -149,3 +149,39 @@ Both Output:
 ["configuration_4", 44, "ACTIVE", "INACTIVE", 40000]
 
 ```
+
+### More Bulk Searches - Built-In Origin Example:
+
+```
+akamai query bulksearch --network Production --searchname origins.json
+
+```
+
+Output:
+
+```
+["propertyName", "results"]
+["configuration_1", "origin-1.example.com"]
+["configuration_2", "origin-2.example.com"]
+["configuration_3", "origin-3.example.com"]
+["configuration_4", "origin-4.example.com"]
+
+```
+
+### More Bulk Searches - Built-In GTM Origin Example:
+
+```
+akamai query bulksearch --network Production --searchname gtm-origins.json
+
+```
+
+Output:
+
+```
+["propertyName", "results"]
+["configuration_1", "origin-1.example.com.akadns.net"]
+["configuration_2", "origin-2.example.com.akadns.net"]
+["configuration_3", "origin-3.example.com.akadns.net"]
+["configuration_4", "origin-4.example.com.akadns.net"]
+
+```
