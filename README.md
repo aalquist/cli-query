@@ -329,3 +329,100 @@ akamai query filtertemplate --type bulksearch --get property.json
 }
  
 ``` 
+### Bulk Search - Putting it all together
+Here are a few examples how you can use built-in options or your own customized filters & searches.
+
+### First Example:
+Many times its useful to get the list CPCODEs for a set of properties. This is the most common use case, so its the default search. The default filter output shows all of the results for each property on a single line. The default output is one JSON Array per line. If needed, this output can easily be converted into a CSV file [JQ and @CSV formatting](https://stedolan.github.io/jq/manual/#Formatstringsandescaping). 
+
+#### Default Search and Filter:
+```
+akamai query bulksearch --network Production 
+
+```
+Output:
+
+```
+["propertyName", "results"]
+["configuration_1", "10000"]
+["configuration_2", "20000"]
+["configuration_3", "30000,30001,30002,30003"]
+["configuration_4", "40000"]
+
+```
+
+Using JQ @CSV:
+
+```
+akamai query bulksearch --network Production | jq ' . | @csv'
+
+```
+CSV Output:
+
+```
+"\"propertyName\",\"results\""
+"\"configuration_1\",\"10000\""
+"\"configuration_2\",\"20000\""
+"\"configuration_3\",\"30000,30001,30002,30003\""
+"\"configuration_4\",\"40000\""
+
+```
+
+#### Default Search w/ Built-in Results Only fiter:
+For simple output that returns a flattened list of one value per line, modify the above command to use the result.json filter.
+
+Add result.json filter:
+
+```
+akamai query bulksearch --network Production --filtername result.json
+
+```
+
+Outputs Flattened List:
+
+```
+10000
+20000
+30000
+30001
+30002
+30003
+40000
+
+```
+
+#### Default Search - JSON Only:
+In some cases you might want to write your own filter or rather use JQ querying syntax; you can output JSON instead.
+
+```
+akamai query bulksearch --network Production --show-json
+
+```
+
+Outputs:
+
+```
+[
+ {
+  "propertyId": "prp_00001",
+  "propertyVersion": 100,
+  "propertyName": "configuration_1",
+  "productionStatus": "ACTIVE",
+  "stagingStatus": "ACTIVE",
+  "isLatest": true,
+  "isLocked": true,
+  "matchLocations": [
+   "/rules/behaviors/1/options/value/id"
+  ],
+  "lastModifiedTime": "2019-01-01T00:00:00Z",
+  "isSecure": false,
+  "matchLocationResults": [
+   10000
+  ]
+ }
+
+ //...
+
+```
+
+
