@@ -371,7 +371,6 @@ CSV Output:
 #### Default Search w/ Built-in Results Only filter:
 For simple output that returns a flattened list of one value per line, modify the above command to use the result.json filter.
 
-Add result.json filter:
 
 ```
 akamai query bulksearch --network Production --filtername result.json
