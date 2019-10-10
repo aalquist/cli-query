@@ -329,7 +329,7 @@ akamai query filtertemplate --type bulksearch --get property.json
 }
  
 ``` 
-### Bulk Search - Putting it all together
+### Bulk Search - Putting it together
 Here are a few examples how you can use built-in options or your own customized filters & searches.
 
 ### First Example:
@@ -344,10 +344,10 @@ Output:
 
 ```
 ["propertyName", "results"]
-["configuration_1", "10000"]
-["configuration_2", "20000"]
+["configuration_1", 10000]
+["configuration_2", 20000]
 ["configuration_3", "30000,30001,30002,30003"]
-["configuration_4", "40000"]
+["configuration_4", 40000]
 
 ```
 
@@ -424,4 +424,60 @@ Outputs:
 
 ```
 
+
+#### Default Search - Write your own filter:
+To build your own filter, check out the syntax of the built-in filters, copy one, and build your own. Each filter is a map of JSONPath statements where each map key is the column name and its value is a JSONPath. Each JSONPath is executed independently and repeatedly on each result row/item. 
+
+In the example below, I copied one of the built-in filters and added 3 more columns of my own:  PropertyVersion, ProductionStatus, StagingStatus. Now-- I run the same command as before, but have the configuration's version and the activation status for both networks.
+
+Create My Custom Filter:
+
+```
+'{
+ "PropertyName": "$.propertyName",
+ "PropertyVersion": "$.propertyVersion",
+ "ProductionStatus": "$.productionStatus",
+ "StagingStatus": "$.stagingStatus",
+ "results": "$.matchLocationResults[*]"
+}'
+```
+
+Option 1: Pipe In My Custom Filter using STDIN:
+
+```
+echo '{
+ "PropertyName": "$.propertyName",
+ "PropertyVersion": "$.propertyVersion",
+ "ProductionStatus": "$.productionStatus",
+ "StagingStatus": "$.stagingStatus",
+ "results": "$.matchLocationResults[*]"
+}' | akamai query bulksearch --network Production --use-filterstdin
+
+```
+
+Option 2: Save My Custom Filter to a file and read from file:
+
+```
+echo '{
+ "PropertyName": "$.propertyName",
+ "PropertyVersion": "$.propertyVersion",
+ "ProductionStatus": "$.productionStatus",
+ "StagingStatus": "$.stagingStatus",
+ "results": "$.matchLocationResults[*]"
+}' > myfilter.json
+
+akamai query bulksearch --network Production --filterfile myfilter.json
+
+```
+
+Both Output:
+
+```
+["PropertyName", "PropertyVersion", "ProductionStatus", "StagingStatus", "results"]
+["configuration_1", 11, "ACTIVE", "ACTIVE", 10000]
+["configuration_2", 22, "ACTIVE", "INACTIVE", 20000]
+["configuration_3", 33, "ACTIVE", "INACTIVE", "30000,30001,30002,30003"]
+["configuration_4", 44, "ACTIVE", "INACTIVE", 40000]
+
+```
 
