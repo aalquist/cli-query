@@ -224,7 +224,7 @@ optional arguments:
 ``` 
 ### Bulk Search Built-In Templates
 
-Out-of-the box bulk searches done on the bulksearch endpoint. They are listed when running the command:
+Ready to go bulk searches. See them when running the command:
 
 ``` 
 akamai query bulksearchtemplate 
@@ -279,9 +279,9 @@ akamai query bulksearchtemplate --get gtm-origins.json
 }
  
 ``` 
-### Bulk Search Built-In Result Filters
+### Bulk Search Built In Filters
 
-Out-of-the box bulk result filters after getting bulksearch endpoint results. They are listed when running the command:
+Filters limit the bulks earch results. The built-in options are listed when running this command:
 
 ``` 
 akamai query filtertemplate --type bulksearch 

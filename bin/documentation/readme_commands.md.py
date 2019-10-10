@@ -83,7 +83,7 @@ class GenerateReadMeCommands():
 
         print("### Bulk Search Built-In Templates")
         print()
-        print("Out-of-the box bulk searches done on the bulksearch endpoint. They are listed when running the command:")
+        print("Ready to go bulk searches. See them when running the command:")
         args = [ "bulksearchtemplate"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
@@ -110,10 +110,10 @@ class GenerateReadMeCommands():
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
         self.printHelpTest(result)
 
-        print("### Bulk Search Built-In Result Filters")
+        print("### Bulk Search Built In Filters")
 
         print()
-        print("Out-of-the box bulk result filters after getting bulksearch endpoint results. They are listed when running the command:")
+        print("Filters limit the bulks earch results. The built-in options are listed when running this command:")
         args = ["filtertemplate", "--type", "bulksearch"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "
