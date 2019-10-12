@@ -15,6 +15,8 @@ akamai install https://github.com/aalquist/cli-query
 ## Table of Contents:
 
  * [Bulk Search](#querying-property-mangager-configurations)
+    *  [Build BulkSearches](#build-bulk-searches)
+    *  [BulkSearch Result Filters](#default-search---write-your-own-filter)
  * [NetStorage Users](#querying-netstorage-users)
  * [NetStorage Groups](#querying-netstorage-ns4)
  * [Log Delivery Service](#querying-log-delivery-service-lds)
