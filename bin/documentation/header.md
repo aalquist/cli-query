@@ -11,3 +11,11 @@ First install [Akamai CLI](https://developer.akamai.com/cli/docs/getting-started
 akamai install https://github.com/aalquist/cli-query
 
 ```
+
+## Table of Contents:
+
+ * [Bulk Search](#querying-property-mangager-configurations)
+ * [NetStorage Users](#querying-netstorage-users)
+ * [NetStorage Groups](#querying-netstorage-ns4)
+ * [Log Delivery Service](#querying-log-delivery-service-lds)
+

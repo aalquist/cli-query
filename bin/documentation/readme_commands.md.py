@@ -41,7 +41,7 @@ class GenerateReadMeCommands():
         print(self.readFile(os.path.join(SCRIPT_DIR, "header.md")) )
 
 
-        print("## Help Text")
+        print("## Commandline Help Text")
         args = [ "help"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())

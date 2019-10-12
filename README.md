@@ -12,7 +12,15 @@ akamai install https://github.com/aalquist/cli-query
 
 ```
 
-## Help Text
+## Table of Contents:
+
+ * [Bulk Search](#querying-property-mangager-configurations)
+ * [NetStorage Users](#querying-netstorage-users)
+ * [NetStorage Groups](#querying-netstorage-ns4)
+ * [Log Delivery Service](#querying-log-delivery-service-lds)
+
+
+## Commandline Help Text
 
 ``` 
 usage: akamai query help [command] [--version]
