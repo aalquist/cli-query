@@ -438,7 +438,7 @@ Outputs:
 #### Write your own search result filter:
 To build your own filter, check out the syntax of the built-in filters, copy one, and build your own. Each filter is a map of JSONPath statements where the key is the result's column name and the value of the colum is the result of the JSONPath. Each JSONPath is executed independently and repeatedly on each result row/item. 
 
-In the example below, I copied the default.json built-in filter and added 3 more columns of my own:  PropertyVersion, ProductionStatus, StagingStatus. Now-- I run the same command as before, but have the configuration's version and the activation status for both networks.
+Below, the default.json filter was and 3 more columns were added:  PropertyVersion, ProductionStatus, StagingStatus. Then, rerun your last search with the additional output.
 
 Create My Custom Filter:
 
