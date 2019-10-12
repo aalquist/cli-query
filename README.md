@@ -438,7 +438,7 @@ Outputs:
 #### Write your own search result filter:
 To build your own filter, check out the syntax of the built-in filters, copy one, and build your own. Each filter is a map of JSONPath statements where the key is the result's column name and the value of the colum is the result of the JSONPath. Each JSONPath is executed independently and repeatedly on each result row/item. 
 
-Below, the default.json filter was and 3 more columns were added:  PropertyVersion, ProductionStatus, StagingStatus. Then, rerun your last search with the additional output.
+In the example below, copy the default.json filter. Then add 3 more columns from the raw show-json output:  PropertyVersion, ProductionStatus, StagingStatus. Finally, re-run your last search to see the additional columns.
 
 Create My Custom Filter:
 
