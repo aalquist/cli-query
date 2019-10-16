@@ -113,7 +113,8 @@ class GenerateReadMeCommands():
         print("### Bulk Search Built-In Filters")
 
         print()
-        print("Filters limit the bulks earch results. The built-in options are listed when running this command:")
+        print("Filters modify the presentation and fields displayed as part of a bulk search result.")
+        print("The built-in filters are listed when running this command:")
         args = ["filtertemplate", "--type", "bulksearch"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()} "

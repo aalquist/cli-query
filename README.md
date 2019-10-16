@@ -291,7 +291,8 @@ akamai query bulksearchtemplate --get gtm-origins.json
 ``` 
 ### Bulk Search Built-In Filters
 
-Filters limit the bulks earch results. The built-in options are listed when running this command:
+Filters modify the presentation and fields displayed as part of a bulk search result.
+The built-in filters are listed when running this command:
 
 ``` 
 akamai query filtertemplate --type bulksearch 
