@@ -84,6 +84,9 @@ class Fetch_Akamai_OPENAPI_Response():
             _json = result.json()
             return (status_code, _json)
         
+        elif status_code in [204]:
+            return (status_code, dict() )
+
         elif status_code in [500, 501, 502, 503]:
             
             if retry > 0 and context is not None and result.request.method == "GET":

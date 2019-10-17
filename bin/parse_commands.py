@@ -21,6 +21,7 @@ import traceback
 
 from bin.fetch_lds import LdsFetch
 from bin.fetch_netstorage import NetStorageFetch
+from bin.fetch_datastream import DataStreamFetch
 from bin.fetch_cpcodes import CPCODEFetch
 from bin.fetch_propertymanager import PropertyManagerFetch
 
@@ -43,7 +44,7 @@ def get_prog_name():
         prog = "akamai query"
     return prog
 
-def create_sub_command( subparsers, name, help, *, optional_arguments=None, required_arguments=None, actions=None):
+def create_sub_command( subparsers, name, help, *, optional_arguments=None, required_arguments=None, actions=None, disableAccountSwitch=False):
 
     actionname = name
     action = subparsers.add_parser(name=name, help=help, add_help=False)
@@ -103,10 +104,11 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
         help="DEBUG mode to generate additional logs for troubleshooting",
         action="store_true")
 
-    optional.add_argument(
-        "--account-key",
-        help="Account Switch Key",
-        default="")
+    if not disableAccountSwitch:
+        optional.add_argument(
+            "--account-key",
+            help="Account Switch Key",
+            default="")
 
     actions[actionname] = action
 
@@ -250,6 +252,13 @@ def setupCommands(subparsers):
         actions=actions)
     
     create_sub_command(
+        subparsers, "datastream", "Get datastream logs",
+        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Seconds, Minutes & Hours before current time. Eg: 2s, 2m, 2h"} ]),
+        required_arguments=None,
+        disableAccountSwitch=True,
+        actions=actions)
+
+    create_sub_command(
         subparsers, "groupcpcodelist", "CPCODES assigned to groups",
         optional_arguments=combineArgs(defaultQueryArgs, [{"name": "only-contractIds", "help": "limit the query to specific contracts"} ]),
         required_arguments=None,
@@ -360,6 +369,15 @@ def netstorageuser(args):
     queryresult = QueryResult("netstorageuser")
     
     (_ , jsonObj) = fetch.fetchNetStorageUsers(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
+
+    return handleresponse(args, jsonObj, queryresult)
+
+def datastream(args):
+
+    fetch = DataStreamFetch()
+    queryresult = QueryResult("datastream")
+
+    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, debug=args.debug)  
 
     return handleresponse(args, jsonObj, queryresult)
 
