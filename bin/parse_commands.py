@@ -228,6 +228,12 @@ def setupCommands(subparsers):
         actions=actions)
     
     create_sub_command(
+        subparsers, "version", "display the version number",
+        optional_arguments=None,
+        required_arguments=None,
+        actions=actions)
+
+    create_sub_command(
         subparsers, "bulksearchtemplate", "prints a bulksearch template",
         optional_arguments=[ {"name": "get", "help": "get template by name"}],
         required_arguments=None,
@@ -351,6 +357,20 @@ def filtertemplate(args):
 
     print( json.dumps(obj,indent=1) )
     return return_value
+
+def version(args):
+    
+    cwd = os.getcwd()
+    _file = "cli.json"
+    jsonFilePath = os.path.realpath(os.path.join(cwd, _file))
+
+    with open(jsonFilePath, 'r') as myfile:
+        jsonStr = myfile.read()
+    
+    jsonObj = json.loads(jsonStr)
+    version = jsonObj["commands"][0]["version"]
+    print(version)
+    return 0
 
 def ldslist(args):
 
