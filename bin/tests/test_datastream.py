@@ -42,6 +42,10 @@ class DataStream_Test(unittest.TestCase):
             "{}/json/datastream-aggregate/all-aggregate-logs.json".format(self.basedir)
         ]
 
+        self.raw_logs = [
+            "{}/json/datastream-raw/all-raw-logs.json".format(self.basedir)
+        ]
+
     def test_ConvertResponseCodeObjectKeys(self):
 
         dataStreamFetch = DataStreamFetch()
@@ -218,7 +222,7 @@ class DataStream_Test(unittest.TestCase):
                  "--edgerc",
                 commandTester.edgeRc,
                 "--streamId",
-                "2124",
+                "0007",
                 "--timeRange",
                 "20m"
         ]
@@ -244,6 +248,53 @@ class DataStream_Test(unittest.TestCase):
 
             row = json.loads(j)
             self.assertIn(row[0], expectedStartTimes)
+    
+    @patch('requests.Session')
+    def test_DataStreamRAWMockAPI(self, mockSessionObj):
+        session = mockSessionObj()
+        response = MockResponse()
+
+        for mockJson in self.raw_logs:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+            
+        session.post.return_value = response
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+        
+        commandTester = CommandTester(self)
+
+        args = [
+                "datastream_raw",
+                "--debug",
+                "--section",
+                "default",
+                 "--edgerc",
+                commandTester.edgeRc,
+                "--streamId",
+                "0007",
+                "--timeRange",
+                "20m"
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+
+        self.assertEqual(3, len(stdOutResultArray) )
+
+        header = stdOutResultArray[:1]
+        header = json.loads(header[0])
+
+        print(header)
+
+        expectedHeaders = ['CPCODE', 'ResponseCode', 'Method', 'Protocol', 'Host', 'Path']
+        CPCODE = header[0]
+
+        self.assertIn(CPCODE, expectedHeaders)
+
+        values = stdOutResultArray[1:]
+
+        for j in values:
+            json.loads(j)
             
 
         

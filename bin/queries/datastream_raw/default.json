@@ -1,3 +1,8 @@
 {
-    "CPCODE" : "$.cp"
+    "CPCODE" : "$.cp",
+    "ResponseCode" : "$.message.status",
+    "Method" : "$.message.reqMethod",
+    "Protocol" : "$.message.proto",
+    "Host" : "$.message.reqHost",
+    "Path" : "$.message.reqPath"
 }

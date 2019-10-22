@@ -252,7 +252,14 @@ def setupCommands(subparsers):
         actions=actions)
     
     create_sub_command(
-        subparsers, "datastream_aggregate", "Get datastream logs",
+        subparsers, "datastream_aggregate", "Get aggregate datastream logs",
+        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Seconds, Minutes & Hours before current time. Eg: 2s, 2m, 2h"} ]),
+        required_arguments=None,
+        disableAccountSwitch=True,
+        actions=actions)
+
+    create_sub_command(
+        subparsers, "datastream_raw", "Get raw datastream raw logs",
         optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Seconds, Minutes & Hours before current time. Eg: 2s, 2m, 2h"} ]),
         required_arguments=None,
         disableAccountSwitch=True,
@@ -378,6 +385,17 @@ def datastream_aggregate(args):
     queryresult = QueryResult("datastream_aggregate")
 
     logType="aggregate"
+
+    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
+
+    return handleresponse(args, jsonObj, queryresult)
+
+def datastream_raw(args):
+
+    fetch = DataStreamFetch()
+    queryresult = QueryResult("datastream_raw")
+
+    logType="raw"
 
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 

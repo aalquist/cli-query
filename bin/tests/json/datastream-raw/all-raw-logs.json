@@ -1,0 +1,136 @@
+{
+    "numRecords": 2,
+    "metadata": {
+        "page": 0,
+        "pageCount": 28,
+        "perPage": 2,
+        "streamId": "008",
+        "totalNumRecords": 55,
+        "links": [
+            {
+                "first": "/datastream-pull-api/v1/streams/008/raw-logs?start=2019-09-25T11:10:00Z&end=2019-09-25T11:11:00Z&page=0&size=2",
+                "last": "/datastream-pull-api/v1/streams/008/raw-logs?start=2019-09-25T11:10:00Z&end=2019-09-25T11:11:00Z&page=27&size=2",
+                "next": "/datastream-pull-api/v1/streams/008/raw-logs?start=2019-09-25T11:10:00Z&end=2019-09-25T11:11:00Z&page=1&size=2",
+                "self": "/datastream-pull-api/v1/streams/008/raw-logs?start=2019-09-25T11:10:00Z&end=2019-09-25T11:11:00Z&page=0&size=2"
+            }
+        ]
+    },
+    "data": [
+        {
+            "cp": "123456",
+            "guid": "5458506831b55509ff",
+            "id": "008",
+            "processedTime": 1569409801979,
+            "reqid": "55509ff",
+            "start": 1569409795456,
+            "type": "Raw",
+            "geo": {
+                "area": "123",
+                "city": "QUINCY",
+                "country": "US",
+                "lat": "49.1872",
+                "long": "-129.8129",
+                "region": "WA",
+                "zip": "98848"
+            },
+            "message": {
+                "UA": "curl/7.35.0",
+                "bytes": "34801",
+                "cliIP": "23.00.000.24",
+                "fwdHost": "datastream.xyz.akamai.com",
+                "proto": "http",
+                "protoVer": "-",
+                "reqHost": "www.ds-xyz-xyz.in.edgesuite.net",
+                "reqMethod": "GET",
+                "reqPath": "/",
+                "reqPort": "80",
+                "status": "200"
+            },
+            "netPerf": {
+                "asnum": "35994",
+                "downloadTime": "10",
+                "edgeIP": "104.80.88.84",
+                "errCdF29": "ERR_NONE",
+                "errCdR14": "ERR_NONE",
+                "lastByte": "1"
+            },
+            "network": {
+                "bw": "5000",
+                "throughput": "vhigh"
+            },
+            "reqHdr": {
+                "cookie": "COOKIE2-3257829-1569409795",
+                "reqTime": "1569409795.45"
+            },
+            "respHdr": {
+                "accRange": "Accept-Ranges: bytes",
+                "date": "Date: Wed, 25 Sep 2019 11:09:55 GMT",
+                "eTag": "ETag: \\\"12f48e52c6d5298448fe49c05082ff51:1519289789\\\"",
+                "expires": "Expires: Wed, 25 Sep 2019 11:09:55 GMT",
+                "lastMod": "Last-Modified: Thu, 22 Feb 2018 08:56:29 GMT",
+                "respCacheCtl": "Cache-Control: max-age=0",
+                "respConn": "Connection: keep-alive\r\nConnection: Transfer-Encoding",
+                "server": "Server: Apache",
+                "transEnc": "Transfer-Encoding:  chunked"
+            }
+        },
+        {
+            "cp": "123456",
+            "guid": "545850683435554b23",
+            "id": "008",
+            "processedTime": 1569409842763,
+            "reqid": "5554b23",
+            "start": 1569409835101,
+            "type": "Raw",
+            "geo": {
+                "area": "123",
+                "city": "QUINCY",
+                "country": "US",
+                "lat": "49.1872",
+                "long": "-129.8129",
+                "region": "WA",
+                "zip": "98848"
+            },
+            "message": {
+                "UA": "curl/7.35.0",
+                "bytes": "34801",
+                "cliIP": "23.00.000.24",
+                "fwdHost": "datastream.xyz.akamai.com",
+                "proto": "http",
+                "protoVer": "-",
+                "reqHost": "www.ds-xyz-xyz.in.edgesuite.net",
+                "reqMethod": "GET",
+                "reqPath": "/",
+                "reqPort": "80",
+                "status": "200"
+            },
+            "netPerf": {
+                "asnum": "35994",
+                "downloadTime": "10",
+                "edgeIP": "104.80.88.84",
+                "errCdF29": "ERR_NONE",
+                "errCdR14": "ERR_NONE",
+                "lastByte": "1"
+            },
+            "network": {
+                "bw": "5000",
+                "throughput": "vhigh"
+            },
+            "reqHdr": {
+                "cookie": "COOKIE2-3257867-1569409835",
+                "reqTime": "1569409835.10"
+            },
+            "respHdr": {
+                "accRange": "Accept-Ranges: bytes",
+                "date": "Date: Wed, 25 Sep 2019 11:10:35 GMT",
+                "eTag": "ETag: \\\"12f48e52c6d5298448fe49c05082ff51:1519289789\\\"",
+                "expires": "Expires: Wed, 25 Sep 2019 11:10:35 GMT",
+                "lastMod": "Last-Modified: Thu, 22 Feb 2018 08:56:29 GMT",
+                "respCacheCtl": "Cache-Control: max-age=0",
+                "respConn": "Connection: keep-alive\r\nConnection: Transfer-Encoding",
+                "server": "Server: Apache",
+                "transEnc": "Transfer-Encoding:  chunked"
+            }
+        }
+    ]
+}

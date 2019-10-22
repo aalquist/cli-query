@@ -118,15 +118,17 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
         if code in [200] and "data" in json:
             json = json["data"]
 
-            #why? JSONPath doesn't like indexes that start with numbers. changing the index names is easier than the alternatives
-            for j in json:
-                self.convertReponseCodeObjName(j, "1xx")
-                self.convertReponseCodeObjName(j, "2xx")
-                self.convertReponseCodeObjName(j, "3xx")
-                self.convertReponseCodeObjName(j, "4xx")
-                self.convertReponseCodeObjName(j, "5xx")
-            
-            json = self.sortAggregateList( json, "startTime")
+            if logType == "aggregate":
+               
+                #why? JSONPath doesn't like indexes that start with numbers. changing the index names is easier than the alternatives
+                for j in json:
+                    self.convertReponseCodeObjName(j, "1xx")
+                    self.convertReponseCodeObjName(j, "2xx")
+                    self.convertReponseCodeObjName(j, "3xx")
+                    self.convertReponseCodeObjName(j, "4xx")
+                    self.convertReponseCodeObjName(j, "5xx")
+                
+                json = self.sortAggregateList( json, "startTime")
 
             return (code, json)
         else:
