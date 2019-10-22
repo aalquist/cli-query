@@ -59,7 +59,7 @@ class GenerateReadMeCommands():
 
         print("## Querying Datastream Aggregate Data")
         print("Basic support without result pagination")
-        args = [ "help", "datastream_aggregate"]
+        args = [ "help", "datastream_agg"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
