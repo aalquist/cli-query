@@ -51,13 +51,13 @@ class GenerateReadMeCommands():
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
-        print("## Querying Datastream Raw")
+        print("## Querying Datastream Raw Logs")
         print("Basic support without result pagination")
         args = [ "help", "datastream_raw"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
-        print("## Querying Datastream Aggregate")
+        print("## Querying Datastream Aggregate Data")
         print("Basic support without result pagination")
         args = [ "help", "datastream_aggregate"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)

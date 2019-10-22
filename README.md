@@ -71,7 +71,7 @@ optional arguments:
                         Account Switch Key
 
 ``` 
-## Querying Datastream Raw
+## Querying Datastream Raw Logs
 Basic support without result pagination
 
 ``` 
@@ -98,7 +98,7 @@ optional arguments:
                         troubleshooting
 
 ``` 
-## Querying Datastream Aggregate
+## Querying Datastream Aggregate Data
 Basic support without result pagination
 
 ``` 
