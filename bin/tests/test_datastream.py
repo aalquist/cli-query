@@ -16,6 +16,7 @@ import unittest
 import os
 import json
 import sys
+import json
 
 
 from unittest.mock import patch
@@ -25,12 +26,23 @@ from bin.fetch_datastream import DataStreamFetch
 
 import datetime
 from datetime import timedelta
+from bin.credentialfactory import CredentialFactory
+
+from bin.parse_commands import main 
+from bin.tests.unittest_utils import CommandTester, MockResponse
 
 
 
 class DataStream_Test(unittest.TestCase):
 
-    def testConvertResponseCodeObjectKeys(self):
+    def setUp(self):
+        self.basedir = os.path.abspath(os.path.dirname(__file__))
+        self.edgerc = "{}/other/.dummy_edgerc".format(self.basedir)
+        self.aggregate_logs = [
+            "{}/json/datastream-aggregate/all-aggregate-logs.json".format(self.basedir)
+        ]
+
+    def test_ConvertResponseCodeObjectKeys(self):
 
         dataStreamFetch = DataStreamFetch()
         dataStreamFetch.convertReponseCodeObjName
@@ -183,5 +195,60 @@ class DataStream_Test(unittest.TestCase):
         expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
         self.assertEqual(expectedStartStr, new_start )
 
+    @patch('requests.Session')
+    def test_DataStreamAggregateMockAPI(self, mockSessionObj):
+        session = mockSessionObj()
+        response = MockResponse()
+
+        for mockJson in self.aggregate_logs:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+            
+        session.post.return_value = response
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+        
+        commandTester = CommandTester(self)
+
+        args = [
+                "datastream_aggregate",
+                "--debug",
+                "--section",
+                "default",
+                 "--edgerc",
+                commandTester.edgeRc,
+                "--streamId",
+                "2124",
+                "--timeRange",
+                "20m"
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+
+        self.assertEqual(6, len(stdOutResultArray) )
+
+        header = stdOutResultArray[:1]
+        header = json.loads(header[0])
+
+        expectedHeaders = ["startTime", "1xx", "2xx", "3xx", "4xx", "5xx", "endTime"]
+        startTime = header[0]
+
+        self.assertIn(startTime, expectedHeaders)
+
+        values = stdOutResultArray[1:]
+
+        expectedStartTimes = [ "2019-03-13T02:00:00Z", "2019-03-13T02:37:00Z", "2019-03-13T03:13:00Z", "2019-03-13T04:31:00Z", "2019-03-13T04:56:00Z"]
+
+
+        for j in values:
+
+            row = json.loads(j)
+            self.assertIn(row[0], expectedStartTimes)
+            
+
+        
+        
+
+        
 
 
