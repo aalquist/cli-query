@@ -51,6 +51,18 @@ class GenerateReadMeCommands():
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
         self.printHelpTest(result.getvalue())
 
+        print("## Querying Datastream Raw")
+        print("Basic support without result pagination")
+        args = [ "help", "datastream_raw"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        self.printHelpTest(result.getvalue())
+
+        print("## Querying Datastream Aggregate")
+        print("Basic support without result pagination")
+        args = [ "help", "datastream_aggregate"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        self.printHelpTest(result.getvalue())
+
         print("## Querying Netstorage NS4")
         args = [ "help", "netstoragelist"]
         result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)

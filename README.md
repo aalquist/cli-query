@@ -72,6 +72,62 @@ optional arguments:
                         Account Switch Key
 
 ``` 
+## Querying Datastream Raw
+Basic support without result pagination
+
+``` 
+usage: akamai query [command] datastream_raw [--show-json] [--use-filterstdin]
+                                             [--file FILE]
+                                             [--template TEMPLATE]
+                                             [--streamId STREAMID]
+                                             [--timeRange TIMERANGE]
+                                             [--edgerc EDGERC]
+                                             [--section SECTION] [--debug]
+
+optional arguments:
+  --show-json           output json
+  --use-filterstdin     use stdin for query
+  --file FILE           the json file for query
+  --template TEMPLATE   use template name for query
+  --streamId STREAMID   Stream ID
+  --timeRange TIMERANGE
+                        Supported format: \d+[smh]. Eg: 2s, 2m, 2h
+  --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
+  --section SECTION     Section of the credentials file
+                        [$AKAMAI_EDGERC_SECTION]
+  --debug               DEBUG mode to generate additional logs for
+                        troubleshooting
+
+``` 
+## Querying Datastream Aggregate
+Basic support without result pagination
+
+``` 
+usage: akamai query [command] datastream_aggregate [--show-json]
+                                                   [--use-filterstdin]
+                                                   [--file FILE]
+                                                   [--template TEMPLATE]
+                                                   [--streamId STREAMID]
+                                                   [--timeRange TIMERANGE]
+                                                   [--edgerc EDGERC]
+                                                   [--section SECTION]
+                                                   [--debug]
+
+optional arguments:
+  --show-json           output json
+  --use-filterstdin     use stdin for query
+  --file FILE           the json file for query
+  --template TEMPLATE   use template name for query
+  --streamId STREAMID   Stream ID
+  --timeRange TIMERANGE
+                        Supported format: \d+[smh]. Eg: 2s, 2m, 2h
+  --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
+  --section SECTION     Section of the credentials file
+                        [$AKAMAI_EDGERC_SECTION]
+  --debug               DEBUG mode to generate additional logs for
+                        troubleshooting
+
+``` 
 ## Querying Netstorage NS4
 
 ``` 
