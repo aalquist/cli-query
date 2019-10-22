@@ -30,7 +30,39 @@ from datetime import timedelta
 
 class DataStream_Test(unittest.TestCase):
 
-    
+    def testConvertResponseCodeObjectKeys(self):
+
+        dataStreamFetch = DataStreamFetch()
+        dataStreamFetch.convertReponseCodeObjName
+
+        testJSON = {
+            "1xx" : 1,
+            "2xx" : 2,
+            "3xx" : 3,
+            "4xx" : 4,
+            "5xx" : 5
+        }
+
+        jObj = dataStreamFetch.convertReponseCodeObjName(testJSON, "1xx")
+        self.assertTrue( "code_1xx" in jObj)
+        self.assertEquals( 1, jObj["code_1xx"])
+
+        jObj = dataStreamFetch.convertReponseCodeObjName(testJSON, "2xx")
+        self.assertTrue( "code_2xx" in jObj)
+        self.assertEquals( 2, jObj["code_2xx"])
+
+        jObj = dataStreamFetch.convertReponseCodeObjName(testJSON, "3xx")
+        self.assertTrue( "code_3xx" in jObj)
+        self.assertEquals( 3, jObj["code_3xx"])
+
+        jObj = dataStreamFetch.convertReponseCodeObjName(testJSON, "4xx")
+        self.assertTrue( "code_4xx" in jObj)
+        self.assertEquals( 4, jObj["code_4xx"])
+
+        jObj = dataStreamFetch.convertReponseCodeObjName(testJSON, "5xx")
+        self.assertTrue( "code_5xx" in jObj)
+        self.assertEquals( 5, jObj["code_5xx"])
+
 
     def test_list_Calcs(self):
 
@@ -132,6 +164,10 @@ class DataStream_Test(unittest.TestCase):
         end = '2019-10-17T19:45:10Z'
         endDateObj = dataStreamFetch.createDatefromString(end)
         (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2s")
+        self.assertEqual(end, new_end)
+
+        end = '2019-10-17T19:45:10Z'
+        (new_start, new_end) = dataStreamFetch.parseRange(end, "2s")
         self.assertEqual(end, new_end)
 
         expectedStart = endDateObj - delta_2s
