@@ -229,7 +229,7 @@ def setupCommands(subparsers):
     
     create_sub_command(
         subparsers, "version", "display the version number",
-        optional_arguments=None,
+        optional_arguments=[ {"name": "show-git-version", "help": "display git version"} ],
         required_arguments=None,
         actions=actions)
 
@@ -371,6 +371,12 @@ def version(args):
     jsonObj = json.loads(jsonStr)
     version = jsonObj["commands"][0]["version"]
     print(version)
+
+    if args.show_git_version:
+        cmd = "git log -1 --pretty=%H"
+        returned_value = os.system(cmd)
+        print(returned_value)
+
     return 0
 
 def ldslist(args):
