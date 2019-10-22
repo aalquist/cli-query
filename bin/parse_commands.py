@@ -373,9 +373,9 @@ def version(args):
     print(version)
 
     if args.show_git_version:
-        cmd = "git log -1 --pretty=%H"
+        cmd = "cd {}; git log -1 --pretty=%H; cd -".format(SCRIPT_DIR)
         returned_value = os.system(cmd)
-        print(returned_value)
+        return returned_value
 
     return 0
 
