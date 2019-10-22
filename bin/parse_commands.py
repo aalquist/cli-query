@@ -360,9 +360,10 @@ def filtertemplate(args):
 
 def version(args):
     
-    cwd = os.getcwd()
-    _file = "cli.json"
-    jsonFilePath = os.path.realpath(os.path.join(cwd, _file))
+    SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.expanduser(__file__)))
+    SCRIPT_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, '..'))
+
+    jsonFilePath = os.path.realpath(os.path.join(SCRIPT_DIR, "cli.json"))
 
     with open(jsonFilePath, 'r') as myfile:
         jsonStr = myfile.read()
