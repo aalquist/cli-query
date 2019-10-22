@@ -26,13 +26,13 @@ akamai install https://github.com/aalquist/cli-query
 
 ``` 
 usage: akamai query help [command] [--version]
-                                   {help,filtertemplate,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_aggregate,datastream_raw,groupcpcodelist,bulksearch}
+                                   {help,filtertemplate,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
                                    ...
 
 Akamai Query CLI
 
 positional arguments:
-  {help,filtertemplate,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_aggregate,datastream_raw,groupcpcodelist,bulksearch}
+  {help,filtertemplate,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
                         commands
     help                Show available help
     filtertemplate      prints a filter template
@@ -40,8 +40,7 @@ positional arguments:
     ldslist             List all cpcode based log delivery configurations
     netstoragelist      List storage groups
     netstorageuser      List netstorage users
-    datastream_aggregate
-                        Get aggregate datastream logs
+    datastream_agg      Get aggregate datastream logs
     datastream_raw      Get raw datastream raw logs
     groupcpcodelist     CPCODES assigned to groups
     bulksearch          bulk search property manager configurations
@@ -103,29 +102,6 @@ optional arguments:
 Basic support without result pagination
 
 ``` 
-usage: akamai query [command] datastream_aggregate [--show-json]
-                                                   [--use-filterstdin]
-                                                   [--file FILE]
-                                                   [--template TEMPLATE]
-                                                   [--streamId STREAMID]
-                                                   [--timeRange TIMERANGE]
-                                                   [--edgerc EDGERC]
-                                                   [--section SECTION]
-                                                   [--debug]
-
-optional arguments:
-  --show-json           output json
-  --use-filterstdin     use stdin for query
-  --file FILE           the json file for query
-  --template TEMPLATE   use template name for query
-  --streamId STREAMID   Stream ID
-  --timeRange TIMERANGE
-                        Supported format: \d+[smh]. Eg: 2s, 2m, 2h
-  --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
-  --section SECTION     Section of the credentials file
-                        [$AKAMAI_EDGERC_SECTION]
-  --debug               DEBUG mode to generate additional logs for
-                        troubleshooting
 
 ``` 
 ## Querying Netstorage NS4

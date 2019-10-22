@@ -215,7 +215,7 @@ class DataStream_Test(unittest.TestCase):
         commandTester = CommandTester(self)
 
         args = [
-                "datastream_aggregate",
+                "datastream_agg",
                 "--debug",
                 "--section",
                 "default",
