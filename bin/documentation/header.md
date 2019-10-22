@@ -20,4 +20,5 @@ akamai install https://github.com/aalquist/cli-query
  * [NetStorage Users](#querying-netstorage-users)
  * [NetStorage Groups](#querying-netstorage-ns4)
  * [Log Delivery Service](#querying-log-delivery-service-lds)
+ * [DataStream](#querying-datastream-raw-logs)
 
