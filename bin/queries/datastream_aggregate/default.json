@@ -1,0 +1,10 @@
+{
+    "startTime" : "$.startTime",
+    "1xx" : "$.code_1xx",
+    "2xx" : "$.code_2xx",
+    "3xx" : "$.code_3xx",
+    "4xx" : "$.code_4xx",
+    "5xx" : "$.code_5xx",
+    "endTime" : "$.endTime"
+
+}

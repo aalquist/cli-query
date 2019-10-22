@@ -21,6 +21,7 @@ import datetime
 from datetime import timedelta
 import pytz
 import re
+import sys
 
 class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
 
@@ -36,7 +37,7 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
         return d
         
 
-    def parseRange(self, start=None, timerange="2m"):
+    def parseRange(self, end=None, timerange="2m"):
         regex = r"(\d+)([msh])"
         matches = re.search(regex, timerange, re.IGNORECASE | re.DOTALL)
 
@@ -54,50 +55,79 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
             else:
                 raise ValueError("rangeUnit {} is not valid".format(rangeUnit) )
 
-            if start is None:
-                start = datetime.datetime.utcnow()
+            if end is None:
+                end = datetime.datetime.utcnow()
 
-            elif not isinstance(start, datetime.date) :
-                start = self.createDatefromString(start)
+            elif not isinstance(end, datetime.date) :
+                end = self.createDatefromString(end)
 
-            end = start + delta
+            start = end - delta
             
             return (self.formatDatetoString(start), self.formatDatetoString(end) )
             
 
-    def buildStreamUrl(self, context, *, streamId=None, startTime=None, timerange=None):
+    def buildStreamUrl(self, context, *, streamId=None, logType="raw", timerange=None):
         
         if streamId is None:
             raise ValueError("streamId is required")
 
-        url = self.buildUrl("https://{}/datastream-pull-api/v1/streams/{}/raw-logs", context, streamId)
+        if logType not in ["raw", "aggregate"]:
+            raise ValueError("log type must be either raw or aggregate")
 
-        if timerange is None and startTime is None:
+
+        url = self.buildUrl("https://{}/datastream-pull-api/v1/streams/{}/{}-logs", context, streamId, logType)
+
+        if timerange is None:
             (startTime, endTime) = self.parseRange()
-        
-        elif timerange is None:
-            (startTime, endTime) = self.parseRange(start=startTime)
 
         else:
-            (startTime, endTime) = self.parseRange(start=startTime, timerange=timerange)
+            (startTime, endTime) = self.parseRange(timerange=timerange)
 
         queryArgs = [("start", startTime), ("end", endTime)]
 
         url = self.appendQueryStringTupple(url, queryArgs)
         return url
 
-    def fetchLogs(self, *, edgerc, section, streamId=None, startTime=None, timeRange=None, debug=False):
+    def convertReponseCodeObjName(self, jsonElement, codeName):
+
+        if codeName in jsonElement:
+            obj = jsonElement[codeName]
+            del jsonElement[codeName]
+            jsonElement["code_{}".format(codeName)] = obj
+                    
+        return jsonElement
+
+    def sortAggregateList(self, returnedList, sortBy):
+        
+        returnedList = sorted(returnedList, key=lambda x : x[sortBy] )
+        return returnedList
+
+    def fetchLogs(self, *, edgerc, section, streamId=None, startTime=None, timeRange=None, logType="raw", debug=False):
 
         factory = CredentialFactory()
         context = factory.load(edgerc, section, None)
         
-        url = self.buildStreamUrl(context, streamId=streamId, startTime=startTime, timerange=timeRange)
+        url = self.buildStreamUrl(context, streamId=streamId, logType=logType, timerange=timeRange)
         
+        if debug:
+            print(" ... Getting Url: {}".format(url), file=sys.stderr )
+
         result = context.session.get(url)
         code, json = self.handleResponse(result, url, debug)
 
-        if code in [200] and "items" in json:
-            json = json["items"]
+        if code in [200] and "data" in json:
+            json = json["data"]
+
+            #why? JSONPath doesn't like indexes that start with numbers. changing the index names is easier than the alternatives
+            for j in json:
+                self.convertReponseCodeObjName(j, "1xx")
+                self.convertReponseCodeObjName(j, "2xx")
+                self.convertReponseCodeObjName(j, "3xx")
+                self.convertReponseCodeObjName(j, "4xx")
+                self.convertReponseCodeObjName(j, "5xx")
+            
+            json = self.sortAggregateList( json, "startTime")
+
             return (code, json)
         else:
             return (code, json)

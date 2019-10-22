@@ -252,7 +252,7 @@ def setupCommands(subparsers):
         actions=actions)
     
     create_sub_command(
-        subparsers, "datastream", "Get datastream logs",
+        subparsers, "datastream_aggregate", "Get datastream logs",
         optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Seconds, Minutes & Hours before current time. Eg: 2s, 2m, 2h"} ]),
         required_arguments=None,
         disableAccountSwitch=True,
@@ -372,12 +372,14 @@ def netstorageuser(args):
 
     return handleresponse(args, jsonObj, queryresult)
 
-def datastream(args):
+def datastream_aggregate(args):
 
     fetch = DataStreamFetch()
-    queryresult = QueryResult("datastream")
+    queryresult = QueryResult("datastream_aggregate")
 
-    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, debug=args.debug)  
+    logType="aggregate"
+
+    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
     return handleresponse(args, jsonObj, queryresult)
 

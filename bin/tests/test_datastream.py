@@ -30,43 +30,122 @@ from datetime import timedelta
 
 class DataStream_Test(unittest.TestCase):
 
+    
+
+    def test_list_Calcs(self):
+
+        json_list = [
+                        {
+                            "startTime" : "2019-10-21T21:50:00Z",
+                            "1xx" : 88
+                        },
+                        {
+                            "startTime" : "2019-10-21T21:51:00Z",
+                            "1xx" : 66
+                        },
+                        {
+                            "startTime" : "2019-10-21T21:40:00Z",
+                            "1xx" : 77
+                        },
+                        {
+                            "startTime" : "2019-10-21T21:41:00Z",
+                            "1xx" : 55
+                        },
+                        {
+                            "startTime" : "2019-10-21T21:29:00Z",
+                            "1xx" : 44
+                        },
+                        {
+                            "startTime" : "2019-10-21T21:28:00Z",
+                            "1xx" : 33
+                        },
+                        {
+                            "startTime" : "2019-10-21T21:41:01Z",
+                            "1xx" : 22
+                        },
+                        {
+                            "startTime" : "2019-10-21T21:42:00Z",
+                            "1xx" : 11
+                        }
+                      
+                    ]
+            
+        
+        json_data = {}
+        json_data["data"] = json_list
+
+        dataStreamFetch = DataStreamFetch()
+        json_list = dataStreamFetch.sortAggregateList(json_list, "startTime")
+
+        self.assertEqual("2019-10-21T21:28:00Z", json_list[0]["startTime"] )
+        self.assertEqual("2019-10-21T21:29:00Z", json_list[1]["startTime"] )
+        self.assertEqual("2019-10-21T21:40:00Z", json_list[2]["startTime"] )
+        self.assertEqual("2019-10-21T21:51:00Z", json_list[7]["startTime"] )
+        self.assertEqual(8, len(json_list) )
+
+        
+        pass
+
     def test_StartAndEnd_TimeRange_Calculations(self):
        
         dataStreamFetch = DataStreamFetch()
-        start = datetime.datetime.utcnow()
-
+        currentEnd = datetime.datetime.utcnow()
+        currentEndStr = dataStreamFetch.formatDatetoString(currentEnd)
+        
         delta_2s = timedelta(seconds=2)
         delta_2m = timedelta(minutes=2)
         delta_2h = timedelta(hours=2)
         
-        (_, end) = dataStreamFetch.parseRange(start)
-        expectedEnd = start + delta_2m
-        expectedEndStr = dataStreamFetch.formatDatetoString(expectedEnd)
-        self.assertEqual(expectedEndStr, end )
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd)
+        self.assertEqual(currentEndStr, resultingEnd )
+        expectedStart = currentEnd - delta_2m
+        expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
+        self.assertEqual(expectedStartStr, start )
 
-        (_, end) = dataStreamFetch.parseRange(start, "2m")
-        expectedEnd = start + delta_2m
-        expectedEndStr = dataStreamFetch.formatDatetoString(expectedEnd)
-        self.assertEqual(expectedEndStr, end )
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2m")
+        self.assertEqual(currentEndStr, resultingEnd )
+        expectedStart = currentEnd - delta_2m
+        expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
+        self.assertEqual(expectedStartStr, start )
 
-        (_, end) = dataStreamFetch.parseRange(start, "2s")
-        expectedEnd = start + delta_2s
-        expectedEndStr = dataStreamFetch.formatDatetoString(expectedEnd)
-        self.assertEqual(expectedEndStr, end )
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2s")
+        self.assertEqual(currentEndStr, resultingEnd )
+        expectedStart = currentEnd - delta_2s
+        expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
+        self.assertEqual(expectedStartStr, start )
 
-        (_, end) = dataStreamFetch.parseRange(start, "2h")
-        expectedEnd = start + delta_2h
-        expectedEndStr = dataStreamFetch.formatDatetoString(expectedEnd)
-        self.assertEqual(expectedEndStr, end )
-        
-        start = '2019-10-17T19:45:10Z'
-        startDateObj = dataStreamFetch.createDatefromString(start)
-        (new_start, end) = dataStreamFetch.parseRange(start, "2h")
-        self.assertEqual(start, new_start )
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2h")
+        self.assertEqual(currentEndStr, resultingEnd )
+        expectedStart = currentEnd - delta_2h
+        expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
+        self.assertEqual(expectedStartStr, start )
 
-        expectedEnd = startDateObj + delta_2h
-        expectedEndStr = dataStreamFetch.formatDatetoString(expectedEnd)
-        self.assertEqual(expectedEndStr, end)
+        end = '2019-10-17T19:45:10Z'
+        endDateObj = dataStreamFetch.createDatefromString(end)
+        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2h")
+        self.assertEqual(end, new_end)
+
+        expectedStart = endDateObj - delta_2h
+        expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
+        self.assertEqual(expectedStartStr, new_start )
+
+        end = '2019-10-17T19:45:10Z'
+        endDateObj = dataStreamFetch.createDatefromString(end)
+        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2s")
+        self.assertEqual(end, new_end)
+
+        expectedStart = endDateObj - delta_2s
+        expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
+        self.assertEqual(expectedStartStr, new_start )
+
+        end = '2019-10-17T19:45:10Z'
+        endDateObj = dataStreamFetch.createDatefromString(end)
+        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2m")
+        self.assertEqual(end, new_end)
+
+        expectedStart = endDateObj - delta_2m
+        expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
+        self.assertEqual(expectedStartStr, new_start )
 
 
 
