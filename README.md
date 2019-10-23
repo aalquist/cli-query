@@ -51,10 +51,10 @@ positional arguments:
 ## Querying Log Delivery Service (LDS)
 
 ``` 
-usage: akamai query [command] ldslist [--show-json] [--use-filterstdin]
-                                      [--file FILE] [--template TEMPLATE]
-                                      [--edgerc EDGERC] [--section SECTION]
-                                      [--debug] [--account-key ACCOUNT_KEY]
+usage: akamai query ldslist [--show-json] [--use-filterstdin] [--file FILE]
+                            [--template TEMPLATE] [--edgerc EDGERC]
+                            [--section SECTION] [--debug]
+                            [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --show-json           output json
@@ -74,13 +74,11 @@ optional arguments:
 Basic support without result pagination
 
 ``` 
-usage: akamai query [command] datastream_raw [--show-json] [--use-filterstdin]
-                                             [--file FILE]
-                                             [--template TEMPLATE]
-                                             [--streamId STREAMID]
-                                             [--timeRange TIMERANGE]
-                                             [--edgerc EDGERC]
-                                             [--section SECTION] [--debug]
+usage: akamai query datastream_raw [--show-json] [--use-filterstdin]
+                                   [--file FILE] [--template TEMPLATE]
+                                   [--streamId STREAMID]
+                                   [--timeRange TIMERANGE] [--edgerc EDGERC]
+                                   [--section SECTION] [--debug]
 
 optional arguments:
   --show-json           output json
@@ -101,13 +99,11 @@ optional arguments:
 Basic support without result pagination
 
 ``` 
-usage: akamai query [command] datastream_agg [--show-json] [--use-filterstdin]
-                                             [--file FILE]
-                                             [--template TEMPLATE]
-                                             [--streamId STREAMID]
-                                             [--timeRange TIMERANGE]
-                                             [--edgerc EDGERC]
-                                             [--section SECTION] [--debug]
+usage: akamai query datastream_agg [--show-json] [--use-filterstdin]
+                                   [--file FILE] [--template TEMPLATE]
+                                   [--streamId STREAMID]
+                                   [--timeRange TIMERANGE] [--edgerc EDGERC]
+                                   [--section SECTION] [--debug]
 
 optional arguments:
   --show-json           output json
@@ -127,12 +123,10 @@ optional arguments:
 ## Querying Netstorage NS4
 
 ``` 
-usage: akamai query [command] netstoragelist [--show-json] [--use-filterstdin]
-                                             [--file FILE]
-                                             [--template TEMPLATE]
-                                             [--edgerc EDGERC]
-                                             [--section SECTION] [--debug]
-                                             [--account-key ACCOUNT_KEY]
+usage: akamai query netstoragelist [--show-json] [--use-filterstdin]
+                                   [--file FILE] [--template TEMPLATE]
+                                   [--edgerc EDGERC] [--section SECTION]
+                                   [--debug] [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --show-json           output json
@@ -151,12 +145,10 @@ optional arguments:
 ## Querying Netstorage Users
 
 ``` 
-usage: akamai query [command] netstorageuser [--show-json] [--use-filterstdin]
-                                             [--file FILE]
-                                             [--template TEMPLATE]
-                                             [--edgerc EDGERC]
-                                             [--section SECTION] [--debug]
-                                             [--account-key ACCOUNT_KEY]
+usage: akamai query netstorageuser [--show-json] [--use-filterstdin]
+                                   [--file FILE] [--template TEMPLATE]
+                                   [--edgerc EDGERC] [--section SECTION]
+                                   [--debug] [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --show-json           output json
@@ -175,14 +167,11 @@ optional arguments:
 ## Querying Control Center Group CPCodes
 
 ``` 
-usage: akamai query [command] groupcpcodelist [--show-json]
-                                              [--use-filterstdin]
-                                              [--file FILE]
-                                              [--template TEMPLATE]
-                                              [--only-contractIds ONLY_CONTRACTIDS [ONLY_CONTRACTIDS ...]]
-                                              [--edgerc EDGERC]
-                                              [--section SECTION] [--debug]
-                                              [--account-key ACCOUNT_KEY]
+usage: akamai query groupcpcodelist [--show-json] [--use-filterstdin]
+                                    [--file FILE] [--template TEMPLATE]
+                                    [--only-contractIds ONLY_CONTRACTIDS [ONLY_CONTRACTIDS ...]]
+                                    [--edgerc EDGERC] [--section SECTION]
+                                    [--debug] [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --show-json           output json
@@ -203,13 +192,12 @@ optional arguments:
 ## Generic Filter Template Utility
 
 ``` 
-usage: akamai query [command] filtertemplate [--get GET] [--type TYPE]
-                                             [--filterfile FILTERFILE]
-                                             [--args-use-stdin]
-                                             [--arg-list ARG_LIST [ARG_LIST ...]]
-                                             [--edgerc EDGERC]
-                                             [--section SECTION] [--debug]
-                                             [--account-key ACCOUNT_KEY]
+usage: akamai query filtertemplate [--get GET] [--type TYPE]
+                                   [--filterfile FILTERFILE]
+                                   [--args-use-stdin]
+                                   [--arg-list ARG_LIST [ARG_LIST ...]]
+                                   [--edgerc EDGERC] [--section SECTION]
+                                   [--debug] [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --get GET             get template details
@@ -233,16 +221,14 @@ optional arguments:
 ## Querying Property Mangager Configurations
 
 ``` 
-usage: akamai query [command] bulksearch [--show-json] [--use-filterstdin]
-                                         [--filterfile FILTERFILE]
-                                         [--filtername FILTERNAME]
-                                         [--contractId CONTRACTID]
-                                         [--network NETWORK]
-                                         [--use-searchstdin]
-                                         [--searchfile SEARCHFILE]
-                                         [--searchname SEARCHNAME]
-                                         [--edgerc EDGERC] [--section SECTION]
-                                         [--debug] [--account-key ACCOUNT_KEY]
+usage: akamai query bulksearch [--show-json] [--use-filterstdin]
+                               [--filterfile FILTERFILE]
+                               [--filtername FILTERNAME]
+                               [--contractId CONTRACTID] [--network NETWORK]
+                               [--use-searchstdin] [--searchfile SEARCHFILE]
+                               [--searchname SEARCHNAME] [--edgerc EDGERC]
+                               [--section SECTION] [--debug]
+                               [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --show-json           output json
@@ -272,9 +258,9 @@ optional arguments:
 ## Bulk Search Template Utility
 
 ``` 
-usage: akamai query [command] bulksearchtemplate [--get GET] [--edgerc EDGERC]
-                                                 [--section SECTION] [--debug]
-                                                 [--account-key ACCOUNT_KEY]
+usage: akamai query bulksearchtemplate [--get GET] [--edgerc EDGERC]
+                                       [--section SECTION] [--debug]
+                                       [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --get GET             get template by name

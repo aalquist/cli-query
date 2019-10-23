@@ -126,7 +126,7 @@ def initmain():
 
     prog = get_prog_name()
     if len(sys.argv) == 1:
-        prog += " [command]"
+        prog += " "
 
     parser = MyArgumentParser(
             description='Akamai Query CLI',
