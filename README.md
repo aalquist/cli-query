@@ -27,16 +27,17 @@ akamai install https://github.com/aalquist/cli-query
 
 ``` 
 usage: akamai query help [command] [--version]
-                                   {help,filtertemplate,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
+                                   {help,filtertemplate,version,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
                                    ...
 
 Akamai Query CLI
 
 positional arguments:
-  {help,filtertemplate,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
+  {help,filtertemplate,version,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
                         commands
     help                Show available help
     filtertemplate      prints a filter template
+    version             display the version number
     bulksearchtemplate  prints a bulksearch template
     ldslist             List all cpcode based log delivery configurations
     netstoragelist      List storage groups

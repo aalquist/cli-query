@@ -19,6 +19,8 @@ import json
 import copy 
 import traceback
 
+import subprocess
+
 from bin.fetch_lds import LdsFetch
 from bin.fetch_netstorage import NetStorageFetch
 from bin.fetch_datastream import DataStreamFetch
@@ -363,19 +365,21 @@ def version(args):
     SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.expanduser(__file__)))
     SCRIPT_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, '..'))
 
-    jsonFilePath = os.path.realpath(os.path.join(SCRIPT_DIR, "cli.json"))
-
-    with open(jsonFilePath, 'r') as myfile:
-        jsonStr = myfile.read()
     
-    jsonObj = json.loads(jsonStr)
-    version = jsonObj["commands"][0]["version"]
-    print(version)
 
     if args.show_git_version:
         cmd = "cd {}; git log -1 --pretty=%H; cd -".format(SCRIPT_DIR)
-        returned_value = os.system(cmd)
+        returned_value = subprocess.call(cmd, shell=True, stderr=subprocess.DEVNULL)
         return returned_value
+    else:
+
+        jsonFilePath = os.path.realpath(os.path.join(SCRIPT_DIR, "cli.json"))
+        with open(jsonFilePath, 'r') as myfile:
+            jsonStr = myfile.read()
+        
+        jsonObj = json.loads(jsonStr)
+        version = jsonObj["commands"][0]["version"]
+        print(version)
 
     return 0
 
