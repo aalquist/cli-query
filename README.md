@@ -27,25 +27,25 @@ akamai install https://github.com/aalquist/cli-query
 
 ``` 
 usage: akamai query help [command]
-                                   {help,filtertemplate,version,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
+                                   {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate}
                                    ...
 
 Akamai Query CLI
 
 positional arguments:
-  {help,filtertemplate,version,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
+  {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate}
                         commands
     help                Show available help
-    filtertemplate      prints a filter template
     version             display the version number
-    bulksearchtemplate  prints a bulksearch template
     ldslist             List all cpcode based log delivery configurations
     netstoragelist      List storage groups
     netstorageuser      List netstorage users
     datastream_agg      Get aggregate datastream logs
     datastream_raw      Get raw datastream raw logs
     groupcpcodelist     CPCODES assigned to groups
+    filtertemplate      prints a filter template
     bulksearch          bulk search property manager configurations
+    bulksearchtemplate  prints a bulksearch template
 
 ``` 
 ## Querying Log Delivery Service (LDS)

@@ -218,26 +218,10 @@ def setupCommands(subparsers):
                             {"name": "use-filterstdin", "help": "get filter json from stdin"}, 
                             {"name": "filterfile", "help": "the json file to filter results from bulksearch"},
                             {"name": "filtername", "help": "template name to filter results from bulksearch"} ]
-
-    create_sub_command(
-        subparsers, "filtertemplate", "prints a filter template",
-        optional_arguments=[    {"name": "get", "help": "get template details"}, 
-                                {"name": "type", "help": "the templates by filter type"},
-                                {"name": "filterfile", "help": "define your own template. Intended to be used with one of the arg list flags"},
-                                {"name": "args-use-stdin", "help": "use stdin as alternative to arg-list param"},
-                                {"name": "arg-list", "help": "additional args for a JSONPath condition: #JSONPATHCRITERIA.somekey#"}],
-        required_arguments=None,
-        actions=actions)
     
     create_sub_command(
         subparsers, "version", "display the version number",
         optional_arguments=[ {"name": "show-git-version", "help": "display git version"} ],
-        required_arguments=None,
-        actions=actions)
-
-    create_sub_command(
-        subparsers, "bulksearchtemplate", "prints a bulksearch template",
-        optional_arguments=[ {"name": "get", "help": "get template by name"}],
         required_arguments=None,
         actions=actions)
 
@@ -280,6 +264,16 @@ def setupCommands(subparsers):
         actions=actions)
 
     create_sub_command(
+        subparsers, "filtertemplate", "prints a filter template",
+        optional_arguments=[    {"name": "get", "help": "get template details"}, 
+                                {"name": "type", "help": "the templates by filter type"},
+                                {"name": "filterfile", "help": "define your own template. Intended to be used with one of the arg list flags"},
+                                {"name": "args-use-stdin", "help": "use stdin as alternative to arg-list param"},
+                                {"name": "arg-list", "help": "additional args for a JSONPath condition: #JSONPATHCRITERIA.somekey#"}],
+        required_arguments=None,
+        actions=actions)
+
+    create_sub_command(
         subparsers, "bulksearch", "bulk search property manager configurations",
         optional_arguments=combineArgs(bulkSearchQueryArgs, [
                                                             {"name": "contractId", "help": "limit the bulk search scope to a specific contract"},
@@ -288,6 +282,12 @@ def setupCommands(subparsers):
                                                             {"name": "searchfile", "help": "get bulksearch from json file"}, 
                                                             {"name": "searchname", "help": "get bulksearch by name"}, 
                                                              ]),
+        required_arguments=None,
+        actions=actions)
+    
+    create_sub_command(
+        subparsers, "bulksearchtemplate", "prints a bulksearch template",
+        optional_arguments=[ {"name": "get", "help": "get template by name"}],
         required_arguments=None,
         actions=actions)
 
