@@ -26,7 +26,7 @@ akamai install https://github.com/aalquist/cli-query
 ## Commandline Help Text
 
 ``` 
-usage: akamai query help [command] [--version]
+usage: akamai query help [command]
                                    {help,filtertemplate,version,bulksearchtemplate,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,bulksearch}
                                    ...
 
@@ -46,9 +46,6 @@ positional arguments:
     datastream_raw      Get raw datastream raw logs
     groupcpcodelist     CPCODES assigned to groups
     bulksearch          bulk search property manager configurations
-
-optional arguments:
-  --version             show program's version number and exit
 
 ``` 
 ## Querying Log Delivery Service (LDS)

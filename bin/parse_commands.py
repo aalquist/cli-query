@@ -134,7 +134,7 @@ def initmain():
             prog=prog
     )
 
-    parser.add_argument('--version', action='version', version='%(prog)s ' + PACKAGE_VERSION)
+    #parser.add_argument('--version', action='version', version='%(prog)s ' + PACKAGE_VERSION)
 
     subparsers = parser.add_subparsers(help='commands', dest="command")
 
