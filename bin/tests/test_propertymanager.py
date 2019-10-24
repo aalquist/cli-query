@@ -229,7 +229,9 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         session = mockSessionObj()
         response = MockResponse()
+        commandTester = CommandTester(self)
 
+        ## First Check
         for mockJson in self.asyncAllsearchresponses:
             response.appendResponse(response.getJSONFromFile(mockJson))
             
@@ -239,8 +241,6 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         response.status_code = 202
         response.headers = { "Location" : "https://dummy.html"}
         
-        commandTester = CommandTester(self)
-
         args = [
                 "bulksearch",
                 "--debug",
@@ -272,11 +272,91 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         values = stdOutResultArray[1:]
 
-        for j in values:
-            json.loads(j)
-        
-    
+        values = list(map(lambda x: json.loads(x), values))
 
+        self.assertEquals(1, len(values))
+        self.assertEquals(12345,values[0][1])
+        
+
+        ## Next Check
+        response.reset()
+        for mockJson in self.asyncAllsearchresponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+
+        args = [
+                "bulksearch",
+                "--debug",
+                "--section",
+                "default",
+                 "--edgerc",
+                commandTester.edgeRc,
+                "--contractId",
+                contractId,
+                "--account-key",
+                accountKey,
+                "--network",
+                "production"
+
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        
+        header = stdOutResultArray[:1]
+        header = json.loads(header[0])
+
+        expectedHeaders = ['propertyName', 'results']
+
+        self.assertIn(header[0], expectedHeaders)
+        self.assertIn(header[1], expectedHeaders)
+
+        values = stdOutResultArray[1:]
+
+        values = list(map(lambda x: json.loads(x), values))
+
+        self.assertEquals(1, len(values))
+        self.assertEquals(12345,values[0][1])
+
+        ## Next Check
+        response.reset()
+        for mockJson in self.asyncAllsearchresponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+
+        args = [
+                "bulksearch",
+                "--debug",
+                "--section",
+                "default",
+                 "--edgerc",
+                commandTester.edgeRc,
+                "--contractId",
+                contractId,
+                "--account-key",
+                accountKey,
+                "--network",
+                "production",
+                "--searchname",
+                "default.json"
+
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        
+        header = stdOutResultArray[:1]
+        header = json.loads(header[0])
+
+        expectedHeaders = ['propertyName', 'results']
+
+        self.assertIn(header[0], expectedHeaders)
+        self.assertIn(header[1], expectedHeaders)
+
+        values = stdOutResultArray[1:]
+
+        values = list(map(lambda x: json.loads(x), values))
+
+        self.assertEquals(1, len(values))
+        self.assertEquals(12345,values[0][1])
        
 
 if __name__ == '__main__':
