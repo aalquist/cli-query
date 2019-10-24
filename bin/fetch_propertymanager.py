@@ -133,9 +133,12 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         elif network is not None and ( network.startswith("s") or network.startswith("S") ) :
             json = list(filter(lambda x: x["stagingStatus"] == "ACTIVE", json) )
             print(" ... Limiting to staging network with {} ACTIVE properties".format( len(json)) , file=sys.stderr )
+        else:
+            print(" ... Warning: searching unsaved, production, and staging properties. Limit to production or staging network for faster searching" , file=sys.stderr )
+        
         if debug == True:
             print(" ... filtered json:", file=sys.stderr )
-            printjson = jsonlib.dumps(json)
+            printjson = jsonlib.dumps(json, indent=2)
             print(printjson, file=sys.stderr )
 
         jobsize = len(json)
@@ -182,8 +185,8 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.buildGetPropertyUrl(context, propertyId=propertyId, propertyVersion=propertyVersion)
 
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
-        cachedHandler = CachedContextHandler(context, self.cache, cacheResponses=cacheResponses)
-        code, json = cachedHandler.get(url, headers=headers)
+        cachedHandler = CachedContextHandler(context, self.cache, debug=debug)
+        code, json = cachedHandler.get(url, requestHeaders=headers)
         
         if code in [200, 201, 202] and "rules" in json:
 
