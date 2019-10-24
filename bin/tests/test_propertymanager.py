@@ -28,26 +28,8 @@ from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 from bin.credentialfactory import CredentialFactory
 
-class MockResponse:
+from bin.tests.unittest_utils import CommandTester, MockResponse
 
-    def __init__(self):
-        self.status_code = None
-        self.reset()
-        
-    def reset(self):
-        self.jsonObj = []
-
-    def appendResponse(self, obj):
-        self.jsonObj.insert(0,obj)
-
-    def json(self):
-
-        if self.json is not None and len(self.jsonObj) > 0:
-            return self.jsonObj.pop()
-        else :
-            raise Exception("no more mock responses")
-
-        return self.jsonObj
 
 
 
@@ -133,7 +115,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         response = MockResponse()
 
         for mockJson in self.asyncAllsearchresponses:
-            response.appendResponse(self.getJSONFromFile(mockJson))
+            response.appendResponse(response.getJSONFromFile(mockJson))
             
 
         session.post.return_value = response
@@ -153,7 +135,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         response.reset()
 
         for mockJson in self.asyncAllstagingresponses:
-            response.appendResponse(self.getJSONFromFile(mockJson))
+            response.appendResponse(response.getJSONFromFile(mockJson))
 
         (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
 
@@ -187,7 +169,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         response = MockResponse()
 
         for mockJson in self.allsearchresponses:
-            response.appendResponse(self.getJSONFromFile(mockJson))
+            response.appendResponse(response.getJSONFromFile(mockJson))
             
 
         session.post.return_value = response
@@ -207,7 +189,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         response.reset()
 
         for mockJson in self.allstagingresponses:
-            response.appendResponse(self.getJSONFromFile(mockJson))
+            response.appendResponse(response.getJSONFromFile(mockJson))
 
         (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
 
@@ -223,13 +205,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
     
 
-    def getJSONFromFile(self, jsonPath):
-            
-            with open(jsonPath, 'r') as myfile:
-                jsonStr = myfile.read()
-            
-            jsonObj = json.loads(jsonStr)
-            return jsonObj
+
 
        
 
