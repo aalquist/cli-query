@@ -30,6 +30,8 @@ from bin.credentialfactory import CredentialFactory
 
 from bin.tests.unittest_utils import CommandTester, MockResponse
 
+from bin.parse_commands import main 
+
 
 
 
@@ -150,7 +152,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         return json
 
     @patch('requests.Session')
-    def testIntegration(self, mockSessionObj):
+    def testIntegration(self,  mockSessionObj):
         fetch = PropertyManagerFetch()
 
         accountKey="1-abcdef"
@@ -205,7 +207,75 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
     
 
+    @patch('requests.Session')
+    @patch('bin.parse_commands.getArgFromSTDIN')
+    def test_BulkSearchCommand(self,  getArgFromSTDIN, mockSessionObj):
+        
+        accountKey="1-abcdef"
+        
+        contractId="ctr_C-0000"
+        
 
+        postdata = {
+                        "bulkSearchQuery": {
+                            "syntax": "JSONPATH",
+                            "match": "$.behaviors[?(@.name == 'cpCode')].options.value.id"
+                        }
+                    }
+
+        
+        postdata = json.dumps(postdata)
+        getArgFromSTDIN.return_value = postdata
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        for mockJson in self.asyncAllsearchresponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+            
+
+        session.post.return_value = response
+        session.get.return_value = response
+        response.status_code = 202
+        response.headers = { "Location" : "https://dummy.html"}
+        
+        commandTester = CommandTester(self)
+
+        args = [
+                "bulksearch",
+                "--debug",
+                "--section",
+                "default",
+                 "--edgerc",
+                commandTester.edgeRc,
+                "--use-searchstdin",
+                "--contractId",
+                contractId,
+                "--account-key",
+                accountKey,
+                "--network",
+                "production"
+
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        
+        self.assertEqual(2, len(stdOutResultArray) )
+
+        header = stdOutResultArray[:1]
+        header = json.loads(header[0])
+
+        expectedHeaders = ['propertyName', 'results']
+
+        self.assertIn(header[0], expectedHeaders)
+        self.assertIn(header[1], expectedHeaders)
+
+        values = stdOutResultArray[1:]
+
+        for j in values:
+            json.loads(j)
+        
+    
 
        
 

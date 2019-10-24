@@ -284,8 +284,6 @@ class DataStream_Test(unittest.TestCase):
         header = stdOutResultArray[:1]
         header = json.loads(header[0])
 
-        print(header)
-
         expectedHeaders = ['CPCODE', 'ResponseCode', 'Method', 'Protocol', 'Host', 'Path']
         CPCODE = header[0]
 

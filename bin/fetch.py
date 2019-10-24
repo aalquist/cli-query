@@ -163,5 +163,5 @@ class CachedContextHandler(Fetch_Akamai_OPENAPI_Response):
 
         else:
             result = self.context.session.get(url)
-            return self.handleResponse(result, url, self.debug, retry=3, context=self.context)
+            return self.handleResponseWithHeaders(result, url, self.debug, retry=3, headers=headers, context=self.context)
     
