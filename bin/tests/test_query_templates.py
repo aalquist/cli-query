@@ -25,7 +25,7 @@ from bin.fetch_lds import LdsFetch
 from bin.parse_commands import main
 
 from bin.parse_commands import filtertemplate
-
+from bin.tests.unittest_utils import CommandTester
 
 from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
@@ -265,6 +265,38 @@ class Template_Test(unittest.TestCase):
             sys.stdout = saved_stdout
             sys.stderr = saved_stderr
 
+    def testSearchTemplate(self):
+
+        commandTester = CommandTester(self)
+
+        args = [
+                "bulksearchtemplate",
+                "--get",
+                "default.json"
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        stdOutString = os.linesep.join(stdOutResultArray)
+        stdOutJSONDict = json.loads(stdOutString)
+
+        self.assertIn("bulkSearchQuery", stdOutJSONDict)
+
+        ##Next Test
+
+        commandTester = CommandTester(self)
+
+        args = [
+                "bulksearchtemplate"
+                
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        stdOutString = os.linesep.join(stdOutResultArray)
+        stdOutJSONDict = json.loads(stdOutString)
+
+        self.assertIsInstance(stdOutJSONDict, list)
+
+        pass
         
     
     def getJSONFromFile(self, jsonPath):
