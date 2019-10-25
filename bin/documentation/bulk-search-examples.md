@@ -23,17 +23,17 @@ Output:
 Using JQ @CSV:
 
 ```
-akamai query bulksearch --network Production | jq ' . | @csv'
+akamai query bulksearch --network Production | jq -r ' . | @csv'
 
 ```
 CSV Output:
 
 ```
-"\"propertyName\",\"results\""
-"\"configuration_1\",\"10000\""
-"\"configuration_2\",\"20000\""
-"\"configuration_3\",\"30000,30001,30002,30003\""
-"\"configuration_4\",\"40000\""
+"propertyName,results"
+"configuration_1,10000"
+"configuration_2,20000"
+"configuration_3,\"30000,30001,30002,30003\""
+"configuration_4,40000"
 
 ```
 
