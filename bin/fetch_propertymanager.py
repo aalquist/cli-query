@@ -69,7 +69,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         queryArgs = [("validateHostnames", "false")]
 
-        url = self.appendQueryStringArg(url, queryArgs)
+        url = self.appendQueryStringTupple(url, queryArgs)
 
         
         return url
@@ -157,6 +157,18 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         jobsize = len(json)
 
+        def manipulateSearchResults(matchJson, edgerc=None, account_key=None, propertyId=None, propertyVersion=None, cacheResponses=False, debug=None):
+            
+            (code, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=cacheResponses, debug=debug )
+
+            if code in [200, 202]:
+                self.mergeVersionPointerValues(matchJson, propertyJson)
+                (code, digitalPropertyJson) = self.fetchPropertyVersionDigitalProperty(edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
+
+                if code in [200]:
+                    self.mergeDigitalPropertiesValues(matchJson, digitalPropertyJson)
+
+
         for match in json:
             count = count + 1
             propertyId = match["propertyId"]
@@ -166,32 +178,33 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             stagingStatus = match["stagingStatus"]
 
             if productionStatus in [ "ACTIVE", "DEACTIVATED" ] or stagingStatus in [ "ACTIVE", "DEACTIVATED" ]:
-                print(" ... Getting Immutable Property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
-                (code, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=True, debug=debug )
 
-                if code in [200, 202]:
-                    self.mergeVersionPointerValues(match, propertyJson)
+                cacheResponses = True
+                print(" ... Getting Immutable Property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+                manipulateSearchResults(match, edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
 
             else:    
+                cacheResponses = False
                 print(" ... Getting property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
-                (code, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=False, debug=debug )
-                
-                if code in [200, 202]:
-                    self.mergeVersionPointerValues(match, propertyJson)
+                manipulateSearchResults(match, edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
 
         return json
 
     def mergeVersionPointerValues(self, match, propertyJson):
 
-            matchLocations = match["matchLocations"]
-            matchResults = []
-            for pointer in matchLocations:
-                subjson = self.resolvepointer(pointer, propertyJson)
-                matchResults.append(subjson)
-            
-            if len(matchResults) > 0:
-                match["matchLocationResults"] = matchResults
+        matchLocations = match["matchLocations"]
+        matchResults = []
+        for pointer in matchLocations:
+            subjson = self.resolvepointer(pointer, propertyJson)
+            matchResults.append(subjson)
+        
+        if len(matchResults) > 0:
+            match["matchLocationResults"] = matchResults
 
+    def mergeDigitalPropertiesValues(self, searchJson, hostnameJson):
+
+        if len(hostnameJson) > 0:
+            searchJson["hostnames"] = hostnameJson
 
     def validateResponse(self, jsonObj, account_key=None, propertyId=None, propertyVersion=None,):
 
@@ -212,14 +225,14 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.buildGetPropertyDigitalPropertyUrl(context, propertyId=propertyId, propertyVersion=propertyVersion)
 
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
-        #bypassCache = not cacheResponses
-        bypassCache = False
+        bypassCache = not cacheResponses
+        
         cachedHandler = CachedContextHandler(context, self.cache, debug=debug)
         code, jsonObj = cachedHandler.get(url, requestHeaders=headers, bypassCache=bypassCache)
         
-        if code in [200] and "hostnames" in jsonObj:
+        if code in [200] and "hostnames" in jsonObj and "items" in jsonObj["hostnames"]:
             self.validateResponse(jsonObj, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion)
-            jsonObj = jsonObj["hostnames"]
+            jsonObj = jsonObj["hostnames"]["items"]
 
             return (code, jsonObj)
         else:
