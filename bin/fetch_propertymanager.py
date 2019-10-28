@@ -60,6 +60,20 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.buildUrl("https://{}" + uri, context)
         return url
 
+    def buildGetPropertyDigitalPropertyUrl(self, context, *, propertyId=None, propertyVersion=None):
+        
+        #/papi/v1/properties/{propertyId}/versions/{propertyVersion}/hostnames{?contractId,groupId,validateHostnames}
+
+        uri = "/papi/v1/properties/{}/versions/{}/hostnames".format(propertyId,propertyVersion)
+        url = self.buildUrl("https://{}" + uri, context)
+
+        queryArgs = [("validateHostnames", "false")]
+
+        url = self.appendQueryStringArg(url, queryArgs)
+
+        
+        return url
+
     def bulksearch(self, edgerc=None, section=None, account_key=None, contractId=None, groupId=None, postdata=None, network=None, debug=False):
 
         factory = CredentialFactory()
@@ -134,7 +148,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             json = list(filter(lambda x: x["stagingStatus"] == "ACTIVE", json) )
             print(" ... Limiting to staging network with {} ACTIVE properties".format( len(json)) , file=sys.stderr )
         else:
-            print(" ... Warning: searching unsaved, production, and staging properties. Limit to production or staging network for faster searching" , file=sys.stderr )
+            print(" ... Warning: searching non-cacheable properties. Limit to production or staging network for faster searching" , file=sys.stderr )
         
         if debug == True:
             print(" ... filtered json:", file=sys.stderr )
@@ -153,14 +167,21 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
             if productionStatus in [ "ACTIVE", "DEACTIVATED" ] or stagingStatus in [ "ACTIVE", "DEACTIVATED" ]:
                 print(" ... Getting Immutable Property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
-                (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=True, debug=debug )
+                (code, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=True, debug=debug )
+
+                if code in [200, 202]:
+                    self.mergeVersionPointerValues(match, propertyJson)
 
             else:    
                 print(" ... Getting property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
-                (_, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=False, debug=debug )
+                (code, propertyJson) = self.fetchPropertyVersion(edgerc=edgerc, propertyId=propertyId, propertyVersion=propertyVersion, account_key=account_key, cacheResponses=False, debug=debug )
+                
+                if code in [200, 202]:
+                    self.mergeVersionPointerValues(match, propertyJson)
 
+        return json
 
-            
+    def mergeVersionPointerValues(self, match, propertyJson):
 
             matchLocations = match["matchLocations"]
             matchResults = []
@@ -171,11 +192,38 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             if len(matchResults) > 0:
                 match["matchLocationResults"] = matchResults
 
-        return json
 
+    def validateResponse(self, jsonObj, account_key=None, propertyId=None, propertyVersion=None,):
+
+        if propertyId != jsonObj["propertyId"]:
+                raise ValueError("Unexpected API response! Expecting propertyId={} but got {}".format(propertyId, jsonObj["propertyId"] ))
+
+        elif account_key is not None and account_key not in jsonObj["accountId"]:
+            raise ValueError("Unexpected API response! Expecting accountId={} but got {}.".format(account_key,jsonObj["accountId"] ))
+
+        elif propertyVersion != jsonObj["propertyVersion"]:
+            raise ValueError("Unexpected API response! Expecting propertyVersion={} but got {}.".format(propertyVersion,jsonObj["propertyVersion"] ))
    
         
+    def fetchPropertyVersionDigitalProperty(self, edgerc=None, section=None, account_key=None, propertyId=None, propertyVersion=None, cacheResponses=False, debug=False):
+
+        factory = CredentialFactory()
+        context = factory.load(edgerc, section, account_key)
+        url = self.buildGetPropertyDigitalPropertyUrl(context, propertyId=propertyId, propertyVersion=propertyVersion)
+
+        headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
+        #bypassCache = not cacheResponses
+        bypassCache = False
+        cachedHandler = CachedContextHandler(context, self.cache, debug=debug)
+        code, jsonObj = cachedHandler.get(url, requestHeaders=headers, bypassCache=bypassCache)
         
+        if code in [200] and "hostnames" in jsonObj:
+            self.validateResponse(jsonObj, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion)
+            jsonObj = jsonObj["hostnames"]
+
+            return (code, jsonObj)
+        else:
+            return (code, jsonObj)        
 
     
     def fetchPropertyVersion(self, edgerc=None, section=None, account_key=None, propertyId=None, propertyVersion=None, cacheResponses=False, debug=False):
@@ -187,22 +235,15 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
         bypassCache = not cacheResponses
         cachedHandler = CachedContextHandler(context, self.cache, debug=debug)
-        code, json = cachedHandler.get(url, requestHeaders=headers, bypassCache=bypassCache)
+        code, jsonObj = cachedHandler.get(url, requestHeaders=headers, bypassCache=bypassCache)
         
-        if code in [200, 201, 202] and "rules" in json:
+        if code in [200, 201, 202] and "rules" in jsonObj:
 
-            if propertyId != json["propertyId"]:
-                raise ValueError("Unexpected API response! Expecting propertyId={} but got {}".format(propertyId, json["propertyId"] ))
-
-            elif account_key is not None and account_key not in json["accountId"]:
-                raise ValueError("Unexpected API response! Expecting accountId={} but got {}.".format(account_key,json["accountId"] ))
-
-            elif propertyVersion != json["propertyVersion"]:
-                raise ValueError("Unexpected API response! Expecting propertyVersion={} but got {}.".format(propertyVersion,json["propertyVersion"] ))
-
-            return (code, json)
+            self.validateResponse(jsonObj, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion)
+            return (code, jsonObj)
+            
         else:
-            return (code, json)
+            return (code, jsonObj)
 
     
     def resolvepointer(self, pointer, doc):
