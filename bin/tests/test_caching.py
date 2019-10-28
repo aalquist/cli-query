@@ -14,15 +14,85 @@
 
 import unittest
 
+import os
+import datetime
+
 from bin.decorator import count_calls
 from bin.decorator import cacheFunctionCall
 
 from bin.decorator import cache
+from diskcache import Cache
 from bin.decorator import CacheManager
 from bin.decorator import CallCount
 
+from bin.credentialfactory import CredentialFactory
+
+from bin.fetch import CachedContextHandler
+
+from bin.tests.unittest_utils import MockResponse
+
+from unittest.mock import patch
+
+import json
+
+
 class CachingTest(unittest.TestCase):
 
+    def setUp(self):
+        self.basedir = os.path.abspath(os.path.dirname(__file__))
+        self.edgerc = "{}/other/.dummy_edgerc".format(self.basedir)
+        
+    @patch('requests.Session')
+    def test_CachedContextHandler(self, mockSessionObj):
+
+        factory = CredentialFactory()
+        self.context = factory.load(self.edgerc, None, "account_key_789")
+
+        cache = Cache()
+        cachedHandler = CachedContextHandler(self.context, cache)
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        session.get.return_value = response
+        response.status_code = 200
+
+        datevalue = str( datetime.datetime.now() )
+
+        response.appendResponse(json.dumps( { "date" : datevalue } ))
+
+
+        url = "https://test"
+        _, value = cachedHandler.get(url, requestHeaders=None, bypassCache=False)
+
+        newDict = json.loads(value)
+        newDate = newDict["date"]
+
+        self.assertEquals(datevalue, newDate)
+
+        response.appendResponse(json.dumps( { "date" : "date-should-not-be-used" } ))
+
+        url = "https://test"
+        _, value = cachedHandler.get(url, requestHeaders=None, bypassCache=False)
+
+        newDict = json.loads(value)
+        newDate = newDict["date"]
+
+        self.assertEquals(datevalue, newDate)
+        response.reset()
+
+        response.appendResponse(json.dumps( { "date" : "date-should-be-used" } ))
+
+        url = "https://test"
+        _, value = cachedHandler.get(url, requestHeaders=None, bypassCache=True)
+
+        newDict = json.loads(value)
+        newDate = newDict["date"]
+
+        self.assertEquals("date-should-be-used", newDate)
+
+
+        
     def test_caching_function_helper(self):
 
         def oneFunc(one, two, three):

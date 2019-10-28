@@ -151,8 +151,14 @@ class CachedContextHandler(Fetch_Akamai_OPENAPI_Response):
         self.debug = debug
         self.cache = cache
     
-    def get(self, url, requestHeaders=None):
-        value = cacheFunctionCall(self._get, self.cache, url, requestHeaders=requestHeaders)
+    def get(self, url, requestHeaders=None, bypassCache=False):
+
+        if not bypassCache:
+            value = cacheFunctionCall(self._get, self.cache, url, requestHeaders=requestHeaders)
+
+        else:
+            value = self._get(url, requestHeaders=requestHeaders)
+        
         return value
 
     def _get(self, url, requestHeaders=None):

@@ -185,8 +185,9 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.buildGetPropertyUrl(context, propertyId=propertyId, propertyVersion=propertyVersion)
 
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
+        bypassCache = not cacheResponses
         cachedHandler = CachedContextHandler(context, self.cache, debug=debug)
-        code, json = cachedHandler.get(url, requestHeaders=headers)
+        code, json = cachedHandler.get(url, requestHeaders=headers, bypassCache=bypassCache)
         
         if code in [200, 201, 202] and "rules" in json:
 
