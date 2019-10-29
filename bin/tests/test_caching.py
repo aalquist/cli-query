@@ -82,7 +82,8 @@ class CachingTest(unittest.TestCase):
         response.reset()
 
         response.appendResponse(json.dumps( { "date" : "date-should-be-used" } ))
-
+        response.status_code = 200
+        
         url = "https://test"
         _, value = cachedHandler.get(url, requestHeaders=None, bypassCache=True)
 

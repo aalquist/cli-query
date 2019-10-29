@@ -48,11 +48,11 @@ class CommandTester:
 class MockResponse:
 
     def __init__(self):
-        self.status_code = None
         self.reset()
         
     def reset(self):
         self.jsonObj = []
+        self.code = None
 
     def appendResponse(self, obj):
         self.jsonObj.insert(0,obj)
@@ -69,9 +69,27 @@ class MockResponse:
 
         if self.json is not None and len(self.jsonObj) > 0:
             return self.jsonObj.pop()
-        else :
+        else:
             raise Exception("no more mock responses")
 
         return self.jsonObj
 
+    @property
+    def status_code(self):
+
+        if self.code is not None and self.code is list and len(self.code) > 0:
+            return self.code.pop()
+
+        elif self.code is not None and self.code is not list:
+            return self.code
+
+        else:
+            raise Exception("no more mock code responses")
+
+        return self.code
+
+    @status_code.setter
+    def status_code(self, newValue):
+        self.code = newValue 
+    
 

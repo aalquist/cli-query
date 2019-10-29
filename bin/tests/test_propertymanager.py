@@ -135,6 +135,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         self.assertEquals(12345,results[0])
 
         response.reset()
+        response.status_code = 202
 
         for mockJson in self.asyncAllstagingresponses:
             response.appendResponse(response.getJSONFromFile(mockJson))
@@ -189,6 +190,8 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         self.assertEquals(12345,results[0])
 
         response.reset()
+        
+        response.status_code = 200
 
         for mockJson in self.allstagingresponses:
             response.appendResponse(response.getJSONFromFile(mockJson))
@@ -280,6 +283,8 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         ## Next Check
         response.reset()
+        response.status_code = 202
+
         for mockJson in self.asyncAllsearchresponses:
             response.appendResponse(response.getJSONFromFile(mockJson))
 
@@ -319,6 +324,8 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         ## Next Check
         response.reset()
+        response.status_code = 202
+
         for mockJson in self.asyncAllsearchresponses:
             response.appendResponse(response.getJSONFromFile(mockJson))
 
