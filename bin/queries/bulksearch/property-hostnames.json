@@ -1,0 +1,4 @@
+{
+    "PropertyName": "$.propertyName",
+    "Hostnames": "$.hostnames[*].cnameFrom"
+}

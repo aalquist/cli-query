@@ -1,0 +1,6 @@
+{
+    "propertyName": "$.propertyName",
+    "propertyVersion": "$.propertyVersion",
+    "Hostnames": "$.hostnames[*].cnameFrom",
+    "results": "$.matchLocationResults[*]"
+}
