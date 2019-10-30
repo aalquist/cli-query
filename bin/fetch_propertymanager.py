@@ -33,16 +33,31 @@ from bin.decorator import cacheFunctionCall
 
 class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
+    forceTempCache = False
+
+    @staticmethod
+    def UseTempCache():
+        PropertyManagerFetch.forceTempCache = True
+
+    @staticmethod
+    def DisableTempCache():
+        PropertyManagerFetch.forceTempCache = False
+
     def __init__(self, tempCache=False):
         
         cacheDir = os.environ.get('AKAMAI_CLI_CACHE_PATH')
         cacheDirCommand = os.environ.get('AKAMAI_CLI_COMMAND')
-        
 
-        if not tempCache and cacheDir is not None and cacheDirCommand is not None :
+        if PropertyManagerFetch.forceTempCache:
+            self.cache = Cache()
+            self.cache.clear()
+
+        elif not tempCache and cacheDir is not None and cacheDirCommand is not None :
             self.cache = Cache(directory="{}/{}/PropertyManagerFetch".format(cacheDir,cacheDirCommand) )
+
         elif not tempCache:
             self.cache = Cache(directory="cache/PropertyManagerFetch")
+
         else:
             self.cache = Cache()
             self.cache.clear()

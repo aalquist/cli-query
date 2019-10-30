@@ -14,4 +14,8 @@ WORKDIR /cli-test
 RUN git init && git config user.email "aaalquis@akamai.com" && git config user.name "Aaron Alquist" && git add . && git commit -m "Initial"
 
 RUN cat requirements.txt
-RUN pip3 install -r requirements.txt && akamai install file://$PWD
+RUN pip3 install -r requirements.txt
+
+RUN akamai install file://$PWD
+
+RUN ls

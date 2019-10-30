@@ -39,6 +39,9 @@ from bin.parse_commands import main
 class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
     def setUp(self):
+
+        PropertyManagerFetch.UseTempCache()
+
         self.basedir = os.path.abspath(os.path.dirname(__file__))
         self.edgerc = "{}/other/.dummy_edgerc".format(self.basedir)
         self.allsearchresponses = [
@@ -59,10 +62,10 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
             
         ]
 
-        self.allstagingresponses = [
-            "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir),
-            "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir)
-            
+        self.allstagingresponsesMaps = [
+            { "uri" : "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir), "code" : 200 },
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir), "code" : 200 },
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir), "code" : 200 }            
         ]
 
         self.asyncAllstagingresponses = [
@@ -81,7 +84,8 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
             { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir), "code" : 200 }            
         ]
 
-        
+    def tearDown(self):
+         PropertyManagerFetch.DisableTempCache()
 
     def testURLStructure(self):
 
@@ -107,7 +111,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
     @patch('requests.Session')
     def testAsyncIntegration(self, mockSessionObj):
-        fetch = PropertyManagerFetch(tempCache=True)
+        fetch = PropertyManagerFetch()
 
         accountKey="1-abcdef"
         
@@ -153,7 +157,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
             response.appendResponse( response.getJSONFromFile(mapObj["uri"]))
             response.appendResponseCode( mapObj["code"])
 
-        fetch = PropertyManagerFetch(tempCache=True)
+        fetch = PropertyManagerFetch()
         (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
 
         self.assertEquals(1, len(json))
@@ -209,10 +213,10 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         response.reset()
         
-        response.status_code = 200
+        for mapObj in self.allstagingresponsesMaps:
 
-        for mockJson in self.allstagingresponses:
-            response.appendResponse(response.getJSONFromFile(mockJson))
+            response.appendResponse( response.getJSONFromFile(mapObj["uri"]))
+            response.appendResponseCode( mapObj["code"])
 
         (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
 
