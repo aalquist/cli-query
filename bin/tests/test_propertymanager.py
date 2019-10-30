@@ -73,7 +73,15 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
             
         ]
 
-        pass
+        self.asyncAllstagingresponseMaps = [
+            { "uri" : "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir), "code" : 202 },
+            { "uri" : "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir), "code" : 202 },
+            { "uri" : "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir), "code" : 202 },
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir), "code" : 200 },
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir), "code" : 200 }            
+        ]
+
+        
 
     def testURLStructure(self):
 
@@ -99,7 +107,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
     @patch('requests.Session')
     def testAsyncIntegration(self, mockSessionObj):
-        fetch = PropertyManagerFetch()
+        fetch = PropertyManagerFetch(tempCache=True)
 
         accountKey="1-abcdef"
         
@@ -135,12 +143,18 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         self.assertEquals(12345,results[0])
 
         response.reset()
-        response.status_code = 202
 
-        for mockJson in self.asyncAllstagingresponses:
-            response.appendResponse(response.getJSONFromFile(mockJson))
 
-        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
+
+        
+
+        for mapObj in self.asyncAllstagingresponseMaps:
+
+            response.appendResponse( response.getJSONFromFile(mapObj["uri"]))
+            response.appendResponseCode( mapObj["code"])
+
+        fetch = PropertyManagerFetch(tempCache=True)
+        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=True)
 
         self.assertEquals(1, len(json))
         results = json[0]["matchLocationResults"]

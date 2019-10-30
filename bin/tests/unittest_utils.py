@@ -57,6 +57,17 @@ class MockResponse:
     def appendResponse(self, obj):
         self.jsonObj.insert(0,obj)
 
+    def appendResponseCode(self, obj):
+        
+        if self.code is None:
+            self.code = list()
+
+        if isinstance(self.code, list):
+            self.code.insert(0,obj)
+
+        else:
+            raise Exception("can't append to non list")
+
     def getJSONFromFile(self, jsonPath):
             
             with open(jsonPath, 'r') as myfile:
@@ -68,7 +79,10 @@ class MockResponse:
     def json(self):
 
         if self.json is not None and len(self.jsonObj) > 0:
-            return self.jsonObj.pop()
+            obj = self.jsonObj.pop()
+            print(" ... popping mock json obj" , file=sys.stderr )
+            return obj
+
         else:
             raise Exception("no more mock responses")
 
@@ -77,10 +91,12 @@ class MockResponse:
     @property
     def status_code(self):
 
-        if self.code is not None and self.code is list and len(self.code) > 0:
-            return self.code.pop()
+        if self.code is not None and isinstance(self.code, list) and len(self.code) > 0:
+            code = self.code.pop()
+            print(" ... popping mock code {}".format(code) , file=sys.stderr )
+            return code
 
-        elif self.code is not None and self.code is not list:
+        elif self.code is not None and not isinstance(self.code, list):
             return self.code
 
         else:
