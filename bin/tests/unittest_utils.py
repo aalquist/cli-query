@@ -80,7 +80,7 @@ class MockResponse:
 
         if self.json is not None and len(self.jsonObj) > 0:
             obj = self.jsonObj.pop()
-            print(" ... popping mock json obj" , file=sys.stderr )
+            #print(" ... popping mock json obj" , file=sys.stderr )
             return obj
 
         else:
@@ -93,7 +93,7 @@ class MockResponse:
 
         if self.code is not None and isinstance(self.code, list) and len(self.code) > 0:
             code = self.code.pop()
-            print(" ... popping mock code {}".format(code) , file=sys.stderr )
+            #print(" ... popping mock code {}".format(code) , file=sys.stderr )
             return code
 
         elif self.code is not None and not isinstance(self.code, list):

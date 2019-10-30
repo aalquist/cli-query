@@ -264,7 +264,6 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         
         args = [
                 "bulksearch",
-                "--debug",
                 "--section",
                 "default",
                  "--edgerc",
