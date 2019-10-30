@@ -154,7 +154,7 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
             response.appendResponseCode( mapObj["code"])
 
         fetch = PropertyManagerFetch(tempCache=True)
-        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=True)
+        (_, json) = fetch.bulksearch(edgerc=edgerc, postdata=postdata, account_key=accountKey, contractId=contractId, network="Staging", debug=False)
 
         self.assertEquals(1, len(json))
         results = json[0]["matchLocationResults"]
@@ -163,6 +163,10 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         self.assertEquals(12345, results[0])
         self.assertEquals(678910, results[1])
         
+        results = json[0]["hostnames"]
+        self.assertEquals(2, len(results))
+        self.assertEquals("example1.com", results[0]["cnameFrom"] )
+        self.assertEquals("m.example1.com", results[1]["cnameFrom"] )
 
         return json
 
@@ -305,7 +309,6 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         args = [
                 "bulksearch",
-                "--debug",
                 "--section",
                 "default",
                  "--edgerc",
@@ -346,7 +349,6 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         args = [
                 "bulksearch",
-                "--debug",
                 "--section",
                 "default",
                  "--edgerc",
