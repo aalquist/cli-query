@@ -419,7 +419,7 @@ def datastream_agg(args):
 
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
+    return handleresponse(args, jsonObj, queryresult, RequireAll=False, Debug=args.debug)
 
 def datastream_raw(args):
 

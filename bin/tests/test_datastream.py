@@ -229,7 +229,7 @@ class DataStream_Test(unittest.TestCase):
 
         stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
 
-        self.assertEqual(6, len(stdOutResultArray) )
+        self.assertEqual(5, len(stdOutResultArray) )
 
         header = stdOutResultArray[:1]
         header = json.loads(header[0])
@@ -237,7 +237,7 @@ class DataStream_Test(unittest.TestCase):
         expectedHeaders = ["startTime", "1xx", "2xx", "3xx", "4xx", "5xx", "endTime"]
         startTime = header[0]
 
-        self.assertIn(startTime, expectedHeaders)
+        self.assertNotIn(startTime, expectedHeaders)
 
         values = stdOutResultArray[1:]
 
