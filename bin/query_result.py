@@ -176,11 +176,11 @@ class QueryResult():
         queryjson = self.getQueryPath(dir_path=dir_path, fileName="default.json")
         return self.getJsonQueryFile(queryjson)
     
-    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True):
+    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True, Debug=False):
         defaultquery = self.getDefaultJsonQuery()
-        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader)
+        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader, Debug=Debug)
 
-    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True):
+    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True, Debug=False):
         queries = list(dictObj.values() )
 
         returnList = []
@@ -188,7 +188,9 @@ class QueryResult():
         if ReturnHeader:
             header = list(dictObj.keys())
             returnList.append(header)
-            
+        elif Debug:
+            print( " ... printing of header excluded", file=sys.stderr )
+
         result = self.parseElement(json, queries, RequireAll, JoinValues, returnList )
 
         

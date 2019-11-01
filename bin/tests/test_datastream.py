@@ -279,7 +279,7 @@ class DataStream_Test(unittest.TestCase):
 
         stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
 
-        self.assertEqual(3, len(stdOutResultArray) )
+        self.assertEqual(2, len(stdOutResultArray) )
 
         header = stdOutResultArray[:1]
         header = json.loads(header[0])
@@ -287,7 +287,7 @@ class DataStream_Test(unittest.TestCase):
         expectedHeaders = ['CPCODE', 'ResponseCode', 'Method', 'Protocol', 'Host', 'Path']
         CPCODE = header[0]
 
-        self.assertIn(CPCODE, expectedHeaders)
+        self.assertNotIn(CPCODE, expectedHeaders)
 
         values = stdOutResultArray[1:]
 

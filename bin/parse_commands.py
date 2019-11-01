@@ -390,7 +390,7 @@ def ldslist(args):
 
     (_ , jsonObj) = fetch.fetchCPCodeProducts(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def netstoragelist(args):
 
@@ -399,7 +399,7 @@ def netstoragelist(args):
     
     (_ , jsonObj) = fetch.fetchNetStorageGroups(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def netstorageuser(args):
 
@@ -408,7 +408,7 @@ def netstorageuser(args):
     
     (_ , jsonObj) = fetch.fetchNetStorageUsers(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def datastream_agg(args):
 
@@ -419,7 +419,7 @@ def datastream_agg(args):
 
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def datastream_raw(args):
 
@@ -430,7 +430,7 @@ def datastream_raw(args):
 
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, RequireAll=False, Debug=args.debug)
 
 def bulksearch(args):
 
@@ -455,9 +455,9 @@ def bulksearch(args):
     else:
         postdata = queryresult.loadTemplate("default.json", serverside=serverside)
 
-    (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network ,debug=args.debug)  
+    (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def groupcpcodelist(args):
 
@@ -469,9 +469,9 @@ def groupcpcodelist(args):
     else:
         (_ , jsonObj) = fetch.fetchGroupCPCODES(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
-    return handleresponse(args, jsonObj, queryresult)
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
-def handleresponse(args, jsonObj, queryresult, enableSTDIN = True):
+def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = True, Debug=False):
 
     notJSONOutput = False
 
@@ -513,16 +513,16 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True):
                 inputString = getArgFromFile(file)
 
             templateJson = queryresult.loadJson(inputString)
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson)
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, Debug=Debug)
 
         elif template is not None :
 
             templateJson = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson)
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, Debug=Debug)
             
         else:
-            
-            parsed = queryresult.parseCommandDefault(jsonObj)
+            ReturnHeader = RequireAll
+            parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, Debug=Debug)
 
         for line in parsed:
 
@@ -537,14 +537,14 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True):
 
     return 0   
 
-def flatten(queryresult, jsonObj, templateJson):
+def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, Debug=False):
 
     notJSONOutput = False
     
 
     if len(templateJson) == 1 : 
         notJSONOutput = True
-        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, JoinValues=False, ReturnHeader=False)
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, JoinValues=False, ReturnHeader=False, Debug=Debug)
         
         flattenedParsed = []
         for p in parsed:
@@ -552,7 +552,7 @@ def flatten(queryresult, jsonObj, templateJson):
         parsed = flattenedParsed
 
     else:
-        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson)
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, Debug=Debug)
 
     return (notJSONOutput, parsed)
 
