@@ -33,13 +33,20 @@ class QueryResult():
     
     def buildParseExp(self, paths):
         
-        try:
-            expr = Path.parse_str(paths)
-            return expr
+        if isinstance (paths, str):
 
-        except Exception as identifier:
-            raise ValueError("JSON path: {} error: {}".format(paths, identifier))
+            try:
+                expr = Path.parse_str(paths)
+                return expr
 
+            except Exception as identifier:
+
+                raise ValueError("JSON path: {} error: {}".format(paths, identifier))
+
+        else:
+
+            dictString = str(paths)
+            raise ValueError("JSON path is not a string: {}".format(dictString) )
     
     def parseExp(self, json, expression):
         data = list(map(lambda match_data : match_data.current_value, expression.match( json ) ) )
