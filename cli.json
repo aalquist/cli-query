@@ -5,7 +5,7 @@
     "commands": [
       {
         "name": "query",
-        "version": "0.0.3",
+        "version": "0.0.4",
         "description": "Generic querying CLI for multiple end points"
       }
     ]
