@@ -341,6 +341,7 @@ akamai query filtertemplate --type bulksearch
 [
  "result.json",
  "property-hostnames.json",
+ "property-product-result.json",
  "property-version-result.json",
  "arg-filter-configname-result.json",
  "property-hostnames-version-result.json",
