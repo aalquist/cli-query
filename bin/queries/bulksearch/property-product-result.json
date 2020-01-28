@@ -1,0 +1,5 @@
+{
+    "propertyName": "$.propertyName",
+    "productId": "$.versionInfo.productId",
+    "results": "$.matchLocationResults[*]"
+}
