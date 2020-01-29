@@ -31,6 +31,9 @@ from bin.credentialfactory import CredentialFactory
 from bin.parse_commands import main 
 from bin.tests.unittest_utils import CommandTester, MockResponse
 
+from bin.send_analytics import Analytics 
+obj = Analytics()
+obj.disableAnalytics()
 
 
 class DataStream_Test(unittest.TestCase):

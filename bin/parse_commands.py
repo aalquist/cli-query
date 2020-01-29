@@ -29,6 +29,9 @@ from bin.fetch_propertymanager import PropertyManagerFetch
 
 from bin.query_result import QueryResult
 
+from bin.send_analytics import Analytics 
+
+import inspect
 
 
 import json
@@ -296,6 +299,9 @@ def setupCommands(subparsers):
     return actions
 
 def bulksearchtemplate(args):
+    
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     return_value = 0    
     searchType = "bulksearch"
@@ -314,10 +320,14 @@ def bulksearchtemplate(args):
         
 
     print( json.dumps(obj,indent=1) )
+    thread.join()
     return return_value
 
 
 def filtertemplate(args):
+
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path)
 
     return_value = 0    
 
@@ -358,6 +368,8 @@ def filtertemplate(args):
         
 
     print( json.dumps(obj,indent=1) )
+
+    thread.join()
     return return_value
 
 def version(args):
@@ -385,32 +397,47 @@ def version(args):
 
 def ldslist(args):
 
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
+
     fetch = LdsFetch()
     queryresult = QueryResult("ldslist")
 
     (_ , jsonObj) = fetch.fetchCPCodeProducts(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
+    thread.join()
     return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def netstoragelist(args):
+
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     fetch = NetStorageFetch()
     queryresult = QueryResult("netstoragelist")
     
     (_ , jsonObj) = fetch.fetchNetStorageGroups(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
-
+    
+    thread.join()
     return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def netstorageuser(args):
+
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     fetch = NetStorageFetch()
     queryresult = QueryResult("netstorageuser")
     
     (_ , jsonObj) = fetch.fetchNetStorageUsers(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
-
+    
+    thread.join()
     return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def datastream_agg(args):
+
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     fetch = DataStreamFetch()
     queryresult = QueryResult("datastream_aggregate")
@@ -419,9 +446,13 @@ def datastream_agg(args):
 
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
+    thread.join()
     return handleresponse(args, jsonObj, queryresult, RequireAll=False, Debug=args.debug)
 
 def datastream_raw(args):
+
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     fetch = DataStreamFetch()
     queryresult = QueryResult("datastream_raw")
@@ -430,9 +461,13 @@ def datastream_raw(args):
 
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
+    thread.join()
     return handleresponse(args, jsonObj, queryresult, RequireAll=False, Debug=args.debug)
 
 def bulksearch(args):
+
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     fetch = PropertyManagerFetch()
     queryresult = QueryResult("bulksearch")
@@ -457,9 +492,13 @@ def bulksearch(args):
 
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network, debug=args.debug)  
 
+    thread.join()
     return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def groupcpcodelist(args):
+
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     fetch = CPCODEFetch()
     queryresult = QueryResult("groupcpcodelist")
@@ -469,6 +508,7 @@ def groupcpcodelist(args):
     else:
         (_ , jsonObj) = fetch.fetchGroupCPCODES(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
+    thread.join()
     return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = True, Debug=False):

@@ -20,6 +20,7 @@ import sys
 from bin.parse_commands import handleresponse 
 from bin.query_result import QueryResult
 
+
 class Args:
     def __init__(self, show_json=False, use_stdin=False, file=None, template=None):
         self.show_json=show_json

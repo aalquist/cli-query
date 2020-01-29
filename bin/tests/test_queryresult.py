@@ -19,6 +19,9 @@ import json
 
 from bin.query_result import QueryResult
 
+from bin.send_analytics import Analytics 
+obj = Analytics()
+obj.disableAnalytics()
 
 class QueryResultTest(unittest.TestCase):
 

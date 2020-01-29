@@ -26,6 +26,10 @@ from bin.parse_commands import main
 from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
+from bin.send_analytics import Analytics 
+obj = Analytics()
+obj.disableAnalytics()
+
 class MockResponse:
 
     def __init__(self):
