@@ -33,12 +33,19 @@ from bin.tests.unittest_utils import CommandTester, MockResponse
 from bin.parse_commands import main 
 
 from bin.send_analytics import Analytics 
-obj = Analytics()
-obj.disableAnalytics()
-
 
 
 class PropertyManagerBulkSearch_Test(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        obj = Analytics()
+        obj.disableAnalytics()
+
+    @classmethod
+    def tearDownClass(cls):
+        obj = Analytics()
+        obj.enableAnalytics()
 
     def setUp(self):
 

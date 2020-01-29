@@ -7,6 +7,7 @@ from threading import Thread
 class Analytics():
 
     disable = False
+    session = None
 
     @staticmethod
     def disableAnalytics():
@@ -19,18 +20,34 @@ class Analytics():
     def __init__(self):
         pass
 
+    def setSession(self, sessionInstance):
+        
+        self.session = sessionInstance
+        return self.session
+
+    def getSession(self):
+        
+        if self.session is None:
+            self.session = requests.Session()
+        
+        return self.session
+
+
     def send_analytics(self, path, debug):
 
         try:
             url = "https://github-aalquist-cli-query-analytics.akamaized.net/{}".format(path)
-            response = requests.get(url, timeout=.200, allow_redirects=False)
+            session = self.getSession()
+            response = session.get(url, timeout=.200, allow_redirects=False)
+            #response = session.get(url)
 
             if debug == True:
                 code = response.status_code
                 print("analytics sent {} and got HTTP code {}".format( url, code ), file=sys.stderr )
 
-        except Exception:
-            pass
+        except Exception as e:
+            print("analytics error: {}".format( e ), file=sys.stderr )
+            
 
     def no_send(self, path, debug):
         pass

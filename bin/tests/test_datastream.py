@@ -32,11 +32,19 @@ from bin.parse_commands import main
 from bin.tests.unittest_utils import CommandTester, MockResponse
 
 from bin.send_analytics import Analytics 
-obj = Analytics()
-obj.disableAnalytics()
 
 
 class DataStream_Test(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        obj = Analytics()
+        obj.disableAnalytics()
+
+    @classmethod
+    def tearDownClass(cls):
+        obj = Analytics()
+        obj.enableAnalytics()
 
     def setUp(self):
         self.basedir = os.path.abspath(os.path.dirname(__file__))
