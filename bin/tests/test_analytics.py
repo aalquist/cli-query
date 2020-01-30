@@ -36,3 +36,9 @@ class Analytics_Test(unittest.TestCase):
         t.join()
 
         self.assertEquals(1,session.get.call_count)
+
+        obj.enableAnalytics()
+        t = obj.async_send_analytics(debug=True)
+        t.join()
+
+        self.assertEquals(2,session.get.call_count)

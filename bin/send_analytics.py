@@ -38,7 +38,7 @@ class Analytics():
         try:
             url = "https://github-aalquist-cli-query-analytics.akamaized.net/{}".format(path)
             session = self.getSession()
-            response = session.get(url, timeout=.200, allow_redirects=False)
+            response = session.get(url, timeout=.300, allow_redirects=False)
             #response = session.get(url)
 
             if debug == True:
@@ -46,7 +46,8 @@ class Analytics():
                 print("analytics sent {} and got HTTP code {}".format( url, code ), file=sys.stderr )
 
         except Exception as e:
-            print("analytics error: {}".format( e ), file=sys.stderr )
+            if debug == True:
+                print("analytics error: {}".format(e), file=sys.stderr )
             
 
     def no_send(self, path, debug):
