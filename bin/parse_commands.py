@@ -71,7 +71,7 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             name = arg["name"]
             del arg["name"]
 
-            if name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or ("-use-" in name ) or ("_use_" in name ):
+            if name.startswith("skip-") or name.startswith("skip_") or name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or ("-use-" in name ) or ("_use_" in name ):
                 
                 #enable boolean/flags
                 optional.add_argument(
@@ -284,6 +284,8 @@ def setupCommands(subparsers):
                                                             {"name": "use-searchstdin", "help": "get bulksearch json from stdin"}, 
                                                             {"name": "searchfile", "help": "get bulksearch from json file"}, 
                                                             {"name": "searchname", "help": "get bulksearch by name"}, 
+                                                            {"name": "use-union-filter", "help": "union filter results"}, 
+                                                            {"name": "skip-result-concat", "help": "disable JSON Array to String concatenation for JQ @CSV"}
                                                              ]),
         required_arguments=None,
         actions=actions)
@@ -493,7 +495,10 @@ def bulksearch(args):
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network, debug=args.debug)  
 
     thread.join()
-    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
+    RequireAll = not args.use_union_filter
+    SkipConcat = not args.skip_result_concat
+
+    return handleresponse(args, jsonObj, queryresult, RequireAll=RequireAll, concatForJQCSV=SkipConcat, Debug=args.debug)
 
 def groupcpcodelist(args):
 
@@ -511,9 +516,10 @@ def groupcpcodelist(args):
     thread.join()
     return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
-def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = True, Debug=False):
+def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = True, concatForJQCSV = True, Debug=False):
 
     notJSONOutput = False
+    
 
     #normalize args
     vargs = vars(args)
@@ -553,16 +559,16 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
                 inputString = getArgFromFile(file)
 
             templateJson = queryresult.loadJson(inputString)
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, Debug=Debug)
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
         elif template is not None :
 
             templateJson = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, Debug=Debug)
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, concatForJQCSV=concatForJQCSV, Debug=Debug)
             
         else:
             ReturnHeader = RequireAll
-            parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, Debug=Debug)
+            parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
         for line in parsed:
 
@@ -577,14 +583,14 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
 
     return 0   
 
-def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, Debug=False):
+def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCSV=True, Debug=False):
 
     notJSONOutput = False
     
 
     if len(templateJson) == 1 : 
         notJSONOutput = True
-        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, JoinValues=False, ReturnHeader=False, Debug=Debug)
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, JoinValues=False, ReturnHeader=False, concatForJQCSV=True, Debug=Debug)
         
         flattenedParsed = []
         for p in parsed:
@@ -592,7 +598,7 @@ def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, Debug=False):
         parsed = flattenedParsed
 
     else:
-        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, Debug=Debug)
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
     return (notJSONOutput, parsed)
 

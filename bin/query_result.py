@@ -183,28 +183,29 @@ class QueryResult():
         queryjson = self.getQueryPath(dir_path=dir_path, fileName="default.json")
         return self.getJsonQueryFile(queryjson)
     
-    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True, Debug=False):
+    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, Debug=False):
         defaultquery = self.getDefaultJsonQuery()
-        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader, Debug=Debug)
+        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
-    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True, Debug=False):
+    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, Debug=False):
         queries = list(dictObj.values() )
 
         returnList = []
 
+        header = None
         if ReturnHeader:
             header = list(dictObj.keys())
             returnList.append(header)
         elif Debug:
             print( " ... printing of header excluded", file=sys.stderr )
 
-        result = self.parseElement(json, queries, RequireAll, JoinValues, returnList )
+        result = self.parseElement(json, queries, RequireAll=RequireAll, JoinValues=JoinValues, returnList=returnList, concatForJQCSV=concatForJQCSV)
 
         
 
         return result
 
-    def parseElement(self, json, paths, RequireAll = True, JoinValues = True, returnList = None):
+    def parseElement(self, json, paths, RequireAll=True, JoinValues=True, returnList=None, concatForJQCSV=True):
         
         if returnList is None:
             returnList = []
@@ -241,9 +242,15 @@ class QueryResult():
                 #for each result add to return list
                 if JoinValues == True and len(match) > 1:
 
-                    match = list( map( lambda m : str(m), match ) )
-                    joinedValue = ",".join(match)
-                    matchedArray.append(joinedValue)
+                    #output pure json array where values are arrays without sting concatenation 
+                    if concatForJQCSV == False:
+                        matchedArray.append(match)
+
+                    else:
+                        #allows easier piping into JQ '. | @csv'
+                        match = list( map( lambda m : str(m), match ) )
+                        joinedValue = ",".join(match)
+                        matchedArray.append(joinedValue)
 
                 else: 
                     for m in match:
