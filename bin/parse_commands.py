@@ -571,7 +571,7 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
             (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
             
         else:
-            ReturnHeader = (not HideHeader) or RequireAll
+            ReturnHeader = not HideHeader
             parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
         for line in parsed:
