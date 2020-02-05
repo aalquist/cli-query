@@ -450,7 +450,7 @@ def datastream_agg(args):
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
     thread.join()
-    return handleresponse(args, jsonObj, queryresult, RequireAll=False, Debug=args.debug)
+    return handleresponse(args, jsonObj, queryresult, RequireAll=False, HideHeader=True, Debug=args.debug)
 
 def datastream_raw(args):
 
@@ -465,7 +465,7 @@ def datastream_raw(args):
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
     thread.join()
-    return handleresponse(args, jsonObj, queryresult, RequireAll=False, Debug=args.debug)
+    return handleresponse(args, jsonObj, queryresult, RequireAll=False, HideHeader=True,  Debug=args.debug)
 
 def bulksearch(args):
 
@@ -561,15 +561,17 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
                 inputString = getArgFromFile(file)
 
             templateJson = queryresult.loadJson(inputString)
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, concatForJQCSV=concatForJQCSV, Debug=Debug)
+            ReturnHeader = not HideHeader
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
         elif template is not None :
 
             templateJson = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, concatForJQCSV=concatForJQCSV, Debug=Debug)
+            ReturnHeader = not HideHeader
+            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
             
         else:
-            ReturnHeader = HideHeader or RequireAll
+            ReturnHeader = (not HideHeader) or RequireAll
             parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
         for line in parsed:
