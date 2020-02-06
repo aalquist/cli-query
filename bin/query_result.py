@@ -252,6 +252,9 @@ class QueryResult():
                         joinedValue = ",".join(match)
                         matchedArray.append(joinedValue)
 
+                elif JoinValues == True and len(match) == 1 and concatForJQCSV == False:
+                    matchedArray.append(match)
+
                 else: 
                     for m in match:
                         matchedArray.append(m)
