@@ -19,8 +19,19 @@ import json
 
 from bin.query_result import QueryResult
 
+from bin.send_analytics import Analytics 
 
 class QueryResultTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        obj = Analytics()
+        obj.disableAnalytics()
+
+    @classmethod
+    def tearDownClass(cls):
+        obj = Analytics()
+        obj.enableAnalytics()
 
     def testDefaultQueryLogic(self):
         queryresult = QueryResult("groupcpcodelist")

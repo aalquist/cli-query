@@ -92,6 +92,15 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         
         return url
 
+    def buildGetPropertyVersionMetaInfoUrl(self, context, *, propertyId=None, propertyVersion=None):
+
+        #https://developer.akamai.com/api/core_features/property_manager/v1.html#api1580152614326
+
+        uri = "/papi/v1/properties/{}/versions/{}".format(propertyId,propertyVersion)
+        url = self.buildUrl("https://{}" + uri, context)
+        return url
+
+
     def bulksearch(self, edgerc=None, section=None, account_key=None, contractId=None, groupId=None, postdata=None, network=None, debug=False):
 
         factory = CredentialFactory()
@@ -181,10 +190,19 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
             if code in [200, 202]:
                 self.mergeVersionPointerValues(matchJson, propertyJson)
+
+                print(" ..... with hostnames, notes, formats, product_ids, etc..",  file=sys.stderr )
                 (code, digitalPropertyJson) = self.fetchPropertyVersionDigitalProperty(edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
 
                 if code in [200]:
                     self.mergeDigitalPropertiesValues(matchJson, digitalPropertyJson)
+
+                
+                (code, versionMetaJson) = self.fetchPropertyVersionMetaInfo(edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
+
+                if code in [200]:
+                    self.mergeDigitalPropertiesVersionMeta(matchJson, versionMetaJson)
+
 
 
         for match in json:
@@ -224,6 +242,27 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         if len(hostnameJson) > 0:
             searchJson["hostnames"] = hostnameJson
 
+    def mergeDigitalPropertiesVersionMeta(self, searchJson, versionMetaJson):
+
+        if len(versionMetaJson) > 0:
+            if "propertyVersion" in  versionMetaJson:
+                    del versionMetaJson["propertyVersion"]
+                    
+            if "stagingStatus" in  versionMetaJson:                     
+                del versionMetaJson["stagingStatus"]
+
+            if "productionStatus" in  versionMetaJson:    
+                del versionMetaJson["productionStatus"]
+
+            if "etag" in  versionMetaJson:       
+                del versionMetaJson["etag"]
+
+            if "updatedDate" in  versionMetaJson:          
+                del versionMetaJson["updatedDate"]
+
+            searchJson["versionInfo"] = versionMetaJson
+
+
     def validateResponse(self, jsonObj, account_key=None, propertyId=None, propertyVersion=None,):
 
         if propertyId != jsonObj["propertyId"]:
@@ -232,9 +271,39 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         elif account_key is not None and account_key not in jsonObj["accountId"]:
             raise ValueError("Unexpected API response! Expecting accountId={} but got {}.".format(account_key,jsonObj["accountId"] ))
 
-        elif propertyVersion != jsonObj["propertyVersion"]:
-            raise ValueError("Unexpected API response! Expecting propertyVersion={} but got {}.".format(propertyVersion,jsonObj["propertyVersion"] ))
-   
+        elif "propertyVersion" in jsonObj and propertyVersion != jsonObj["propertyVersion"]:
+            raise ValueError("Unexpected API response! Expecting propertyVersion={} but got {}.".format(propertyVersion,jsonObj["propertyVersion"] ))   
+
+        elif "versions" in jsonObj and "items" in jsonObj["versions"] and ( len(jsonObj["versions"]["items"]) == 1 ):
+            versionItem = jsonObj["versions"]["items"][0]
+
+            if "propertyVersion" in versionItem and propertyVersion != versionItem["propertyVersion"]:
+                pass
+
+            
+        else: 
+            pass
+
+
+    def fetchPropertyVersionMetaInfo(self, edgerc=None, section=None, account_key=None, propertyId=None, propertyVersion=None, cacheResponses=False, debug=False):
+
+        factory = CredentialFactory()
+        context = factory.load(edgerc, section, account_key)
+        url = self.buildGetPropertyVersionMetaInfoUrl(context, propertyId=propertyId, propertyVersion=propertyVersion)
+
+        headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
+        bypassCache = not cacheResponses
+        
+        cachedHandler = CachedContextHandler(context, self.cache, debug=debug)
+        code, jsonObj = cachedHandler.get(url, requestHeaders=headers, bypassCache=bypassCache)
+        
+        if code in [200] and "versions" in jsonObj and "items" in jsonObj["versions"]:
+            self.validateResponse(jsonObj, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion)
+            jsonObj = jsonObj["versions"]["items"][0]
+
+            return (code, jsonObj)
+        else:
+            return (code, jsonObj)    
         
     def fetchPropertyVersionDigitalProperty(self, edgerc=None, section=None, account_key=None, propertyId=None, propertyVersion=None, cacheResponses=False, debug=False):
 

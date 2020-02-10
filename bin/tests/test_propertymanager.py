@@ -32,11 +32,20 @@ from bin.tests.unittest_utils import CommandTester, MockResponse
 
 from bin.parse_commands import main 
 
-
-
+from bin.send_analytics import Analytics 
 
 
 class PropertyManagerBulkSearch_Test(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        obj = Analytics()
+        obj.disableAnalytics()
+
+    @classmethod
+    def tearDownClass(cls):
+        obj = Analytics()
+        obj.enableAnalytics()
 
     def setUp(self):
 
@@ -47,8 +56,14 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         self.allsearchresponses = [
             "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir),
             "{}/json/papi/v1/properties/prp_3/versions/10/rules.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_3/versions/10/hostnames.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_3/versions/10/version.json".format(self.basedir),
             "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir),
-            "{}/json/papi/v1/properties/prp_15/versions/2/rules.json".format(self.basedir)
+            "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_1/versions/1/version.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_15/versions/2/rules.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_15/versions/2/hostnames.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_15/versions/2/version.json".format(self.basedir)
             
         ]
 
@@ -65,14 +80,17 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         self.allstagingresponsesMaps = [
             { "uri" : "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir), "code" : 200 },
             { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir), "code" : 200 },
-            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir), "code" : 200 }            
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir), "code" : 200 },
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/version.json".format(self.basedir), "code" : 200 }            
         ]
 
         self.asyncAllstagingresponses = [
             "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir),
             "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir),
             "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir),
-            "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir)
+            "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir),
+            "{}/json/papi/v1/properties/prp_1/versions/1/version.json".format(self.basedir)
             
         ]
 
@@ -81,7 +99,8 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
             { "uri" : "{}/json/papi/_v1_bulk/rules-search-requests-pending.json".format(self.basedir), "code" : 202 },
             { "uri" : "{}/json/papi/_v1_bulk/rules-search-requests-synch.json".format(self.basedir), "code" : 202 },
             { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/rules.json".format(self.basedir), "code" : 200 },
-            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir), "code" : 200 }            
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/hostnames.json".format(self.basedir), "code" : 200 },
+            { "uri" : "{}/json/papi/v1/properties/prp_1/versions/1/version.json".format(self.basedir), "code" : 200 }            
         ]
 
     def tearDown(self):
@@ -148,10 +167,6 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         response.reset()
 
-
-
-        
-
         for mapObj in self.asyncAllstagingresponseMaps:
 
             response.appendResponse( response.getJSONFromFile(mapObj["uri"]))
@@ -211,6 +226,9 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
         self.assertEquals(1, len(results))
         self.assertEquals(12345,results[0])
 
+        self.assertIn("versionInfo", json[0])
+        self.assertIn("hostnames", json[0])
+
         response.reset()
         
         for mapObj in self.allstagingresponsesMaps:
@@ -226,6 +244,9 @@ class PropertyManagerBulkSearch_Test(unittest.TestCase):
 
         self.assertEquals(12345, results[0])
         self.assertEquals(678910, results[1])
+
+        self.assertIn("versionInfo", json[0])
+        self.assertIn("hostnames", json[0])
         
 
         return json

@@ -30,6 +30,9 @@ from bin.tests.unittest_utils import CommandTester
 from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
+from bin.send_analytics import Analytics 
+
+
 class Args:
     def __init__(self, show_json=False, type=None, use_stdin=False, file=None, template=None, arg_list=None, args_use_stdin=False, get=None):
         self.show_json=show_json
@@ -42,6 +45,16 @@ class Args:
         self.get = get
 
 class Template_Test(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        obj = Analytics()
+        obj.disableAnalytics()
+
+    @classmethod
+    def tearDownClass(cls):
+        obj = Analytics()
+        obj.enableAnalytics()
 
     #getArgFromSTDIN
     @patch('bin.parse_commands.getArgFromSTDIN')

@@ -26,6 +26,8 @@ from bin.parse_commands import main
 from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
+from bin.send_analytics import Analytics 
+
 class MockResponse:
 
     def __init__(self):
@@ -37,6 +39,16 @@ class MockResponse:
 
 
 class NetStorage_Test(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        obj = Analytics()
+        obj.disableAnalytics()
+
+    @classmethod
+    def tearDownClass(cls):
+        obj = Analytics()
+        obj.enableAnalytics()
 
     @patch('requests.Session')
     def testParseMain_fetchNetStorageGroups(self, mockSessionObj):

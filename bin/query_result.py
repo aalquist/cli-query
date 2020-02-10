@@ -33,13 +33,20 @@ class QueryResult():
     
     def buildParseExp(self, paths):
         
-        try:
-            expr = Path.parse_str(paths)
-            return expr
+        if isinstance (paths, str):
 
-        except Exception as identifier:
-            raise ValueError("JSON path: {} error: {}".format(paths, identifier))
+            try:
+                expr = Path.parse_str(paths)
+                return expr
 
+            except Exception as identifier:
+
+                raise ValueError("JSON path: {} error: {}".format(paths, identifier))
+
+        else:
+
+            dictString = str(paths)
+            raise ValueError("JSON path is not a string: {}".format(dictString) )
     
     def parseExp(self, json, expression):
         data = list(map(lambda match_data : match_data.current_value, expression.match( json ) ) )
@@ -176,28 +183,29 @@ class QueryResult():
         queryjson = self.getQueryPath(dir_path=dir_path, fileName="default.json")
         return self.getJsonQueryFile(queryjson)
     
-    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True, Debug=False):
+    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, Debug=False):
         defaultquery = self.getDefaultJsonQuery()
-        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader, Debug=Debug)
+        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
-    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True, Debug=False):
+    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, Debug=False):
         queries = list(dictObj.values() )
 
         returnList = []
 
+        header = None
         if ReturnHeader:
             header = list(dictObj.keys())
             returnList.append(header)
         elif Debug:
             print( " ... printing of header excluded", file=sys.stderr )
 
-        result = self.parseElement(json, queries, RequireAll, JoinValues, returnList )
+        result = self.parseElement(json, queries, RequireAll=RequireAll, JoinValues=JoinValues, returnList=returnList, concatForJQCSV=concatForJQCSV)
 
         
 
         return result
 
-    def parseElement(self, json, paths, RequireAll = True, JoinValues = True, returnList = None):
+    def parseElement(self, json, paths, RequireAll=True, JoinValues=True, returnList=None, concatForJQCSV=True):
         
         if returnList is None:
             returnList = []
@@ -234,9 +242,18 @@ class QueryResult():
                 #for each result add to return list
                 if JoinValues == True and len(match) > 1:
 
-                    match = list( map( lambda m : str(m), match ) )
-                    joinedValue = ",".join(match)
-                    matchedArray.append(joinedValue)
+                    #output pure json array where values are arrays without sting concatenation 
+                    if concatForJQCSV == False:
+                        matchedArray.append(match)
+
+                    else:
+                        #allows easier piping into JQ '. | @csv'
+                        match = list( map( lambda m : str(m), match ) )
+                        joinedValue = ",".join(match)
+                        matchedArray.append(joinedValue)
+
+                elif JoinValues == True and len(match) == 1 and concatForJQCSV == False:
+                    matchedArray.append(match)
 
                 else: 
                     for m in match:

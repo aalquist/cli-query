@@ -1,0 +1,23 @@
+{
+    "propertyId": "prp_1",
+    "propertyName": "example1.example.com",
+    "accountId": "1-abcdef",
+    "contractId": "ctr_1-1TJZH5",
+    "groupId": "grp_15225",
+    "assetId": "aid_101",
+    "versions": {
+        "items": [
+            {
+                "propertyVersion": 1,
+                "updatedByUser": "aaalquis",
+                "updatedDate": "2018-01-18T00:00:00Z",
+                "productionStatus": "ACTIVE",
+                "stagingStatus": "INACTIVE",
+                "etag": "a9dfe78cf93090516bde891d009eaf57",
+                "productId": "prd_Alta",
+                "ruleFormat": "latest",
+                "note": "initial version"
+            }
+        ]
+    }
+}
