@@ -286,7 +286,7 @@ def setupCommands(subparsers):
                                                             {"name": "searchname", "help": "get bulksearch by name"}, 
                                                             {"name": "use-union-filter", "help": "union filter results"}, 
                                                             {"name": "skip-header", "help": "hide filter header from output"}, 
-                                                            {"name": "skip-result-concat", "help": "disable JSON Array to String concatenation for JQ @CSV"}
+                                                            {"name": "show-nested-list", "help": "disable JSON Array to String concatenation for JQ @CSV"}
                                                              ]),
         required_arguments=None,
         actions=actions)
@@ -498,7 +498,7 @@ def bulksearch(args):
     thread.join()
     RequireAll = not args.use_union_filter
     HideHeader = args.skip_header
-    SkipConcat = not args.skip_result_concat
+    SkipConcat = not args.show_nested_list
 
     return handleresponse(args, jsonObj, queryresult, RequireAll=RequireAll, HideHeader=HideHeader, concatForJQCSV=SkipConcat, Debug=args.debug)
 

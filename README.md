@@ -227,7 +227,7 @@ usage: akamai query bulksearch [--show-json] [--use-filterstdin]
                                [--contractId CONTRACTID] [--network NETWORK]
                                [--use-searchstdin] [--searchfile SEARCHFILE]
                                [--searchname SEARCHNAME] [--use-union-filter]
-                               [--skip-header] [--skip-result-concat]
+                               [--skip-header] [--show-nested-list]
                                [--edgerc EDGERC] [--section SECTION] [--debug]
                                [--account-key ACCOUNT_KEY]
 
@@ -249,7 +249,7 @@ optional arguments:
                         get bulksearch by name
   --use-union-filter    union filter results
   --skip-header         hide filter header from output
-  --skip-result-concat  disable JSON Array to String concatenation for JQ @CSV
+  --show-nested-list    disable JSON Array to String concatenation for JQ @CSV
   --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
   --section SECTION     Section of the credentials file
                         [$AKAMAI_EDGERC_SECTION]
