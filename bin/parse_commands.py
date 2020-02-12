@@ -270,8 +270,8 @@ def setupCommands(subparsers):
         subparsers, "filtertemplate", "prints a filter template",
         optional_arguments=[    {"name": "get", "help": "get template details"}, 
                                 {"name": "type", "help": "the templates by filter type"},
-                                {"name": "filterfile", "help": "define your own template. Intended to be used with one of the arg list flags"},
-                                {"name": "args-use-stdin", "help": "use stdin as alternative to arg-list param"},
+                                {"name": "filterfile", "help": "use your own template from your file system"},
+                                {"name": "args-use-stdin", "help": "use your own template from STDIN"},
                                 {"name": "arg-list", "help": "additional args for a JSONPath condition: #JSONPATHCRITERIA.somekey#"}],
         required_arguments=None,
         actions=actions)
@@ -293,7 +293,11 @@ def setupCommands(subparsers):
     
     create_sub_command(
         subparsers, "bulksearchtemplate", "prints a bulksearch template",
-        optional_arguments=[ {"name": "get", "help": "get template by name"}],
+        optional_arguments=[ 
+                {"name": "get", "help": "get template by name"},
+                {"name": "searchfile", "help": "use your own bulk search template from your file system"},
+                {"name": "arg-list", "help": "additional args for a JSONPath condition: #JSONPATHCRITERIA.somekey#"}
+                ],
         required_arguments=None,
         actions=actions)
 
@@ -310,7 +314,7 @@ def bulksearchtemplate(args):
     searchType = "bulksearch"
     serverside = True
 
-    if args.get is None:
+    if args.get is None and args.searchfile is None:
 
         print( "template name is required. here is a list of options", file=sys.stderr )
         queryType = QueryResult(searchType)
@@ -320,7 +324,16 @@ def bulksearchtemplate(args):
 
         queryType = QueryResult(searchType)
         obj = queryType.loadTemplate(args.get, serverside=serverside)
-        
+
+        templateArgs = args.arg_list
+
+        if templateArgs is None:
+            templateArgs = []
+
+        if "searchfile" in vars(args) and args.searchfile is not None:
+            obj = queryType.loadTemplate(args.get, templateArgs=templateArgs, serverside=serverside, templatefile=args.searchfile)
+        else:
+            obj = queryType.loadTemplate(args.get, templateArgs=templateArgs, serverside=serverside)    
 
     print( json.dumps(obj,indent=1) )
     thread.join()
@@ -486,6 +499,10 @@ def bulksearch(args):
             inputString = getArgFromFile(args.searchfile)
 
         postdata = queryresult.loadJson(inputString)
+
+        if not queryresult.isJsonServerSide(postdata):
+            print("Error:\n{}".format(postdata), file=sys.stderr )
+            raise ValueError("bulk search json is not correct format")
     
     elif args.searchname is not None :
         postdata = queryresult.loadTemplate(args.searchname, serverside=serverside)

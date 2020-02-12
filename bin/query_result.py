@@ -108,24 +108,6 @@ class QueryResult():
         
         return obj
 
-    def listServersideQueryTypes(self):
-
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-
-        queriesdir = self.getQueryPath(dir_path=dir_path, serverside= True) 
-        queriesdir = os.listdir(queriesdir)
-
-        returnlist = []
-
-        for f in queriesdir:
-            fullname = self.getQueryPath(dir_path=dir_path, fileName=f, serverside=True)
-
-            if os.path.isdir(fullname):
-                returnlist.append(f)
-            
-
-        return returnlist
-
     def listQueryTypes(self, serverside=False):
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -294,13 +276,31 @@ class QueryResult():
 
         return templateDictObj
 
+    def isJsonServerSide(self, templateDictObj):
+        return "bulkSearchQuery" in templateDictObj and "syntax" in templateDictObj["bulkSearchQuery"] and templateDictObj["bulkSearchQuery"]["syntax"] == "JSONPATH"
+
+    def preprocessServerSideTemplate(self, templateDictObj, args = None):
+        
+        if self.isJsonServerSide(templateDictObj):
+
+            value = templateDictObj["bulkSearchQuery"]["match"]
+            value = self.extractAndReplaceCriteria(value, args)
+            templateDictObj["bulkSearchQuery"]["match"] = value
+
+        return templateDictObj
+            
+
     def loadTemplate(self, get, templateArgs=None, serverside=False, templatefile=None):
         
         if templatefile is not None:
 
             obj = self.getJsonQueryFile(templatefile)
             if serverside == False and templateArgs is not None and len(templateArgs) > 0:
-                obj = self.preprocessTemplate(obj, templateArgs)    
+                obj = self.preprocessTemplate(obj, templateArgs)  
+
+            elif serverside == True and templateArgs is not None and len(templateArgs) > 0:
+                obj = self.preprocessServerSideTemplate(obj, templateArgs)  
+
 
         elif get is None:
             obj = self.listQuery(serverside=serverside)
@@ -310,7 +310,10 @@ class QueryResult():
             obj = self.getQuerybyName(get, serverside=serverside)
 
             if serverside == False and templateArgs is not None and len(templateArgs) > 0:
-                obj = self.preprocessTemplate(obj, templateArgs)    
+                obj = self.preprocessTemplate(obj, templateArgs)  
+
+            elif serverside == True and templateArgs is not None and len(templateArgs) > 0:
+                obj = self.preprocessServerSideTemplate(obj, templateArgs)    
 
             
 

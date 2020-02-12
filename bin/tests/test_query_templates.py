@@ -98,8 +98,8 @@ class Template_Test(unittest.TestCase):
             sys.stdout = saved_stdout
             sys.stderr = saved_stderr
 
-        
 
+    
     def testjSONPaths(self):
 
         
@@ -124,8 +124,13 @@ class Template_Test(unittest.TestCase):
         result = template.extractAndReplaceCriteria("$.logSource.cpCodeNumber", args)
         self.assertEqual(jsonPathGoal, result)
 
+        args = ["cpCode", "origin"]
+        jsonPathGoal = "$..behaviors[?(@.name=\"cpCode\"),?(@.name=\"origin\")].name"
+        result = template.extractAndReplaceCriteria("$..behaviors[#JSONPATHCRITERIA.name#].name", args)
+        self.assertEqual(jsonPathGoal, result)
     
     def testTemplateTypes(self):
+        #filterfile = "{}/bin/tests/json/_storage_v1_storage-groups.json".format(os.getcwd())
 
         args = [ "filtertemplate"]
 
@@ -160,7 +165,51 @@ class Template_Test(unittest.TestCase):
             
 
         finally:
-            pass
+            sys.stdout = saved_stdout
+            sys.stderr = saved_stderr
+
+    def testTemplateTypes_filterfile(self):
+        
+        filterfile = "{}/bin/queries/ldslist/default.json".format(os.getcwd())
+
+        args = [ 
+            "filtertemplate",
+            "--filterfile",
+            filterfile
+        ]
+
+
+        saved_stdout = sys.stdout
+        saved_stderr = sys.stderr
+
+        finaloutput = None
+
+        try:
+            out = StringIO()
+            sys.stdout = out
+            
+            outerr = StringIO()
+            sys.stderr = outerr
+
+            self.assertEqual(main(args), 0, "command args {} should return successcode".format(args) )
+
+            output = list(out.getvalue().split("\n"))
+            finaloutput = list(filter(lambda line: line != '', output))
+
+           
+            self.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
+            
+            jsonStr=out.getvalue()
+            jsondict = json.loads(jsonStr)  
+            self.assertIsInstance(jsondict, dict)
+
+            self.assertIn("CPCODE", jsondict)
+            self.assertIn("Aggregation_Frequency", jsondict)
+            self.assertIn("Directory", jsondict)
+            
+            
+
+        finally:
             sys.stdout = saved_stdout
             sys.stderr = saved_stderr
 
@@ -309,7 +358,75 @@ class Template_Test(unittest.TestCase):
 
         self.assertIsInstance(stdOutJSONDict, list)
 
-        pass
+    def testSearchTemplate_withArgs(self):
+
+        ##Next Test
+
+        commandTester = CommandTester(self)
+
+        args = [
+                "bulksearchtemplate",
+                "--get",
+                "arg-behavior-by-name.json",
+                "--arg-list",
+                "origin"
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        stdOutString = os.linesep.join(stdOutResultArray)
+        stdOutJSONDict = json.loads(stdOutString)
+
+        self.assertIn("bulkSearchQuery", stdOutJSONDict)
+        self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
+
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name=\"origin\")].name" )
+       
+
+        ##Next Test
+
+        commandTester = CommandTester(self)
+
+        args = [
+                "bulksearchtemplate",
+                "--get",
+                "arg-behavior-by-name.json",
+                "--arg-list",
+                "origin",
+                "cpCode"
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        stdOutString = os.linesep.join(stdOutResultArray)
+        stdOutJSONDict = json.loads(stdOutString)
+
+        self.assertIn("bulkSearchQuery", stdOutJSONDict)
+        self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
+
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name=\"origin\"),?(@.name=\"cpCode\")].name" )
+
+        ##Next Test
+
+        commandTester = CommandTester(self)
+
+        searchfile = "{}/bin/queries/bulksearch/serverside/arg-behavior-by-name.json".format(os.getcwd())
+
+        args = [
+                "bulksearchtemplate",
+                "--searchfile",
+                searchfile,
+                "--arg-list",
+                "origin",
+                "cpCode"
+        ]
+
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        stdOutString = os.linesep.join(stdOutResultArray)
+        stdOutJSONDict = json.loads(stdOutString)
+
+        self.assertIn("bulkSearchQuery", stdOutJSONDict)
+        self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
+
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name=\"origin\"),?(@.name=\"cpCode\")].name" )
         
     
     def getJSONFromFile(self, jsonPath):
