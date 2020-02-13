@@ -419,6 +419,7 @@ def ldslist(args):
     fetch = LdsFetch()
     queryresult = QueryResult("ldslist")
 
+    checkFilterArgs(args, queryresult)
     (_ , jsonObj) = fetch.fetchCPCodeProducts(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
 
     thread.join()
@@ -432,6 +433,7 @@ def netstoragelist(args):
     fetch = NetStorageFetch()
     queryresult = QueryResult("netstoragelist")
     
+    checkFilterArgs(args, queryresult)
     (_ , jsonObj) = fetch.fetchNetStorageGroups(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
     
     thread.join()
@@ -445,6 +447,7 @@ def netstorageuser(args):
     fetch = NetStorageFetch()
     queryresult = QueryResult("netstorageuser")
     
+    checkFilterArgs(args, queryresult)
     (_ , jsonObj) = fetch.fetchNetStorageUsers(edgerc = args.edgerc, section=args.section, account_key=args.account_key, debug=args.debug)  
     
     thread.join()
@@ -460,6 +463,7 @@ def datastream_agg(args):
 
     logType="aggregate"
 
+    checkFilterArgs(args, queryresult)
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
     thread.join()
@@ -475,6 +479,7 @@ def datastream_raw(args):
 
     logType="raw"
 
+    checkFilterArgs(args, queryresult)
     (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
 
     thread.join()
@@ -510,6 +515,8 @@ def bulksearch(args):
     else:
         postdata = queryresult.loadTemplate("default.json", serverside=serverside)
 
+    checkFilterArgs(args, queryresult)
+
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network, debug=args.debug)  
 
     thread.join()
@@ -527,6 +534,8 @@ def groupcpcodelist(args):
     fetch = CPCODEFetch()
     queryresult = QueryResult("groupcpcodelist")
 
+    checkFilterArgs(args, queryresult)
+
     if args.only_contractIds is not None and len(args.only_contractIds) > 0 :
         (_ , jsonObj) = fetch.fetchGroupCPCODES(edgerc = args.edgerc, section=args.section, account_key=args.account_key, onlycontractIds=args.only_contractIds, debug=args.debug, )  
     else:
@@ -535,10 +544,17 @@ def groupcpcodelist(args):
     thread.join()
     return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
-def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = True, HideHeader = False, concatForJQCSV = True, Debug=False):
+def checkFilterArgs(args, queryresult, skipErrorMsg=False):
 
-    notJSONOutput = False
-    
+    (isFilterJSON, _, filterJsonTemplate, _, _) = verifyInputTemplateFilter(args, queryresult)
+
+    if isFilterJSON == False and filterJsonTemplate is not None:
+        if skipErrorMsg:
+            printJsonStr = json.dumps(filterJsonTemplate)
+            print("Error:\n{}".format(printJsonStr), file=sys.stderr )
+        raise ValueError("filter json is not in correct format")
+
+def verifyInputTemplateFilter(args, queryresult, enableSTDIN = True):
 
     #normalize args
     vargs = vars(args)
@@ -567,6 +583,8 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
     else:
         template = None
 
+    passedFilterCheck = True
+    templateJson = None
 
     if not args.show_json:
 
@@ -578,17 +596,39 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
                 inputString = getArgFromFile(file)
 
             templateJson = queryresult.loadJson(inputString)
-            ReturnHeader = not HideHeader
+            passedFilterCheck = not queryresult.isJsonServerSide(templateJson)
+    
+    return (passedFilterCheck, template, templateJson, file, use_stdin)
+
+def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = True, HideHeader = False, concatForJQCSV = True, Debug=False):
+
+    notJSONOutput = False
+    ReturnHeader = not HideHeader
+
+    (_, template, templateJson, file, use_stdin) = verifyInputTemplateFilter(args, queryresult, enableSTDIN=enableSTDIN)
+
+
+    if not args.show_json:
+
+        if (enableSTDIN and use_stdin) or (file is not None) :
+            
+            if (enableSTDIN and use_stdin):
+                inputString = getArgFromSTDIN()
+            else: 
+                inputString = getArgFromFile(file)
+
+            templateJson = queryresult.loadJson(inputString)
+            
             (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
         elif template is not None :
 
             templateJson = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
-            ReturnHeader = not HideHeader
+            
             (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
             
         else:
-            ReturnHeader = not HideHeader
+            
             parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
         for line in parsed:

@@ -17,7 +17,7 @@ import collections
 import os
 import argparse
 import sys
-from bin.parse_commands import handleresponse 
+from bin.parse_commands import handleresponse, verifyInputTemplateFilter, checkFilterArgs 
 from bin.query_result import QueryResult
 
 
@@ -43,7 +43,26 @@ class Test_Lds_Parse_Commands(unittest.TestCase):
         self.assertIn("Test_12313123", the_exception.args[0])
         self.assertIn("not found", the_exception.args[0])  
         
-    
+    def testVerifyInputTemplateFilter(self):
+
+        filterfile = "{}/bin/queries/ldslist/default.json".format(os.getcwd())
+        args = Args(file=filterfile)
+        queryresult = QueryResult("ldslist")
+
+        (passed, _, _, _, _) = verifyInputTemplateFilter(args, queryresult)
+        self.assertTrue(passed)
+
+        filterfile = "{}/bin/queries/bulksearch/serverside/cpcodes.json".format(os.getcwd())
+        args = Args(file=filterfile)
+        queryresult = QueryResult("ldslist")
+
+        with self.assertRaises(Exception):  
+            checkFilterArgs(args, queryresult, skipErrorMsg=True)
+            pass
+
+        (passed, _, _, _, _) = verifyInputTemplateFilter(args, queryresult)
+        self.assertFalse(passed)
+        
         
         
 
