@@ -506,8 +506,9 @@ def bulksearch(args):
         postdata = queryresult.loadJson(inputString)
 
         if not queryresult.isJsonServerSide(postdata):
-            print("Error:\n{}".format(postdata), file=sys.stderr )
-            raise ValueError("bulk search json is not correct format")
+            postdataStr = json.dumps(postdata)
+            print("Search JSON Format Error:\n{}".format(postdataStr), file=sys.stderr )
+            raise ValueError("bulksearch JSON is not correct format")
     
     elif args.searchname is not None :
         postdata = queryresult.loadTemplate(args.searchname, serverside=serverside)

@@ -58,7 +58,6 @@ class Test_Lds_Parse_Commands(unittest.TestCase):
 
         with self.assertRaises(Exception):  
             checkFilterArgs(args, queryresult, skipErrorMsg=True)
-            pass
 
         (passed, _, _, _, _) = verifyInputTemplateFilter(args, queryresult)
         self.assertFalse(passed)
