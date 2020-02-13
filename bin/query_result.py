@@ -259,7 +259,7 @@ class QueryResult():
 
             jsonPathCriteria = []
             for a in args:
-                jsonPathCriteria.append("?(@{}=\"{}\")".format(criteriaName, a))
+                jsonPathCriteria.append("?(@{} == '{}')".format(criteriaName, a))
 
             modified = "{}{}{}".format(prefix,",".join(jsonPathCriteria),postfix)
             return modified
