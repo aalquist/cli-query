@@ -248,7 +248,7 @@ class QueryResult():
 
         return returnList
 
-    def extractAndReplaceCriteria(self, value, args=None):
+    def extractAndReplaceCriteria(self, value, args=None, ServerSide=True):
 
         regexFound = re.search(r'(^.*)([#]JSONPATHCRITERIA(\.[^]]+)[#])(.*$)', value, flags=0)
 
@@ -259,9 +259,16 @@ class QueryResult():
 
             jsonPathCriteria = []
             for a in args:
-                jsonPathCriteria.append("?(@{} == '{}')".format(criteriaName, a))
+                if ServerSide:
+                    jsonPathCriteria.append("?(@{} == '{}')".format(criteriaName, a))
+                else:
+                    jsonPathCriteria.append("?(@{}=\"{}\")".format(criteriaName, a))
 
-            modified = "{}{}{}".format(prefix,",".join(jsonPathCriteria),postfix)
+            if ServerSide:
+                modified = "{}{}{}".format(prefix," || ".join(jsonPathCriteria),postfix)
+            else:
+                modified = "{}{}{}".format(prefix,",".join(jsonPathCriteria),postfix)
+
             return modified
 
         else:
@@ -271,7 +278,7 @@ class QueryResult():
         
         for templateKey in templateDictObj:
             value = templateDictObj[templateKey]
-            value = self.extractAndReplaceCriteria(value, args)
+            value = self.extractAndReplaceCriteria(value, args, ServerSide=False)
             templateDictObj[templateKey] = value
 
         return templateDictObj
@@ -284,7 +291,7 @@ class QueryResult():
         if self.isJsonServerSide(templateDictObj):
 
             value = templateDictObj["bulkSearchQuery"]["match"]
-            value = self.extractAndReplaceCriteria(value, args)
+            value = self.extractAndReplaceCriteria(value, args, ServerSide=True)
             templateDictObj["bulkSearchQuery"]["match"] = value
 
         return templateDictObj

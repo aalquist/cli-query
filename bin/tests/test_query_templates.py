@@ -110,23 +110,23 @@ class Template_Test(unittest.TestCase):
         
         args = ["123", "456"]
         jsonPathGoal = "$.logSource[?(@.cpCodeNumber=\"123\"),?(@.cpCodeNumber=\"456\")].cpCodeNumber"
-        result = template.extractAndReplaceCriteria(jsonConfiguration, args)
+        result = template.extractAndReplaceCriteria(jsonConfiguration, args, ServerSide=False)
         self.assertEqual(jsonPathGoal, result)
 
         
         args = ["123"]
         jsonPathGoal = "$.logSource[?(@.cpCodeNumber=\"123\")].cpCodeNumber"
-        result = template.extractAndReplaceCriteria(jsonConfiguration, args)
+        result = template.extractAndReplaceCriteria(jsonConfiguration, args, ServerSide=False)
         self.assertEqual(jsonPathGoal, result)
 
         args = ["123"]
         jsonPathGoal = "$.logSource.cpCodeNumber"
-        result = template.extractAndReplaceCriteria("$.logSource.cpCodeNumber", args)
+        result = template.extractAndReplaceCriteria("$.logSource.cpCodeNumber", args, ServerSide=False)
         self.assertEqual(jsonPathGoal, result)
 
         args = ["cpCode", "origin"]
         jsonPathGoal = "$..behaviors[?(@.name=\"cpCode\"),?(@.name=\"origin\")].name"
-        result = template.extractAndReplaceCriteria("$..behaviors[#JSONPATHCRITERIA.name#].name", args)
+        result = template.extractAndReplaceCriteria("$..behaviors[#JSONPATHCRITERIA.name#].name", args, ServerSide=False)
         self.assertEqual(jsonPathGoal, result)
     
     def testTemplateTypes(self):
@@ -379,7 +379,7 @@ class Template_Test(unittest.TestCase):
         self.assertIn("bulkSearchQuery", stdOutJSONDict)
         self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
 
-        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name=\"origin\")].name" )
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name == 'origin')].name" )
        
 
         ##Next Test
@@ -402,7 +402,7 @@ class Template_Test(unittest.TestCase):
         self.assertIn("bulkSearchQuery", stdOutJSONDict)
         self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
 
-        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name=\"origin\"),?(@.name=\"cpCode\")].name" )
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name == 'origin') || ?(@.name == 'cpCode')].name" )
 
         ##Next Test
 
@@ -426,7 +426,7 @@ class Template_Test(unittest.TestCase):
         self.assertIn("bulkSearchQuery", stdOutJSONDict)
         self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
 
-        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name=\"origin\"),?(@.name=\"cpCode\")].name" )
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name == 'origin') || ?(@.name == 'cpCode')].name" )
         
     
     def getJSONFromFile(self, jsonPath):
