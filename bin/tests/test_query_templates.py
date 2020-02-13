@@ -402,7 +402,7 @@ class Template_Test(unittest.TestCase):
         self.assertIn("bulkSearchQuery", stdOutJSONDict)
         self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
 
-        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name == 'origin') || ?(@.name == 'cpCode')].name" )
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name == 'origin' || @.name == 'cpCode')].name" )
 
         ##Next Test
 
@@ -426,7 +426,7 @@ class Template_Test(unittest.TestCase):
         self.assertIn("bulkSearchQuery", stdOutJSONDict)
         self.assertIn("match", stdOutJSONDict["bulkSearchQuery"])
 
-        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name == 'origin') || ?(@.name == 'cpCode')].name" )
+        self.assertEquals(stdOutJSONDict["bulkSearchQuery"]["match"], "$..behaviors[?(@.name == 'origin' || @.name == 'cpCode')].name" )
         
     
     def getJSONFromFile(self, jsonPath):

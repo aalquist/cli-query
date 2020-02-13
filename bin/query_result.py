@@ -260,12 +260,12 @@ class QueryResult():
             jsonPathCriteria = []
             for a in args:
                 if ServerSide:
-                    jsonPathCriteria.append("?(@{} == '{}')".format(criteriaName, a))
+                    jsonPathCriteria.append("@{} == '{}'".format(criteriaName, a))
                 else:
                     jsonPathCriteria.append("?(@{}=\"{}\")".format(criteriaName, a))
 
             if ServerSide:
-                modified = "{}{}{}".format(prefix," || ".join(jsonPathCriteria),postfix)
+                modified = "{}?({}){}".format(prefix," || ".join(jsonPathCriteria),postfix)
             else:
                 modified = "{}{}{}".format(prefix,",".join(jsonPathCriteria),postfix)
 
