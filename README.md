@@ -203,9 +203,8 @@ optional arguments:
   --get GET             get template details
   --type TYPE           the templates by filter type
   --filterfile FILTERFILE
-                        define your own template. Intended to be used with one
-                        of the arg list flags
-  --args-use-stdin      use stdin as alternative to arg-list param
+                        use your own template from your file system
+  --args-use-stdin      use your own template from STDIN
   --arg-list ARG_LIST [ARG_LIST ...]
                         additional args for a JSONPath condition:
                         #JSONPATHCRITERIA.somekey#
@@ -262,12 +261,19 @@ optional arguments:
 ## Bulk Search Template Utility
 
 ``` 
-usage: akamai query bulksearchtemplate [--get GET] [--edgerc EDGERC]
-                                       [--section SECTION] [--debug]
-                                       [--account-key ACCOUNT_KEY]
+usage: akamai query bulksearchtemplate [--get GET] [--searchfile SEARCHFILE]
+                                       [--arg-list ARG_LIST [ARG_LIST ...]]
+                                       [--edgerc EDGERC] [--section SECTION]
+                                       [--debug] [--account-key ACCOUNT_KEY]
 
 optional arguments:
   --get GET             get template by name
+  --searchfile SEARCHFILE
+                        use your own bulk search template from your file
+                        system
+  --arg-list ARG_LIST [ARG_LIST ...]
+                        additional args for a JSONPath condition:
+                        #JSONPATHCRITERIA.somekey#
   --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
   --section SECTION     Section of the credentials file
                         [$AKAMAI_EDGERC_SECTION]
@@ -285,6 +291,7 @@ Ready to go bulk searches. See them when running the command:
 akamai query bulksearchtemplate 
 
 [
+ "arg-behavior-by-name.json",
  "default.json",
  "gtm-origins.json",
  "origins.json",
