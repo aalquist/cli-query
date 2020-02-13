@@ -550,7 +550,7 @@ def checkFilterArgs(args, queryresult, skipErrorMsg=False):
     (isFilterJSON, _, filterJsonTemplate, _, _) = verifyInputTemplateFilter(args, queryresult)
 
     if isFilterJSON == False and filterJsonTemplate is not None:
-        if skipErrorMsg:
+        if not skipErrorMsg:
             printJsonStr = json.dumps(filterJsonTemplate)
             print("Error:\n{}".format(printJsonStr), file=sys.stderr )
         raise ValueError("filter json is not in correct format")
