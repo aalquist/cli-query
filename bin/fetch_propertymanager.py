@@ -268,8 +268,9 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         if propertyId != jsonObj["propertyId"]:
                 raise ValueError("Unexpected API response! Expecting propertyId={} but got {}".format(propertyId, jsonObj["propertyId"] ))
 
-        elif account_key is not None and account_key not in jsonObj["accountId"]:
-            raise ValueError("Unexpected API response! Expecting accountId={} but got {}.".format(account_key,jsonObj["accountId"] ))
+        #doesn't support hyphenated account keys as the return back different values
+        #elif account_key is not None and account_key not in jsonObj["accountId"]:
+        #    raise ValueError("Unexpected API response! Expecting accountId={} but got {}.".format(account_key,jsonObj["accountId"] ))
 
         elif "propertyVersion" in jsonObj and propertyVersion != jsonObj["propertyVersion"]:
             raise ValueError("Unexpected API response! Expecting propertyVersion={} but got {}.".format(propertyVersion,jsonObj["propertyVersion"] ))   
