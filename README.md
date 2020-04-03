@@ -291,6 +291,8 @@ Ready to go bulk searches. See them when running the command:
 akamai query bulksearchtemplate 
 
 [
+ "criteria-names.json",
+ "behavior-names.json",
  "arg-behavior-by-name.json",
  "default.json",
  "gtm-origins.json",
