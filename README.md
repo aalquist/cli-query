@@ -291,6 +291,7 @@ Ready to go bulk searches. See them when running the command:
 akamai query bulksearchtemplate 
 
 [
+ "siteshield-value.json",
  "criteria-names.json",
  "behavior-names.json",
  "arg-behavior-by-name.json",
