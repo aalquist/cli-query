@@ -292,8 +292,10 @@ akamai query bulksearchtemplate
 
 [
  "siteshield-value.json",
+ "netstorage-origin-details.json",
  "criteria-names.json",
  "behavior-names.json",
+ "sureroute-details.json",
  "arg-behavior-by-name.json",
  "default.json",
  "gtm-origins.json",
