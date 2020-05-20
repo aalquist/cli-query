@@ -513,6 +513,12 @@ def bulksearch(args):
     elif args.searchname is not None :
         postdata = queryresult.loadTemplate(args.searchname, serverside=serverside)
 
+        if isinstance(postdata, list):
+            print("Error: choose from one of these:", file=sys.stderr)
+            printJsonStr = json.dumps(postdata, indent=1)
+            print(printJsonStr, file=sys.stderr)
+            raise ValueError("{} not found".format(args.searchname))
+        
     else:
         postdata = queryresult.loadTemplate("default.json", serverside=serverside)
 
