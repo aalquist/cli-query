@@ -102,7 +102,7 @@ class QueryResult():
         if argname in validNames:
             obj = self.getNonDefaultQuery(argname, serverside=serverside)
         elif throwErrorIfNotFound:
-            raise Exception("query name {} not found".format(argname))
+            raise Exception("query name {} not found".format(argname), validNames)
         else: 
             obj = validNames
         
