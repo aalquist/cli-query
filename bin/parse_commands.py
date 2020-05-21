@@ -655,6 +655,7 @@ def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCS
 
     notJSONOutput = False
     
+    allValuesAreNotJsonInstances = True
 
     if len(templateJson) == 1 : 
         notJSONOutput = True
@@ -662,13 +663,17 @@ def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCS
         
         flattenedParsed = []
         for p in parsed:
+
+            if allValuesAreNotJsonInstances and len(p) == 1 and isinstance(p[0], dict):
+                allValuesAreNotJsonInstances = False
+
             flattenedParsed.extend(p)
         parsed = flattenedParsed
 
     else:
         parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
-    return (notJSONOutput, parsed)
+    return (notJSONOutput and allValuesAreNotJsonInstances, parsed)
 
 def argFromInput(arg):
 
