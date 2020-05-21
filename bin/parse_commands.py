@@ -586,6 +586,19 @@ def verifyInputTemplateFilter(args, queryresult, enableSTDIN = True):
     
     elif "filtername" in vargs and args.filtername is not None:
         template = args.filtername
+
+        try:
+            templatefound = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
+
+        except Exception as ex:
+
+            if len(ex.args) > 1:
+                availableargs = ex.args[1]
+                print("Error: choose from one of these:", file=sys.stderr)
+                printJsonStr = json.dumps(availableargs, indent=1)
+                print(printJsonStr, file=sys.stderr)
+            
+            raise ValueError("{} not found".format(args.filtername))
         
     else:
         template = None
