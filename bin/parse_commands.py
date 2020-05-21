@@ -561,6 +561,20 @@ def checkFilterArgs(args, queryresult, skipErrorMsg=False):
             print("Error:\n{}".format(printJsonStr), file=sys.stderr )
         raise ValueError("filter json is not in correct format")
 
+def checkTemplateNotFoundError(queryresult, template):
+        try:
+            templatefound = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
+
+        except Exception as ex:
+
+            if len(ex.args) > 1:
+                availableargs = ex.args[1]
+                print("Error: choose from one of these:", file=sys.stderr)
+                printJsonStr = json.dumps(availableargs, indent=1)
+                print(printJsonStr, file=sys.stderr)
+            
+            raise ValueError("{} not found".format(template))
+        
 def verifyInputTemplateFilter(args, queryresult, enableSTDIN = True):
 
     #normalize args
@@ -583,22 +597,11 @@ def verifyInputTemplateFilter(args, queryresult, enableSTDIN = True):
 
     if "template" in vargs and args.template is not None:
         template = args.template
-    
+        checkTemplateNotFoundError(queryresult, template)
+
     elif "filtername" in vargs and args.filtername is not None:
         template = args.filtername
-
-        try:
-            templatefound = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
-
-        except Exception as ex:
-
-            if len(ex.args) > 1:
-                availableargs = ex.args[1]
-                print("Error: choose from one of these:", file=sys.stderr)
-                printJsonStr = json.dumps(availableargs, indent=1)
-                print(printJsonStr, file=sys.stderr)
-            
-            raise ValueError("{} not found".format(args.filtername))
+        checkTemplateNotFoundError(queryresult, template)
         
     else:
         template = None
