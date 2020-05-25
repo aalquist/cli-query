@@ -1,0 +1,3 @@
+{
+    "resolution" : "$.resolution[*].dnsJson.Answer[*].name"
+}

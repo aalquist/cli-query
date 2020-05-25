@@ -31,6 +31,8 @@ from bin.query_result import QueryResult
 
 from bin.send_analytics import Analytics 
 
+from bin.resolve_dns import checkDNSMetadata
+
 import inspect
 
 
@@ -59,9 +61,16 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
         for arg in required_arguments:
             name = arg["name"]
             del arg["name"]
-            required.add_argument("--" + name,
-                                  required=True,
-                                  **arg)
+
+            if "positional" in arg and arg["positional"] == True:
+                positional = arg["positional"]
+                del arg["positional"]
+                required.add_argument(name,
+                                    **arg)
+            else:
+                required.add_argument("--" + name,
+                                    required=True,
+                                    **arg)
 
     optional = action.add_argument_group("optional arguments")
 
@@ -301,6 +310,12 @@ def setupCommands(subparsers):
         required_arguments=None,
         actions=actions)
 
+    create_sub_command(
+        subparsers, "doh", "dns over http command",
+        
+        optional_arguments=combineArgs(defaultQueryArgs, [ {"name": "type", "help": "the DNS record type (A,AAAA,CNAME,NS)"}]),
+        required_arguments=[ {"name": "domain", "help": "the domain", "positional" : True} ],
+        actions=actions)
     
 
     return actions
@@ -339,6 +354,17 @@ def bulksearchtemplate(args):
     thread.join()
     return return_value
 
+def doh(args):
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
+
+    queryresult = QueryResult("doh")
+    
+    checkFilterArgs(args, queryresult)
+    jsonObj = [checkDNSMetadata([args.domain]) ]
+
+    thread.join()
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
 
 def filtertemplate(args):
 
@@ -387,6 +413,8 @@ def filtertemplate(args):
 
     thread.join()
     return return_value
+
+
 
 def version(args):
     
