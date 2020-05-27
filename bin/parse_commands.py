@@ -314,7 +314,7 @@ def setupCommands(subparsers):
         subparsers, "doh", "dns over http command",
         
         optional_arguments=combineArgs(defaultQueryArgs, [ {"name": "type", "help": "the DNS record type (A,AAAA,CNAME,NS)"}]),
-        required_arguments=[ {"name": "domain", "help": "the domain", "positional" : True} ],
+        required_arguments=[ {"name": "domain", "help": "the domain", "positional" : True, "nargs" : '+'} ],
         actions=actions)
     
 
@@ -361,10 +361,13 @@ def doh(args):
     queryresult = QueryResult("doh")
     
     checkFilterArgs(args, queryresult)
-    jsonObj = [checkDNSMetadata([args.domain]) ]
+    jsonObj = checkDNSMetadata(args.domain, recoredType=None) 
+
+    if "resolution" in jsonObj:
+        jsonObj= jsonObj["resolution"]
 
     thread.join()
-    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
+    return handleresponse(args, jsonObj, queryresult,  Debug=args.debug)
 
 def filtertemplate(args):
 

@@ -1,3 +1,5 @@
 {
-    "resolution" : "$.resolution[*].dnsJson.Answer[*].name"
+    "isAkamai" : "$.isAkamai",
+    "domain" : "$.domain",
+    "resolution" : "$.dnsJson.Answer[*].data"
 }
