@@ -23,6 +23,7 @@ from unittest.mock import patch
 from akamai.edgegrid import EdgeGridAuth, EdgeRc
 
 from bin.fetch_datastream import DataStreamFetch
+from bin.fetch_datastream import utcDatefromString, daysSince
 
 import datetime
 from datetime import timedelta
@@ -56,6 +57,14 @@ class DataStream_Test(unittest.TestCase):
         self.raw_logs = [
             "{}/json/datastream-raw/all-raw-logs.json".format(self.basedir)
         ]
+
+    def testDaysSince(self):
+        
+        priorDate = "2020-03-04T18:46:29Z"
+        now = utcDatefromString("2020-05-28T12:54:11Z")
+        
+        days = daysSince(priorDate=priorDate, now=now)
+        self.assertEquals(84, days)
 
     def test_ConvertResponseCodeObjectKeys(self):
 

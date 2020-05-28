@@ -23,6 +23,23 @@ import pytz
 import re
 import sys
 
+def utcDatefromString(start):
+    format = '%Y-%m-%dT%H:%M:%SZ'
+    d = datetime.datetime.strptime(start, format)
+    d.replace(tzinfo=pytz.UTC)
+    return d
+
+def daysSince(priorDate, now=None):
+    
+    priorDate = utcDatefromString(priorDate)
+
+    if now is None:
+        now = datetime.datetime.utcnow()
+    
+    delta = now - priorDate
+    days = delta.days
+    return days
+
 class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
 
     def formatDatetoString(self, dateobj):
@@ -31,10 +48,7 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
 
     
     def createDatefromString(self, start):
-        format = '%Y-%m-%dT%H:%M:%SZ'
-        d = datetime.datetime.strptime(start, format)
-        d.replace(tzinfo=pytz.UTC)
-        return d
+        return utcDatefromString(start)
         
 
     def parseRange(self, end=None, timerange="2m"):
