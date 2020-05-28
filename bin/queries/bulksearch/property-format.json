@@ -1,4 +1,4 @@
 {
     "propertyName": "$.propertyName",
-    "propertyVersion": "$.versionInfo.ruleFormat"
+    "propertyRuleFormat": "$.versionInfo.ruleFormat"
 }
