@@ -1,0 +1,4 @@
+{
+    "propertyName": "$.propertyName",
+    "propertyRuleFormat": "$.versionInfo.ruleFormat"
+}

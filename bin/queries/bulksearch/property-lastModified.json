@@ -1,0 +1,7 @@
+{
+    "propertyName": "$.propertyName",
+    "propertyVersion": "$.propertyVersion",
+    "lastModifiedTime": "$.lastModifiedTime",
+    "daysSinceModified": "$.daysSinceModified",
+    "versionInfo": "$.versionInfo.updatedByUser"
+}

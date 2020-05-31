@@ -28,6 +28,7 @@ from akamai.edgegrid import EdgeGridAuth, EdgeRc
 from bin.credentialfactory import CredentialFactory
 from bin.fetch import Fetch_Akamai_OPENAPI_Response
 from bin.fetch import CachedContextHandler
+from bin.fetch_datastream import daysSince
 
 from bin.decorator import cacheFunctionCall
 
@@ -195,7 +196,8 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                 (code, digitalPropertyJson) = self.fetchPropertyVersionDigitalProperty(edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
 
                 if code in [200]:
-                    self.mergeDigitalPropertiesValues(matchJson, digitalPropertyJson)
+                    lastModifiedTime = matchJson["lastModifiedTime"] if "lastModifiedTime" in matchJson else None
+                    self.mergeDigitalPropertiesValues(matchJson, digitalPropertyJson, lastModifiedTime=lastModifiedTime)
 
                 
                 (code, versionMetaJson) = self.fetchPropertyVersionMetaInfo(edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
@@ -237,10 +239,15 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
         if len(matchResults) > 0:
             match["matchLocationResults"] = matchResults
 
-    def mergeDigitalPropertiesValues(self, searchJson, hostnameJson):
+    def mergeDigitalPropertiesValues(self, searchJson, hostnameJson, lastModifiedTime=None):
 
         if len(hostnameJson) > 0:
             searchJson["hostnames"] = hostnameJson
+
+        if lastModifiedTime is not None:
+
+            days = daysSince(lastModifiedTime)
+            searchJson["daysSinceModified"] = days
 
     def mergeDigitalPropertiesVersionMeta(self, searchJson, versionMetaJson):
 
