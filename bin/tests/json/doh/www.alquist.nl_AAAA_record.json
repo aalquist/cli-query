@@ -1,0 +1,71 @@
+{
+  "Status": 0,
+  "TC": false,
+  "RD": true,
+  "RA": true,
+  "AD": false,
+  "CD": false,
+  "Question": [
+    {
+      "name": "www.alquist.nl.",
+      "type": 28
+    }
+  ],
+  "Answer": [
+    {
+      "name": "www.alquist.nl.",
+      "type": 5,
+      "TTL": 299,
+      "data": "d2c99t9e0sxfl6.cloudfront.net."
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:8600:c:1662:4a80:93a1"
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:4200:c:1662:4a80:93a1"
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:3600:c:1662:4a80:93a1"
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:a400:c:1662:4a80:93a1"
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:5c00:c:1662:4a80:93a1"
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:9000:c:1662:4a80:93a1"
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:7400:c:1662:4a80:93a1"
+    },
+    {
+      "name": "d2c99t9e0sxfl6.cloudfront.net.",
+      "type": 28,
+      "TTL": 59,
+      "data": "2600:9000:20ee:4a00:c:1662:4a80:93a1"
+    }
+  ],
+  "Comment": "Response from 205.251.194.167."
+}

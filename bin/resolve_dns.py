@@ -17,16 +17,21 @@ def isIPV6(dnsName):
         return False
 
 def getDomainJson(domain, recoredType="AAAA"):
-    with requests.Session() as s:
 
-        if recoredType is not None:
-            response = s.get(f"https://dns.google.com/resolve?type={recoredType}&name={domain}")
-        else:
-            response = s.get(f"https://dns.google.com/resolve?name={domain}")
+    s = requests.Session()
 
-        dnsResponse = response.json()
+    if recoredType is not None:
+        url = f"https://dns.google.com/resolve?type={recoredType}&name={domain}"
+        response = s.get(url)
+        
+    else:
+        url = f"https://dns.google.com/resolve?name={domain}"
+        response = s.get(url)
 
-        return dnsResponse
+    dnsResponse = response.json()
+    s.close()
+
+    return dnsResponse
 
 def checkSingleDNSDomainJson(domainJson, func=None):
     
