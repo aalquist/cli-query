@@ -65,11 +65,22 @@ class Doh_Test(unittest.TestCase):
         
         result = checkDNSMetadata(["www.alquist.nl", "www.akamai.com" ])
         
-        self.assertFalse(result["anyAkamai"])
+        self.assertTrue(result["anyAkamai"])
         self.assertFalse(result["allAkamai"])
         self.assertFalse(result["allIPv6"])
         self.assertTrue(result["anyIPv6"])
 
+        self.assertEqual("www.alquist.nl", result["resolution"][0]["domain"])
+        self.assertEqual("www.akamai.com", result["resolution"][1]["domain"])
+        
+        self.assertEqual(False, result["resolution"][0]["isAkamai"])
+        self.assertEqual(True, result["resolution"][1]["isAkamai"])
+
+        self.assertEqual(False, result["resolution"][0]["isIPV6"])
+        self.assertEqual(True, result["resolution"][1]["isIPV6"])
+        
+
+        
 
         
 
