@@ -45,8 +45,8 @@ class Doh_Test(unittest.TestCase):
     def setUp(self):
         self.basedir = os.path.abspath(os.path.dirname(__file__))
         self.dnsQueries = [
-            "{}/json/doh/www.alquist.nl_AAAA_record.json".format(self.basedir),
-            "{}/json/doh/www.alquist.nl_A_record.json".format(self.basedir)
+            "{}/json/doh/www.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/www.akamai.com_AAAA.json".format(self.basedir)
         ]
     
 
@@ -63,7 +63,7 @@ class Doh_Test(unittest.TestCase):
         response.status_code = 200
         response.headers = {}
         
-        result = checkDNSMetadata(["www.alquist.nl", "www.alquist.nl" ])
+        result = checkDNSMetadata(["www.alquist.nl", "www.akamai.com" ])
         
         self.assertFalse(result["anyAkamai"])
         self.assertFalse(result["allAkamai"])
