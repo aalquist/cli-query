@@ -65,12 +65,9 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             if "positional" in arg and arg["positional"] == True:
                 positional = arg["positional"]
                 del arg["positional"]
-                required.add_argument(name,
-                                    **arg)
+                required.add_argument(name, **arg)
             else:
-                required.add_argument("--" + name,
-                                    required=True,
-                                    **arg)
+                required.add_argument("--" + name, required=True, **arg)
 
     optional = action.add_argument_group("optional arguments")
 
@@ -99,7 +96,13 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
 
             else:
 
-                optional.add_argument("--" + name,
+                if "positional" in arg and arg["positional"] == True:
+                    positional = arg["positional"]
+                    del arg["positional"]
+                    optional.add_argument(name, **arg)
+
+                else:
+                    optional.add_argument("--" + name,
                                       required=False,
                                       **arg)
 
@@ -313,8 +316,10 @@ def setupCommands(subparsers):
     create_sub_command(
         subparsers, "doh", "dns over http command",
         
-        optional_arguments=combineArgs(defaultQueryArgs, [ {"name": "type", "help": "the DNS record type (A,AAAA,CNAME,NS)"}]),
-        required_arguments=[ {"name": "domain", "help": "the domain", "positional" : True, "nargs" : '+'} ],
+        optional_arguments=combineArgs(defaultQueryArgs, [ 
+                {"name": "type", "help": "the DNS record type (A,AAAA,CNAME,NS)"},
+                {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '?'}]),
+        required_arguments=None,
         actions=actions)
     
 
@@ -361,13 +366,24 @@ def doh(args):
     queryresult = QueryResult("doh")
     
     checkFilterArgs(args, queryresult)
-    jsonObj = checkDNSMetadata(args.domain, recoredType=None) 
+
+    if args.domain is None:
+        stdinStr = getArgFromSTDIN()
+        stdinStr = str.rstrip(stdinStr)
+        listofDomains = stdinStr.split()
+        
+    else:
+        listofDomains = args.domain
+
+    jsonObj = checkDNSMetadata(listofDomains, recoredType=None) 
+
+    
 
     if "resolution" in jsonObj:
         jsonObj= jsonObj["resolution"]
 
     thread.join()
-    return handleresponse(args, jsonObj, queryresult,  RequireAll=False, Debug=args.debug)
+    return handleresponse(args, jsonObj, queryresult, enableSTDIN=False, RequireAll=False, Debug=args.debug)
 
 def filtertemplate(args):
 
