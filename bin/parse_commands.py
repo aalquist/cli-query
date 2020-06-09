@@ -367,7 +367,7 @@ def doh(args):
         jsonObj= jsonObj["resolution"]
 
     thread.join()
-    return handleresponse(args, jsonObj, queryresult,  Debug=args.debug)
+    return handleresponse(args, jsonObj, queryresult,  RequireAll=False, Debug=args.debug)
 
 def filtertemplate(args):
 

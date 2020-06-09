@@ -25,7 +25,7 @@ from akamai.edgegrid import EdgeGridAuth, EdgeRc
 from bin.parse_commands import main 
 from bin.tests.unittest_utils import CommandTester, MockResponse
 
-from bin.resolve_dns import checkDNSMetadata
+from bin.resolve_dns import checkDNSMetadata, lookupCode
 
 from bin.send_analytics import Analytics 
 
@@ -49,6 +49,9 @@ class Doh_Test(unittest.TestCase):
             "{}/json/doh/www.akamai.com_AAAA.json".format(self.basedir)
         ]
     
+    def testLookup(self):
+        valueCNAME = lookupCode(5)
+        self.assertEqual("CNAME", valueCNAME)
 
     @patch('requests.Session')
     def test_MockDNSResponse(self, mockSessionObj):
@@ -58,7 +61,7 @@ class Doh_Test(unittest.TestCase):
         for mockJson in self.dnsQueries:
             response.appendResponse(response.getJSONFromFile(mockJson))
             
-        
+
         session.get.return_value = response
         response.status_code = 200
         response.headers = {}
@@ -71,7 +74,14 @@ class Doh_Test(unittest.TestCase):
         self.assertTrue(result["anyIPv6"])
 
         self.assertEqual("www.alquist.nl", result["resolution"][0]["domain"])
+        self.assertEqual("CNAME", result["resolution"][0]["dnsJson"]["Answer"][0]["typeName"])
+        self.assertEqual("A", result["resolution"][0]["dnsJson"]["Answer"][1]["typeName"])
+        
         self.assertEqual("www.akamai.com", result["resolution"][1]["domain"])
+        self.assertEqual("CNAME", result["resolution"][1]["dnsJson"]["Answer"][0]["typeName"])
+        self.assertEqual("CNAME", result["resolution"][1]["dnsJson"]["Answer"][1]["typeName"])
+        self.assertEqual("CNAME", result["resolution"][1]["dnsJson"]["Answer"][2]["typeName"])
+        self.assertEqual("AAAA", result["resolution"][1]["dnsJson"]["Answer"][3]["typeName"])
         
         self.assertEqual(False, result["resolution"][0]["isAkamai"])
         self.assertEqual(True, result["resolution"][1]["isAkamai"])
