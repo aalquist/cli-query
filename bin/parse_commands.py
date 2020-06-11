@@ -318,7 +318,7 @@ def setupCommands(subparsers):
         
         optional_arguments=combineArgs(defaultQueryArgs, [ 
                 {"name": "type", "help": "the DNS record type (A,AAAA,CNAME,NS)"},
-                {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '?'}]),
+                {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '*'}]),
         required_arguments=None,
         actions=actions)
     
@@ -375,12 +375,11 @@ def doh(args):
     else:
         listofDomains = args.domain
 
-    jsonObj = checkDNSMetadata(listofDomains, recoredType=None) 
 
-    
-
-    if "resolution" in jsonObj:
-        jsonObj= jsonObj["resolution"]
+    if True:
+        jsonObj = checkDNSMetadata(listofDomains, recoredType=None) 
+        if "resolution" in jsonObj:
+            jsonObj= jsonObj["resolution"]
 
     thread.join()
     return handleresponse(args, jsonObj, queryresult, enableSTDIN=False, RequireAll=False, Debug=args.debug)
