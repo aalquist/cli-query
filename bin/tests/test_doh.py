@@ -49,6 +49,21 @@ class Doh_Test(unittest.TestCase):
             "{}/json/doh/www.akamai.com_AAAA.json".format(self.basedir)
         ]
 
+    def testJsonParseOutputFilter(self): 
+        jsonObjArray = list()
+       
+        jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
+        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, returnAkamaiHosts=True)
+
+        self.assertEqual( 2, len(returnList) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+        self.assertEqual("akamai1.alquist.nl", returnList[0][1][0])
+        
+        self.assertEqual("configname_ion4", returnList[1][0][0])
+        self.assertEqual("akamai3.alquist.nl", returnList[1][1][0])
+        self.assertEqual("akamai4.alquist.nl", returnList[1][1][1])
+
     def testJsonParseNestedArrays(self): 
         jsonObjArray = list()
        

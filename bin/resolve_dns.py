@@ -340,7 +340,7 @@ def compositeCheck(domainList, recoredType="AAAA"):
 
     return jsonMap
 
-def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False):
+def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None):
 
     if requireAllAkamai:
         requireAnyAkamai = False
@@ -364,6 +364,13 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
 
             dnsResults = checkDNSMetadata(hosts)
         
+        
+        if returnAkamaiHosts is not None :
+            #modify the hostnames returned to only show the ones that are CNAMEd to Akamai or not
+            returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts, dnsResults["resolution"]))
+            returnToList = list(map(lambda x : x["domain"], returnToList))
+            obj[arrayHostIndex] = returnToList
+
         if requireAnyAkamai == True and dnsResults["anyAkamai"] :
             returnList.append(obj)
 
