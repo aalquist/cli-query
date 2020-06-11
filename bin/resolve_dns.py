@@ -379,9 +379,7 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
 
     return returnList
 
-
-def checkDNSMetadata(domainList, recoredType="AAAA"):
-
+def loadDNSfromHostList(domainList, recoredType="AAAA"):
     hostCheck = compositeCheck(domainList, recoredType=recoredType)
 
     isAkamai = list(map(lambda domain : domain["isAkamai"], hostCheck) )
@@ -396,5 +394,13 @@ def checkDNSMetadata(domainList, recoredType="AAAA"):
     }
 
     return DNSInfo
+
+def checkDNSMetadata(inputList, inputIsJSON=False, recoredType="AAAA"):
+
+    if inputIsJSON == False:
+       return loadDNSfromHostList(inputList, recoredType="AAAA")
+
+    else:
+        return checkJsonArrayDNS(inputList, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None)
 
    
