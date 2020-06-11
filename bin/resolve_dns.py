@@ -340,6 +340,39 @@ def compositeCheck(domainList, recoredType="AAAA"):
 
     return jsonMap
 
+def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False):
+
+    if requireAllAkamai:
+        requireAnyAkamai = False
+
+    objList = list(map(lambda x : json.loads(x), jsonObj))
+
+    returnList = list()
+
+    for obj in objList:
+
+        if arrayHostIndex >= len(obj):
+            returnList.append(obj)
+
+        elif isinstance(obj, list):
+
+            hosts = obj[arrayHostIndex]
+            if isinstance(hosts, str):
+                hosts = hosts.split(",")
+            elif isinstance(hosts, list):
+                pass
+
+            dnsResults = checkDNSMetadata(hosts)
+        
+        if requireAnyAkamai == True and dnsResults["anyAkamai"] :
+            returnList.append(obj)
+
+        elif requireAllAkamai == True and dnsResults["allAkamai"] :
+            returnList.append(obj)
+
+    return returnList
+
+
 def checkDNSMetadata(domainList, recoredType="AAAA"):
 
     hostCheck = compositeCheck(domainList, recoredType=recoredType)

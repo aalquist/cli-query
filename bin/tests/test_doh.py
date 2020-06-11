@@ -25,7 +25,7 @@ from akamai.edgegrid import EdgeGridAuth, EdgeRc
 from bin.parse_commands import main 
 from bin.tests.unittest_utils import CommandTester, MockResponse
 
-from bin.resolve_dns import checkDNSMetadata, lookupCode
+from bin.resolve_dns import checkDNSMetadata, lookupCode, checkJsonArrayDNS
 
 from bin.send_analytics import Analytics 
 
@@ -48,7 +48,65 @@ class Doh_Test(unittest.TestCase):
             "{}/json/doh/www.alquist.nl_A.json".format(self.basedir),
             "{}/json/doh/www.akamai.com_AAAA.json".format(self.basedir)
         ]
+
+    def testJsonParseNestedArrays(self): 
+        jsonObjArray = list()
+       
+        jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
+        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
+
+        self.assertEqual( 2, len(returnList) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+        self.assertEqual("www.alquist.nl", returnList[0][1][0])
+        self.assertEqual("akamai1.alquist.nl", returnList[0][1][1])
+
+        self.assertEqual("configname_ion4", returnList[1][0][0])
+        self.assertEqual("akamai3.alquist.nl", returnList[1][1][0])
+        self.assertEqual("akamai4.alquist.nl", returnList[1][1][1])
+
+    def testJsonParseNestedArrays_AnyAkamai(self): 
+        jsonObjArray = list()
+       
+        jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
+        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAnyAkamai=True)
+
+        self.assertEqual( 1, len(returnList) )
+        self.assertEqual("configname_ion4", returnList[0][0][0])
+        self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
+        self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
     
+    def testJsonParseNestedArrays_All_Akamai(self): 
+        jsonObjArray = list()
+       
+        jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"] ]' )
+        jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
+        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAllAkamai=True)
+
+        self.assertEqual( 1, len(returnList) )
+        self.assertEqual("configname_ion4", returnList[0][0][0])
+        self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
+        self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
+
+    def testJsonParseArray(self):
+
+        jsonObjArray = list()
+        jsonObjArray.append('["configname_ion1", "www.alquist.nl,akamai1.alquist.nl"]' )
+        jsonObjArray.append('["configname_ion2", "akamai2.alquist.nl,akamai3.alquist.nl"]' )
+        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
+
+        self.assertEqual( 2, len(returnList) )
+
+        self.assertEqual("configname_ion1", returnList[0][0])
+        self.assertEqual("www.alquist.nl", returnList[0][1].split(",")[0])
+        self.assertEqual("akamai1.alquist.nl", returnList[0][1].split(",")[1])
+
+        self.assertEqual("configname_ion2", returnList[1][0].split(",")[0])
+        self.assertEqual("akamai2.alquist.nl", returnList[1][1].split(",")[0])
+        self.assertEqual("akamai3.alquist.nl", returnList[1][1].split(",")[1])        
+
+
     def testLookup(self):
         valueCNAME = lookupCode(5)
         self.assertEqual("CNAME", valueCNAME)
