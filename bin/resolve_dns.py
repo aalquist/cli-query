@@ -292,6 +292,8 @@ def isIPV6(dnsName):
 
 def getDomainJson(domain, recoredType="AAAA"):
 
+    checkInvalidDNSChars(domain)
+
     s = requests.Session()
 
     if recoredType is not None:
@@ -340,6 +342,14 @@ def compositeCheck(domainList, recoredType="AAAA"):
 
     return jsonMap
 
+def checkInvalidDNSChars(dns):
+    notAllowed = ["{", "}", "[", "]", ":" , ","]
+    containsNotAllowed = [e for e in notAllowed if e in dns]
+
+    if len(containsNotAllowed) > 0:
+        raise ValueError("... domain {} has wrong char {}".format(dns, containsNotAllowed))
+
+
 def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None):
 
     if requireAllAkamai:
@@ -352,7 +362,7 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
     for obj in objList:
 
         if arrayHostIndex >= len(obj):
-            returnList.append(obj)
+            raise ValueError("index {} is >= size {}. choose a smaller number. line:\n{}".format(arrayHostIndex, len(obj) , obj))
 
         elif isinstance(obj, list):
 

@@ -31,7 +31,7 @@ from bin.query_result import QueryResult
 
 from bin.send_analytics import Analytics 
 
-from bin.resolve_dns import checkDNSMetadata
+from bin.resolve_dns import loadDNSfromHostList, checkJsonArrayDNS
 
 import inspect
 
@@ -77,7 +77,7 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             name = arg["name"]
             del arg["name"]
 
-            if name.startswith("skip-") or name.startswith("skip_") or name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or ("-use-" in name ) or ("_use_" in name ):
+            if name.startswith("require-") or name.startswith("require_") or name.startswith("skip-") or name.startswith("skip_") or name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or name.startswith("is-") or name.startswith("is_") or ("-use-" in name ) or ("_use_" in name ) or ("-is-" in name ) or ("_is_" in name ):
                 
                 #enable boolean/flags
                 optional.add_argument(
@@ -222,6 +222,11 @@ def setupCommands(subparsers):
 
     actions = {}
 
+    basicQueryArgs = [ 
+                            {"name": "show-json", "help": "output json"},
+                            {"name": "templatefile", "help": "the json file for query"},
+                            {"name": "templatename", "help": "use template name for query"} ]
+
     defaultQueryArgs = [ 
                             {"name": "show-json", "help": "output json"},
                             {"name": "use-filterstdin", "help": "use stdin for query"},
@@ -314,9 +319,15 @@ def setupCommands(subparsers):
         actions=actions)
 
     create_sub_command(
-        subparsers, "doh", "dns over http command",
+        subparsers, "checkdns", "dns filtering tool",
         
-        optional_arguments=combineArgs(defaultQueryArgs, [ 
+        #requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts
+
+        optional_arguments=combineArgs(basicQueryArgs, [ 
+                {"name": "json-dns-index", "help": "zero based index where hostname is located", "default" : 1},
+                {"name": "require-AnyAkamai", "help": "requireAnyAkamai", "default" : True},
+                {"name": "require-AllAkamai", "help": "requireAllAkamai", "default" : False},
+                {"name": "return-AkamaiHosts", "help": "returnAkamaiHosts"},
                 {"name": "type", "help": "the DNS record type (A,AAAA,CNAME,NS)"},
                 {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '*'}]),
         required_arguments=None,
@@ -359,30 +370,67 @@ def bulksearchtemplate(args):
     thread.join()
     return return_value
 
-def doh(args):
+def checkdns(args):
     path = inspect.getframeinfo(inspect.currentframe()).function
     thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
     queryresult = QueryResult("doh")
     
-    checkFilterArgs(args, queryresult)
+    
 
-    if args.domain is None:
+    if args.domain is None or len(args.domain) < 1:
+        print("... waiting for domain list or json docs from user input...", file=sys.stderr )
         stdinStr = getArgFromSTDIN()
+        print("... got list from user input...", file=sys.stderr )
         stdinStr = str.rstrip(stdinStr)
-        listofDomains = stdinStr.split()
-        
+        lines = stdinStr.split(os.linesep)
+
     else:
-        listofDomains = args.domain
+        lines = args.domain
 
+    #check each line if any line has JSON chars
+    linesNotDNS = list(filter(lambda dns : len([e for e in ["{", "}", "[", "]", ":" , ","] if e in dns]) > 0, lines ))
 
-    if True:
-        jsonObj = checkDNSMetadata(listofDomains, recoredType=None) 
+    inputIsJSON = len(linesNotDNS) > 0
+
+    if inputIsJSON == False:
+        checkFilterArgs(args, queryresult)
+
+        for dns in lines:
+            notAllowed = ["{", "}", "[", "]", ":" , ","]
+            containsNotAllowed = [e for e in notAllowed if e in dns]
+
+            if len(containsNotAllowed) > 0:
+                print("... domain {} has wrong char {}".format(dns, containsNotAllowed), file=sys.stderr )
+                return 1
+
+        jsonObj = loadDNSfromHostList(lines, recoredType=None)
         if "resolution" in jsonObj:
             jsonObj= jsonObj["resolution"]
+            thread.join()
+            return handleresponse(args, jsonObj, queryresult, enableSTDIN=False, RequireAll=False, Debug=args.debug)
+        else:
+            print("... something went wrong with response", file=sys.stderr )
 
-    thread.join()
-    return handleresponse(args, jsonObj, queryresult, enableSTDIN=False, RequireAll=False, Debug=args.debug)
+    else:
+        print("... accepting JSON input and skipping any template output", file=sys.stderr )
+        
+        try:
+            args.json_dns_index = int(args.json_dns_index)
+
+        except ValueError:
+            print("... domain index must be an int {}".format(args.json_dns_index), file=sys.stderr )
+            return 1
+        
+        
+        returnAkamaiHosts = None if args.return_AkamaiHosts is None else bool(args.return_AkamaiHosts)
+        
+        jsonObj= checkJsonArrayDNS(lines, arrayHostIndex=args.json_dns_index, requireAnyAkamai=args.require_AnyAkamai, requireAllAkamai=args.require_AllAkamai, returnAkamaiHosts=returnAkamaiHosts)
+        
+        printResponse(jsonObj,JSONOutput=inputIsJSON)
+        thread.join()
+        return 0   
+
 
 def filtertemplate(args):
 
@@ -700,18 +748,22 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
             
             parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
-        for line in parsed:
-
-            if notJSONOutput:
-                print( line )
-            else:
-                print( json.dumps(line) )
+        printResponse(parsed, JSONOutput=(not notJSONOutput))
 
     else: 
         print( json.dumps( jsonObj, indent=1 ) )
 
 
     return 0   
+
+def printResponse(parsed, JSONOutput=False):
+    
+    for line in parsed:
+
+        if not JSONOutput:
+            print( line )
+        else:
+            print( json.dumps(line) )
 
 def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCSV=True, Debug=False):
 
