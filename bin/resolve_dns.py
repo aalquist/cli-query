@@ -372,7 +372,8 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
             else:
                 hosts = hostIndex
 
-            print(" ... checking dns for {} hosts".format( len(hosts) ), file=sys.stderr )
+            if len(obj) > 0: 
+                print(" ... checking dns for {} hosts on {}".format( len(hosts), obj[0] ), file=sys.stderr )
 
             dnsResults = checkDNSMetadata(hosts)
         
@@ -382,6 +383,12 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
         if returnAkamaiHosts is not None :
             #modify the hostnames returned to only show the ones that are CNAMEd to Akamai or not
             returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts, dnsResults["resolution"]))
+
+            if len(hosts) != len(returnToList):
+                print("  ... {} hosts were reduced to {} hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+            else:
+                print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
+
             returnToList = list(map(lambda x : x["domain"], returnToList))
             
             if isinstance(hostIndex, str):
