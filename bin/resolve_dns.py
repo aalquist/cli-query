@@ -1,5 +1,6 @@
 import requests
 import json
+import sys
 
 typedict =  {
                 "1": {
@@ -370,6 +371,8 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
                 hosts = hostIndex.split(",")
             else:
                 hosts = hostIndex
+
+            print(" ... checking dns for {} hosts".format( len(hosts) ), file=sys.stderr )
 
             dnsResults = checkDNSMetadata(hosts)
         

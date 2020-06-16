@@ -379,7 +379,7 @@ def checkdns(args):
     
 
     if args.domain is None or len(args.domain) < 1:
-        print("... waiting for domain list or json docs from user input...", file=sys.stderr )
+        print("... waiting for domain list or json docs from stdin...", file=sys.stderr )
         stdinStr = getArgFromSTDIN()
         print("... got list from user input...", file=sys.stderr )
         stdinStr = str.rstrip(stdinStr)
