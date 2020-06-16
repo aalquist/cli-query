@@ -385,7 +385,7 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
             returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts, dnsResults["resolution"]))
 
             if len(hosts) != len(returnToList):
-                print("  ... {} hosts were reduced to {} hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+                print("  ... {} had {} hosts thet were reduced to {}".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
             else:
                 print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
 
