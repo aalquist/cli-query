@@ -278,7 +278,7 @@ def updateDNSAnswer(answer):
 def isAkamai(dnsName):
     if "type" in dnsName and dnsName["type"] == 5 and "data" in dnsName:
         data = dnsName["data"]
-        akamaiDNSTupple = ("akamaiedge.net.", "edgekey.net.", "edgesuite.net.", "akamaized.net.", "akamai.net.", "akamaihd.net.")
+        akamaiDNSTupple = ("akamaiedge.net.", "akamaiedge-staging.net.", "edgekey.net.", "edgekey-staging.net.", "edgesuite.net.", "edgesuite-staging.net.", "akamaized.net.", "akamaized-staging.net.", "akamai.net.", "akamai-staging.net.", "akamaihd.net.", "akamaihd-staging.net.")
         hasAkamaiCNAME = data.endswith(akamaiDNSTupple)
         return hasAkamaiCNAME
     else:
@@ -352,9 +352,6 @@ def checkInvalidDNSChars(dns):
 
 def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None):
 
-    if requireAllAkamai:
-        requireAnyAkamai = False
-
     objList = list(map(lambda x : json.loads(x), jsonObj))
 
     returnList = list()
@@ -366,26 +363,39 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
 
         elif isinstance(obj, list):
 
-            hosts = obj[arrayHostIndex]
-            if isinstance(hosts, str):
-                hosts = hosts.split(",")
-            elif isinstance(hosts, list):
-                pass
+            hostIndex = obj[arrayHostIndex]
+
+            #check if input is a string, otherwise assume its a list
+            if isinstance(hostIndex, str):
+                hosts = hostIndex.split(",")
+            else:
+                hosts = hostIndex
 
             dnsResults = checkDNSMetadata(hosts)
         
+        if requireAllAkamai:
+            requireAnyAkamai = False
         
         if returnAkamaiHosts is not None :
             #modify the hostnames returned to only show the ones that are CNAMEd to Akamai or not
             returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts, dnsResults["resolution"]))
             returnToList = list(map(lambda x : x["domain"], returnToList))
+            
+            if isinstance(hostIndex, str):
+                returnToList = ",".join(returnToList)
+
             obj[arrayHostIndex] = returnToList
 
-        if requireAnyAkamai == True and dnsResults["anyAkamai"] :
-            returnList.append(obj)
+            if len(returnToList ) > 0:
+                returnList.append(obj)
 
-        elif requireAllAkamai == True and dnsResults["allAkamai"] :
-            returnList.append(obj)
+        else:
+
+            if requireAnyAkamai == True and dnsResults["anyAkamai"] :
+                returnList.append(obj)
+
+            elif requireAllAkamai == True and dnsResults["allAkamai"] :
+                returnList.append(obj)
 
     return returnList
 

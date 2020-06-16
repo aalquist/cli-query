@@ -423,8 +423,10 @@ def checkdns(args):
             return 1
         
         
-        returnAkamaiHosts = None if args.return_AkamaiHosts is None else bool(args.return_AkamaiHosts)
+        returnAkamaiHosts = None if args.return_AkamaiHosts is None else True if "True" == args.return_AkamaiHosts else False
         
+        print("... running dns check with requireAnyAkamai={}, requireAllAkamai={}, returnAkamaiHosts={}".format(args.require_AnyAkamai, args.require_AllAkamai, returnAkamaiHosts), file=sys.stderr )
+
         jsonObj= checkJsonArrayDNS(lines, arrayHostIndex=args.json_dns_index, requireAnyAkamai=args.require_AnyAkamai, requireAllAkamai=args.require_AllAkamai, returnAkamaiHosts=returnAkamaiHosts)
         
         printResponse(jsonObj,JSONOutput=inputIsJSON)
