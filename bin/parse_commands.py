@@ -388,21 +388,29 @@ def checkdns(args):
     else:
         lines = args.domain
 
-    #check each line if any line has JSON chars
-    linesNotDNS = list(filter(lambda dns : len([e for e in ["{", "}", "[", "]", ":" , ","] if e in dns]) > 0, lines ))
+    #check each line if any line has JSON chars (but not including comma or space)
+    linesNotDNS = list(filter(lambda dns : len([e for e in ["{", "}", "[", "]", ":" ] if e in dns]) > 0, lines ))
 
     inputIsJSON = len(linesNotDNS) > 0
 
     if inputIsJSON == False:
         checkFilterArgs(args, queryresult)
 
+        updatedLines = None
         for dns in lines:
-            notAllowed = ["{", "}", "[", "]", ":" , ","]
-            containsNotAllowed = [e for e in notAllowed if e in dns]
+            split = [" ", ","]
+            splitCharFound = [e for e in split if e in dns]
 
-            if len(containsNotAllowed) > 0:
-                print("... domain {} has wrong char {}".format(dns, containsNotAllowed), file=sys.stderr )
-                return 1
+            if len(splitCharFound) > 0:
+                updatedLines = list()
+                for split in splitCharFound:
+
+                    
+                    newDns = str.strip(dns)
+                    updatedLines.extend( newDns.split(split) ) 
+
+        if updatedLines is not None:
+            lines = updatedLines
 
         jsonObj = loadDNSfromHostList(lines, recoredType=None)
         if "resolution" in jsonObj:
