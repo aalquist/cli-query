@@ -1,7 +1,7 @@
 {
  "propertyName": "$.propertyName",
  "propertyVersion": "$.propertyVersion",
- "stagingStatus" : "$.productionStatus",
+ "stagingStatus" : "$.stagingStatus",
  "productionStatus" : "$.productionStatus",
  "results": "$.matchLocationResults[*]"
 }
