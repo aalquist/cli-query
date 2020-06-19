@@ -298,11 +298,11 @@ def getDomainJson(domain, recoredType="AAAA"):
     s = requests.Session()
 
     if recoredType is not None:
-        url = f"https://dns.google.com/resolve?type={recoredType}&name={domain}"
+        url = "https://dns.google.com/resolve?type={}&name={}".format(recoredType,domain)
         response = s.get(url)
         
     else:
-        url = f"https://dns.google.com/resolve?name={domain}"
+        url = "https://dns.google.com/resolve?name={}".format(domain)
         response = s.get(url)
 
     dnsResponse = response.json()
