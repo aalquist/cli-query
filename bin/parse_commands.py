@@ -319,7 +319,7 @@ def setupCommands(subparsers):
         actions=actions)
 
     create_sub_command(
-        subparsers, "checkdns", "dns filtering tool",
+        subparsers, "checkjsondns", "dns filtering tool for json objects",
         
         #requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts
 
@@ -328,7 +328,16 @@ def setupCommands(subparsers):
                 {"name": "require-AnyAkamai", "help": "requireAnyAkamai", "default" : True},
                 {"name": "require-AllAkamai", "help": "requireAllAkamai", "default" : False},
                 {"name": "return-AkamaiHosts", "help": "returnAkamaiHosts"},
-                {"name": "type", "help": "the DNS record type (A,AAAA,CNAME,NS)"},
+                {"name": "filterby", "help": "a list of domains", "positional" : True, "choices" : [ "configsWithCNAME", "configsWithoutCNAME", "hostsCNAMED", "hostsNotCNAMED" ]}]),
+        required_arguments=None,
+        actions=actions)
+
+    create_sub_command(
+        subparsers, "checkdnshost", "dns filtering tool",
+        
+        #requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts
+
+        optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '*'}]),
         required_arguments=None,
         actions=actions)
@@ -370,7 +379,70 @@ def bulksearchtemplate(args):
     thread.join()
     return return_value
 
-def checkdns(args):
+def checkjsondns(args):
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
+
+    #default values
+    requireAnyAkamai=True
+    requireAllAkamai=False
+    returnAkamaiHosts=None
+
+    if args.filterby in [ "configsWithCNAME", "configsWithoutCNAME" ]:
+        print("... preparing to filter listed configurations with {}...".format(args.filterby), file=sys.stderr )
+        
+        if args.filterby == "configsWithCNAME":
+            requireAnyAkamai = True
+            requireAllAkamai = False
+            returnAkamaiHosts = None
+
+        elif args.filterby == "configsWithoutCNAME":
+            requireAnyAkamai = False
+            requireAllAkamai = True
+            returnAkamaiHosts = None
+
+    elif args.filterby in [ "hostsCNAMED", "hostsNotCNAMED" ]:
+
+        print("... preparing to modify listed hosts with setting {}...".format(args.filterby), file=sys.stderr )
+
+        if args.filterby == "hostsCNAMED":
+            requireAnyAkamai = True
+            requireAllAkamai = False
+            returnAkamaiHosts=True
+
+        elif args.filterby == "hostsNotCNAMED":
+            requireAnyAkamai = True
+            requireAllAkamai = False
+            returnAkamaiHosts = False
+
+    else:
+        print("... invalid setting. skipping filter {}...".format(args.filterby), file=sys.stderr )
+        return 1
+
+
+    print("... waiting for domain list or json docs from stdin...", file=sys.stderr )
+    stdinStr = getArgFromSTDIN()
+    print("... got list from user input...", file=sys.stderr )
+    stdinStr = str.rstrip(stdinStr)
+    lines = stdinStr.split(os.linesep)
+
+
+    print("... accepting JSON input and skipping any template output", file=sys.stderr )
+    
+    try:
+        args.json_dns_index = int(args.json_dns_index)
+
+    except ValueError:
+        print("... domain index must be an int {}".format(args.json_dns_index), file=sys.stderr )
+        return 1
+    
+    jsonObj= checkJsonArrayDNS(lines, arrayHostIndex=args.json_dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
+    
+    printResponse(jsonObj,JSONOutput=True)
+    thread.join()
+    return 0   
+
+def checkdnshost(args):
     path = inspect.getframeinfo(inspect.currentframe()).function
     thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
@@ -388,58 +460,34 @@ def checkdns(args):
     else:
         lines = args.domain
 
-    #check each line if any line has JSON chars (but not including comma or space)
-    linesNotDNS = list(filter(lambda dns : len([e for e in ["{", "}", "[", "]", ":" ] if e in dns]) > 0, lines ))
 
-    inputIsJSON = len(linesNotDNS) > 0
+    checkFilterArgs(args, queryresult)
 
-    if inputIsJSON == False:
-        checkFilterArgs(args, queryresult)
+    updatedLines = None
+    for dns in lines:
+        split = [" ", ","]
+        splitCharFound = [e for e in split if e in dns]
 
-        updatedLines = None
-        for dns in lines:
-            split = [" ", ","]
-            splitCharFound = [e for e in split if e in dns]
+        if len(splitCharFound) > 0:
+            updatedLines = list()
+            for split in splitCharFound:
 
-            if len(splitCharFound) > 0:
-                updatedLines = list()
-                for split in splitCharFound:
+                
+                newDns = str.strip(dns)
+                updatedLines.extend( newDns.split(split) ) 
 
-                    
-                    newDns = str.strip(dns)
-                    updatedLines.extend( newDns.split(split) ) 
+    if updatedLines is not None:
+        lines = updatedLines
 
-        if updatedLines is not None:
-            lines = updatedLines
+    jsonObj = loadDNSfromHostList(lines, recoredType=None)
 
-        jsonObj = loadDNSfromHostList(lines, recoredType=None)
-        if "resolution" in jsonObj:
-            jsonObj= jsonObj["resolution"]
-            thread.join()
-            return handleresponse(args, jsonObj, queryresult, enableSTDIN=False, RequireAll=False, Debug=args.debug)
-        else:
-            print("... something went wrong with response", file=sys.stderr )
-
-    else:
-        print("... accepting JSON input and skipping any template output", file=sys.stderr )
-        
-        try:
-            args.json_dns_index = int(args.json_dns_index)
-
-        except ValueError:
-            print("... domain index must be an int {}".format(args.json_dns_index), file=sys.stderr )
-            return 1
-        
-        
-        returnAkamaiHosts = None if args.return_AkamaiHosts is None else True if "True" == args.return_AkamaiHosts else False
-        
-        print("... running dns check with requireAnyAkamai={}, requireAllAkamai={}, returnAkamaiHosts={}".format(args.require_AnyAkamai, args.require_AllAkamai, returnAkamaiHosts), file=sys.stderr )
-
-        jsonObj= checkJsonArrayDNS(lines, arrayHostIndex=args.json_dns_index, requireAnyAkamai=args.require_AnyAkamai, requireAllAkamai=args.require_AllAkamai, returnAkamaiHosts=returnAkamaiHosts)
-        
-        printResponse(jsonObj,JSONOutput=inputIsJSON)
+    if "resolution" in jsonObj:
+        jsonObj= jsonObj["resolution"]
         thread.join()
-        return 0   
+        return handleresponse(args, jsonObj, queryresult, enableSTDIN=False, RequireAll=False, Debug=args.debug)
+    else:
+        print("... something went wrong with response", file=sys.stderr )
+        return 1
 
 
 def filtertemplate(args):

@@ -384,8 +384,10 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
             #modify the hostnames returned to only show the ones that are CNAMEd to Akamai or not
             returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts, dnsResults["resolution"]))
 
+            returnedHostTypeText = "CNAMED" if returnAkamaiHosts else "Non-CNAMED"
+           
             if len(hosts) != len(returnToList):
-                print("  ... {} had {} hosts thet were reduced to {}".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+                print("  ... {} had {} hosts thet were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
             else:
                 print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
 
