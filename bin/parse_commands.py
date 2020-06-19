@@ -320,8 +320,6 @@ def setupCommands(subparsers):
 
     create_sub_command(
         subparsers, "checkjsondns", "dns filtering tool for json objects",
-        
-        #requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts
 
         optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "json-dns-index", "help": "zero based index where hostname is located", "default" : 1},
@@ -332,8 +330,6 @@ def setupCommands(subparsers):
     create_sub_command(
         subparsers, "checkdnshost", "dns filtering tool",
         
-        #requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts
-
         optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '*'}]),
         required_arguments=None,
