@@ -325,10 +325,7 @@ def setupCommands(subparsers):
 
         optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "json-dns-index", "help": "zero based index where hostname is located", "default" : 1},
-                {"name": "require-AnyAkamai", "help": "requireAnyAkamai", "default" : True},
-                {"name": "require-AllAkamai", "help": "requireAllAkamai", "default" : False},
-                {"name": "return-AkamaiHosts", "help": "returnAkamaiHosts"},
-                {"name": "filterby", "help": "a list of domains", "positional" : True, "choices" : [ "configsWithCNAME", "configsWithoutCNAME", "hostsCNAMED", "hostsNotCNAMED" ]}]),
+                {"name": "filterby", "help": "a list of domains", "positional" : True, "choices" : [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME", "hostsCNAMED", "hostsNotCNAMED" ]}]),
         required_arguments=None,
         actions=actions)
 
@@ -388,7 +385,7 @@ def checkjsondns(args):
     requireAllAkamai=False
     returnAkamaiHosts=None
 
-    if args.filterby in [ "configsWithCNAME", "configsWithoutCNAME" ]:
+    if args.filterby in [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME" ]:
         print("... preparing to filter listed configurations with {}...".format(args.filterby), file=sys.stderr )
         
         if args.filterby == "configsWithCNAME":
@@ -397,6 +394,11 @@ def checkjsondns(args):
             returnAkamaiHosts = None
 
         elif args.filterby == "configsWithoutCNAME":
+            requireAnyAkamai = False
+            requireAllAkamai = False
+            returnAkamaiHosts = None
+
+        elif args.filterby == "configsFullyCNAMED":
             requireAnyAkamai = False
             requireAllAkamai = True
             returnAkamaiHosts = None
