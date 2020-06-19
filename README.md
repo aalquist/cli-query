@@ -357,8 +357,8 @@ akamai query filtertemplate --type bulksearch
 [
  "result.json",
  "hostnames.json",
+ "property-version-status-result.json",
  "property-lastModified.json",
- "property-version-status.json",
  "property-hostnames.json",
  "property-product-result.json",
  "property-version-result.json",
