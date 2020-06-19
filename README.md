@@ -27,13 +27,13 @@ akamai install https://github.com/aalquist/cli-query
 
 ``` 
 usage: akamai query help [command]
-                                   {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate}
+                                   {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate,checkjsondns,checkdnshost}
                                    ...
 
 Akamai Query CLI
 
 positional arguments:
-  {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate}
+  {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate,checkjsondns,checkdnshost}
                         commands
     help                Show available help
     version             display the version number
@@ -46,6 +46,8 @@ positional arguments:
     filtertemplate      prints a filter template
     bulksearch          bulk search property manager configurations
     bulksearchtemplate  prints a bulksearch template
+    checkjsondns        dns filtering tool for json objects
+    checkdnshost        dns filtering tool
 
 ``` 
 ## Querying Log Delivery Service (LDS)
@@ -357,8 +359,8 @@ akamai query filtertemplate --type bulksearch
 [
  "result.json",
  "hostnames.json",
+ "property-version-status-result.json",
  "property-lastModified.json",
- "property-version-status.json",
  "property-hostnames.json",
  "property-product-result.json",
  "property-version-result.json",
