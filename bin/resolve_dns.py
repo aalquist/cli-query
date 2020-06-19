@@ -408,6 +408,9 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
 
             elif requireAllAkamai == True and dnsResults["allAkamai"] :
                 returnList.append(obj)
+            
+            elif requireAnyAkamai == False and requireAnyAkamai == dnsResults["anyAkamai"] :
+                returnList.append(obj)
 
     return returnList
 
