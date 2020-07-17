@@ -41,8 +41,10 @@ import json
 PACKAGE_VERSION = "0.0.1"
 
 class MyArgumentParser(argparse.ArgumentParser):
+
     def error(self, message):
         self.print_help(sys.stderr)
+        thing = self._get_args
         self.exit(0, '%s: error: %s\n' % (self.prog, message))
 
 def get_prog_name():
@@ -223,9 +225,8 @@ def setupCommands(subparsers):
     actions = {}
 
     basicQueryArgs = [ 
-                            {"name": "show-json", "help": "output json"},
-                            {"name": "templatefile", "help": "the json file for query"},
-                            {"name": "templatename", "help": "use template name for query"} ]
+                            {"name": "show-json", "help": "output json"}
+                     ]
 
     defaultQueryArgs = [ 
                             {"name": "show-json", "help": "output json"},
@@ -323,7 +324,7 @@ def setupCommands(subparsers):
 
         optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "json-dns-index", "help": "zero based index where hostname is located", "default" : 1},
-                {"name": "filterby", "help": "a list of domains", "positional" : True, "choices" : [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME", "hostsCNAMED", "hostsNotCNAMED" ]}]),
+                {"name": "filterby", "help": "a list of domains", "positional" : True}]),
         required_arguments=None,
         actions=actions)
 
@@ -373,6 +374,19 @@ def bulksearchtemplate(args):
     return return_value
 
 def checkjsondns(args):
+
+    configFilters = [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME"]
+    hostFilters = [ "hostsCNAMED", "hostsNotCNAMED" ]
+    
+    filterbychoices = []
+    filterbychoices.extend(configFilters)
+    filterbychoices.extend(hostFilters)
+    
+    if args.filterby not in filterbychoices:
+        print("... filterby positional arg must be one of {}...".format(filterbychoices), file=sys.stderr )
+        return 1
+    
+
     path = inspect.getframeinfo(inspect.currentframe()).function
     thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
@@ -381,7 +395,7 @@ def checkjsondns(args):
     requireAllAkamai=False
     returnAkamaiHosts=None
 
-    if args.filterby in [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME" ]:
+    if args.filterby in configFilters:
         print("... preparing to filter listed configurations with {}...".format(args.filterby), file=sys.stderr )
         
         if args.filterby == "configsWithCNAME":
@@ -399,7 +413,7 @@ def checkjsondns(args):
             requireAllAkamai = True
             returnAkamaiHosts = None
 
-    elif args.filterby in [ "hostsCNAMED", "hostsNotCNAMED" ]:
+    elif args.filterby in hostFilters:
 
         print("... preparing to modify listed hosts with setting {}...".format(args.filterby), file=sys.stderr )
 
