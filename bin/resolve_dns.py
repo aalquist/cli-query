@@ -291,7 +291,7 @@ def isIPV6(dnsName):
     else:
         return False
 
-def getDomainJson(domain, recoredType="AAAA"):
+def getDomainJson(domain, recoredType="AAAA", debug=False):
 
     checkInvalidDNSChars(domain)
 
@@ -306,6 +306,10 @@ def getDomainJson(domain, recoredType="AAAA"):
         response = s.get(url)
 
     dnsResponse = response.json()
+    
+    if debug:
+        print(json.dumps( dnsResponse, indent=1), file=sys.stderr )
+
     s.close()
 
     return dnsResponse
@@ -327,9 +331,9 @@ def checkSingleDNSDomainJson(domainJson, func=None):
     else:
         return (False, False)
 
-def compositeCheck(domainList, recoredType="AAAA"):
+def compositeCheck(domainList, recoredType="AAAA", debug=False):
 
-    jsonMap = list(map(lambda domain : {"domain": domain, "dnsJson" : getDomainJson(domain, recoredType=recoredType) }, domainList ))
+    jsonMap = list(map(lambda domain : {"domain": domain, "dnsJson" : getDomainJson(domain, recoredType=recoredType, debug=debug) }, domainList ))
 
     def mapDomainMeta(jsonDict):
         jsonDict["isAkamai"] = checkSingleDNSDomainJson(jsonDict["dnsJson"], isAkamai)
@@ -351,7 +355,7 @@ def checkInvalidDNSChars(dns):
         raise ValueError("... domain {} has wrong char {}".format(dns, containsNotAllowed))
 
 
-def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None):
+def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None, debug=False):
 
     objList = list(map(lambda x : json.loads(x), jsonObj))
 
@@ -375,7 +379,7 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
             if len(obj) > 0: 
                 print(" ... checking dns for {} hosts on {}".format( len(hosts), obj[0] ), file=sys.stderr )
 
-            dnsResults = checkDNSMetadata(hosts)
+            dnsResults = checkDNSMetadata(hosts, debug=debug)
         
         if requireAllAkamai:
             requireAnyAkamai = False
@@ -414,8 +418,8 @@ def checkJsonArrayDNS(jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireA
 
     return returnList
 
-def loadDNSfromHostList(domainList, recoredType="AAAA"):
-    hostCheck = compositeCheck(domainList, recoredType=recoredType)
+def loadDNSfromHostList(domainList, recoredType="AAAA", debug=False):
+    hostCheck = compositeCheck(domainList, recoredType=recoredType, debug=debug)
 
     isAkamai = list(map(lambda domain : domain["isAkamai"], hostCheck) )
     isIPV6 = list(map(lambda domain : domain["isIPV6"], hostCheck) )
@@ -430,10 +434,10 @@ def loadDNSfromHostList(domainList, recoredType="AAAA"):
 
     return DNSInfo
 
-def checkDNSMetadata(inputList, inputIsJSON=False, recoredType="AAAA"):
+def checkDNSMetadata(inputList, inputIsJSON=False, recoredType="AAAA", debug=False):
 
     if inputIsJSON == False:
-       return loadDNSfromHostList(inputList, recoredType="AAAA")
+       return loadDNSfromHostList(inputList, recoredType="AAAA", debug=debug)
 
     else:
         return checkJsonArrayDNS(inputList, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None)

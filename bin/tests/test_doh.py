@@ -44,12 +44,30 @@ class Doh_Test(unittest.TestCase):
 
     def setUp(self):
         self.basedir = os.path.abspath(os.path.dirname(__file__))
-        self.dnsQueries = [
-            "{}/json/doh/www.alquist.nl_A.json".format(self.basedir),
-            "{}/json/doh/www.akamai.com_AAAA.json".format(self.basedir)
-        ]
 
-    def testJsonParseOutputFilter(self): 
+    @patch('requests.Session')
+    def testJsonParseOutputFilter(self, mockSessionObj): 
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+
+            
+
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
         jsonObjArray = list()
        
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
@@ -64,7 +82,32 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("akamai3.alquist.nl", returnList[1][1][0])
         self.assertEqual("akamai4.alquist.nl", returnList[1][1][1])
 
-    def testJsonParseNestedArrays(self): 
+    @patch('requests.Session')
+    def testJsonParseNestedArrays(self, mockSessionObj): 
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
         jsonObjArray = list()
        
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
@@ -80,7 +123,29 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("akamai3.alquist.nl", returnList[1][1][0])
         self.assertEqual("akamai4.alquist.nl", returnList[1][1][1])
 
-    def testJsonParseNestedArrays_AnyAkamai(self): 
+    @patch('requests.Session')
+    def testJsonParseNestedArrays_AnyAkamai(self, mockSessionObj): 
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir)
+
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
         jsonObjArray = list()
        
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl"]]' )
@@ -92,7 +157,30 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
         self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
     
-    def testJsonParseNestedArrays_All_Akamai(self): 
+    @patch('requests.Session')
+    def testJsonParseNestedArrays_All_Akamai(self, mockSessionObj): 
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir)
+
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
         jsonObjArray = list()
        
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"] ]' )
@@ -104,7 +192,30 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
         self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
 
-    def testJsonParseArray(self):
+    @patch('requests.Session')
+    def testJsonParseArray(self, mockSessionObj):
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir)
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
 
         jsonObjArray = list()
         jsonObjArray.append('["configname_ion1", "www.alquist.nl,akamai1.alquist.nl"]' )
@@ -131,9 +242,13 @@ class Doh_Test(unittest.TestCase):
         session = mockSessionObj()
         response = MockResponse()
 
-        for mockJson in self.dnsQueries:
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/www.akamai.com_AAAA.json".format(self.basedir)
+        ]   
+
+        for mockJson in dnsResponses:
             response.appendResponse(response.getJSONFromFile(mockJson))
-            
 
         session.get.return_value = response
         response.status_code = 200
