@@ -6,8 +6,9 @@ class Fetch_DNS():
 
     def __init__(self):
         s = requests.Session()
-        s.mount('https://', requests.adapters.HTTPAdapter(pool_connections=1, pool_maxsize=2))
+        s.mount('https://', requests.adapters.HTTPAdapter(pool_connections=2, pool_maxsize=4))
         self.http_Session = s
+        s.headers = {}
     
     def __del__(self):
         if self.http_Session is not None:
