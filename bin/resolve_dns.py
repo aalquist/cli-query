@@ -404,7 +404,7 @@ class Fetch_DNS():
                 returnedHostTypeText = "CNAMED" if returnAkamaiHosts else "Non-CNAMED"
             
                 if len(hosts) != len(returnToList):
-                    print("  ... {} had {} hosts thet were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+                    print("  ... {} had {} hosts that were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
                 else:
                     print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
 
