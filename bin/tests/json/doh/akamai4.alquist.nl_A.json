@@ -1,0 +1,36 @@
+{
+    "Status": 0,
+    "TC": false,
+    "RD": true,
+    "RA": true,
+    "AD": false,
+    "CD": false,
+    "Question": [
+     {
+      "name": "akamai4.alquist.nl.",
+      "type": 28
+     }
+    ],
+    "Answer": [
+     {
+      "name": "akamai4.alquist.nl.",
+      "type": 5,
+      "TTL": 299,
+      "data": "akamai.alquist.nl.edgekey.net."
+     },
+     {
+      "name": "akamai.alquist.nl.edgekey.net.",
+      "type": 5,
+      "TTL": 21238,
+      "data": "e12284.x.akamaiedge.net."
+     }
+    ],
+    "Authority": [
+     {
+      "name": "x.akamaiedge.net.",
+      "type": 6,
+      "TTL": 638,
+      "data": "n0x.akamaiedge.net. hostmaster.akamai.com. 1595259375 1000 1000 1000 1800"
+     }
+    ]
+   }

@@ -1,0 +1,49 @@
+{
+    "Status": 0,
+    "TC": false,
+    "RD": true,
+    "RA": true,
+    "AD": false,
+    "CD": false,
+    "Question": [
+     {
+      "name": "akamai2.alquist.nl.",
+      "type": 28
+     }
+    ],
+    "Answer": [
+     {
+      "name": "akamai2.alquist.nl.",
+      "type": 5,
+      "TTL": 119,
+      "data": "s528007553.sc.qa01en25.com.alquist.nl."
+     },
+     {
+      "name": "s528007553.sc.qa01en25.com.alquist.nl.",
+      "type": 5,
+      "TTL": 119,
+      "data": "akamai2.cdn.alquist.nl."
+     },
+     {
+      "name": "akamai2.cdn.alquist.nl.",
+      "type": 5,
+      "TTL": 299,
+      "data": "akamai.alquist.nl.edgekey.net."
+     },
+     {
+      "name": "akamai.alquist.nl.edgekey.net.",
+      "type": 5,
+      "TTL": 21599,
+      "data": "e12284.x.akamaiedge.net."
+     }
+    ],
+    "Authority": [
+     {
+      "name": "x.akamaiedge.net.",
+      "type": 6,
+      "TTL": 999,
+      "data": "n0x.akamaiedge.net. hostmaster.akamai.com. 1595259020 1000 1000 1000 1800"
+     }
+    ],
+    "Comment": "Response from 72.247.37.57."
+   }
