@@ -25,7 +25,7 @@ from akamai.edgegrid import EdgeGridAuth, EdgeRc
 from bin.parse_commands import main 
 from bin.tests.unittest_utils import CommandTester, MockResponse
 
-from bin.resolve_dns import checkDNSMetadata, lookupCode, checkJsonArrayDNS
+from bin.resolve_dns import Fetch_DNS
 
 from bin.send_analytics import Analytics 
 
@@ -72,7 +72,8 @@ class Doh_Test(unittest.TestCase):
        
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
-        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, returnAkamaiHosts=True)
+        fetchDNS = Fetch_DNS()
+        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, returnAkamaiHosts=True)
 
         self.assertEqual( 2, len(returnList) )
         self.assertEqual("configname_ion3", returnList[0][0][0])
@@ -112,7 +113,8 @@ class Doh_Test(unittest.TestCase):
        
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
-        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
+        fetchDNS = Fetch_DNS()
+        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
 
         self.assertEqual( 2, len(returnList) )
         self.assertEqual("configname_ion3", returnList[0][0][0])
@@ -148,9 +150,11 @@ class Doh_Test(unittest.TestCase):
 
         jsonObjArray = list()
        
+        fetchDNS = Fetch_DNS()
+
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl"]]' )
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
-        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAnyAkamai=True)
+        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAnyAkamai=True)
 
         self.assertEqual( 1, len(returnList) )
         self.assertEqual("configname_ion4", returnList[0][0][0])
@@ -185,7 +189,9 @@ class Doh_Test(unittest.TestCase):
        
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"] ]' )
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
-        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAllAkamai=True)
+
+        fetchDNS = Fetch_DNS()
+        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAllAkamai=True)
 
         self.assertEqual( 1, len(returnList) )
         self.assertEqual("configname_ion4", returnList[0][0][0])
@@ -220,7 +226,9 @@ class Doh_Test(unittest.TestCase):
         jsonObjArray = list()
         jsonObjArray.append('["configname_ion1", "www.alquist.nl,akamai1.alquist.nl"]' )
         jsonObjArray.append('["configname_ion2", "akamai2.alquist.nl,akamai3.alquist.nl"]' )
-        returnList = checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
+
+        fetchDNS = Fetch_DNS()
+        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
 
         self.assertEqual( 2, len(returnList) )
 
@@ -234,7 +242,8 @@ class Doh_Test(unittest.TestCase):
 
 
     def testLookup(self):
-        valueCNAME = lookupCode(5)
+        fetchDNS = Fetch_DNS()
+        valueCNAME = fetchDNS.lookupCode(5)
         self.assertEqual("CNAME", valueCNAME)
 
     @patch('requests.Session')
@@ -254,7 +263,8 @@ class Doh_Test(unittest.TestCase):
         response.status_code = 200
         response.headers = {}
         
-        result = checkDNSMetadata(["www.alquist.nl", "www.akamai.com" ])
+        fetchDNS = Fetch_DNS()
+        result = fetchDNS.checkDNSMetadata(["www.alquist.nl", "www.akamai.com" ])
         
         self.assertTrue(result["anyAkamai"])
         self.assertFalse(result["allAkamai"])

@@ -31,7 +31,7 @@ from bin.query_result import QueryResult
 
 from bin.send_analytics import Analytics 
 
-from bin.resolve_dns import loadDNSfromHostList, checkJsonArrayDNS
+from bin.resolve_dns import Fetch_DNS
 
 import inspect
 
@@ -448,7 +448,8 @@ def checkjsondns(args):
         print("... domain index must be an int {}".format(args.json_dns_index), file=sys.stderr )
         return 1
     
-    jsonObj= checkJsonArrayDNS(lines, arrayHostIndex=args.json_dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
+    fetchDNS = Fetch_DNS()
+    jsonObj= fetchDNS.checkJsonArrayDNS(lines, arrayHostIndex=args.json_dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
     
     printResponse(jsonObj,JSONOutput=True)
     thread.join()
@@ -491,7 +492,8 @@ def checkdnshost(args):
     if updatedLines is not None:
         lines = updatedLines
 
-    jsonObj = loadDNSfromHostList(lines, recoredType=None)
+    fetchDNS = Fetch_DNS()
+    jsonObj = fetchDNS.loadDNSfromHostList(lines, recoredType=None)
 
     if "resolution" in jsonObj:
         jsonObj= jsonObj["resolution"]
