@@ -395,6 +395,11 @@ class Fetch_DNS():
                 if len(obj) > 0: 
                     print(" ... checking dns for {} hosts on {}".format( len(hosts), obj[0] ), file=sys.stderr )
 
+                hosts = list(filter(lambda domain : "." in domain, hosts) )
+
+                if len(hosts) < 1:
+                    return returnList
+
                 dnsResults = self.checkDNSMetadata(hosts, debug=debug)
             
             if requireAllAkamai:

@@ -310,6 +310,41 @@ class Doh_Test(unittest.TestCase):
 
     @patch('requests.Session')
     @patch('bin.parse_commands.getArgFromSTDIN')
+    def testCommandLine_checkjsondns_hostsNotCNAMED_badDomain(self, getArgFromSTDIN, mockSessionObj):
+
+        stdin = []
+        stdin.append('["Header1", "Property"]')
+        
+
+        getArgFromSTDIN.return_value = "\n".join(stdin)
+
+        session = mockSessionObj()
+        response = MockResponse()
+        response.reset()
+
+        dnsResponses = [
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir)
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        args = [ "checkjsondns", "hostsNotCNAMED" ]
+
+        commandTester = CommandTester(self)
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args, assertMinStdOutLines=0)
+        
+        self.assertEquals( len(stdOutResultArray), 0 )
+
+        
+
+
+    @patch('requests.Session')
+    @patch('bin.parse_commands.getArgFromSTDIN')
     def testCommandLine_checkjsondns_hostsNotCNAMED(self, getArgFromSTDIN, mockSessionObj):
 
         stdin = []

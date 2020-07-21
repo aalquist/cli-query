@@ -10,7 +10,7 @@ class CommandTester:
         self.edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
     
 
-    def wrapSuccessCommandStdOutOnly(self, func=None, args=[]):
+    def wrapSuccessCommandStdOutOnly(self, func=None, args=[], expectedReturnCode=0, assertMinStdOutLines=1):
 
         saved_stdout = sys.stdout
         saved_sterr = sys.stdout
@@ -27,13 +27,13 @@ class CommandTester:
             returnVal = func(args)
             stdErrStr = outerr.getvalue()
 
-            self.unittester.assertEqual(returnVal, 0, "command args {} should return successcode. Error msg: {}".format(args,stdErrStr) )
+            self.unittester.assertEqual(returnVal, expectedReturnCode, "command args {} should return successcode. Error msg: {}".format(args,stdErrStr) )
 
             output = list(out.getvalue().split("\n"))
             finaloutput = list(filter(lambda line: line != '', output))
 
            
-            self.unittester.assertGreater(len(finaloutput), 0, "command args {} and its output should be greater than zero".format(args) )
+            self.unittester.assertGreater(len(finaloutput), assertMinStdOutLines-1, "command args {} and its output should be greater than zero".format(args) )
 
             #sys.stdout = saved_stdout
 
