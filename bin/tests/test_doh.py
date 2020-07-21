@@ -655,6 +655,7 @@ class Doh_Test(unittest.TestCase):
         self.assertFalse(result["allAkamai"])
         self.assertFalse(result["allIPv6"])
         self.assertTrue(result["anyIPv6"])
+        self.assertFalse(result["anyNXDomain"])
 
         self.assertEqual("www.alquist.nl", result["resolution"][0]["domain"])
         self.assertEqual("CNAME", result["resolution"][0]["dnsJson"]["Answer"][0]["typeName"])
@@ -673,7 +674,33 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual(True, result["resolution"][1]["isIPV6"])
         
 
+    @patch('requests.Session')
+    def test_MockDNSResponse(self, mockSessionObj):
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir)
+            
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
         
+        fetchDNS = Fetch_DNS()
+        result = fetchDNS.checkDNSMetadata(["notfound.alquist.nl"])
+        
+        self.assertFalse(result["anyAkamai"])
+        self.assertFalse(result["allAkamai"])
+        self.assertFalse(result["allIPv6"])
+        self.assertFalse(result["anyIPv6"])
+        self.assertTrue(result["anyNXDomain"])
+        
+    
 
         
 

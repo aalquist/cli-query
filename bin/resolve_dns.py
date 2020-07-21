@@ -330,19 +330,21 @@ class Fetch_DNS():
     def markupTypeCodes(self, domainJson):
         
         dnsResponse = domainJson
-        if "Answer" in dnsResponse and len(dnsResponse["Answer"])> 0:
+        if self.answerFound(dnsResponse):
             updatedList = list(map(lambda x : self.updateDNSAnswer(x), dnsResponse["Answer"] ) ) 
             dnsResponse["Answer"] = updatedList
 
+    def answerFound(self, dnsResponse):
+        return "Answer" in dnsResponse and len(dnsResponse["Answer"])> 0
 
     def checkSingleDNSDomainJson(self, domainJson, func=None):
         
         dnsResponse = domainJson
-        if "Answer" in dnsResponse and len(dnsResponse["Answer"])> 0:
+        if self.answerFound(dnsResponse):
             anyExists = any( list(map(lambda x : func(x), dnsResponse["Answer"] ) ) )
             return anyExists
         else:
-            return (False, False)
+            return False
 
     def compositeCheck(self, domainList, recoredType="AAAA", debug=False):
 
@@ -351,6 +353,7 @@ class Fetch_DNS():
         def mapDomainMeta(jsonDict):
             jsonDict["isAkamai"] = self.checkSingleDNSDomainJson(jsonDict["dnsJson"], self.isAkamai)
             jsonDict["isIPV6"] = self.checkSingleDNSDomainJson(jsonDict["dnsJson"], self.isIPV6)
+            jsonDict["NXDomain"] = not self.answerFound(jsonDict["dnsJson"])
             
             self.markupTypeCodes(jsonDict["dnsJson"])
 
@@ -436,12 +439,14 @@ class Fetch_DNS():
 
         isAkamai = list(map(lambda domain : domain["isAkamai"], hostCheck) )
         isIPV6 = list(map(lambda domain : domain["isIPV6"], hostCheck) )
+        NXDomain = list(map(lambda domain : domain["NXDomain"], hostCheck) )
 
         DNSInfo = {
             "anyAkamai" : any(isAkamai),
             "allAkamai" : all(isAkamai),
             "allIPv6" : all(isIPV6),
             "anyIPv6" : any(isIPV6),
+            "anyNXDomain" : any(NXDomain),
             "resolution" : hostCheck
         }
 
