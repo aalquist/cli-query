@@ -30,8 +30,6 @@ from bin.credentialfactory import CredentialFactory
 
 from bin.tests.unittest_utils import CommandTester, MockResponse
 
-from bin.parse_commands import main 
-
 from bin.send_analytics import Analytics 
 
 
