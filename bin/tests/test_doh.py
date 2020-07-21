@@ -47,6 +47,45 @@ class Doh_Test(unittest.TestCase):
 
     @patch('requests.Session')
     @patch('bin.parse_commands.getArgFromSTDIN')
+    def testCommandLine_checkjsondns_configsWithoutCNAME_jsonDnsIndex(self, getArgFromSTDIN, mockSessionObj):
+
+        stdin = []
+        stdin.append('["property_1", "dummy1", "www.alquist.nl"]')
+        stdin.append('["property_2", "dummy2", "akamai1.alquist.nl,akamai2.alquist.nl"]')
+
+        getArgFromSTDIN.return_value = "\n".join(stdin)
+
+        session = mockSessionObj()
+        response = MockResponse()
+        response.reset()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),  
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        args = [ "checkjsondns", "configsWithoutCNAME", "--json-dns-index", "2" ]
+
+        commandTester = CommandTester(self)
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        
+        self.assertEquals( len(stdOutResultArray), 1 )
+
+        row = json.loads(stdOutResultArray[0])
+        self.assertEquals( row[0], "property_1" )
+        self.assertEquals( row[1], "dummy1" )
+        self.assertEquals( row[2], "www.alquist.nl" )
+
+    @patch('requests.Session')
+    @patch('bin.parse_commands.getArgFromSTDIN')
     def testCommandLine_checkjsondns_configsWithoutCNAME(self, getArgFromSTDIN, mockSessionObj):
 
         stdin = []
