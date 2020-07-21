@@ -323,7 +323,7 @@ def setupCommands(subparsers):
         subparsers, "checkjsondns", "dns filtering tool for json objects",
 
         optional_arguments=combineArgs(basicQueryArgs, [ 
-                {"name": "json-dns-index", "help": "zero based index where hostname is located", "default" : 1},
+                {"name": "dns-index", "help": "zero based index where hostname lookup should be performed", "default" : 1},
                 {"name": "filterby", "help": "a list of domains", "positional" : True}]),
         required_arguments=None,
         actions=actions)
@@ -442,14 +442,14 @@ def checkjsondns(args):
     print("... accepting JSON input and skipping any template output", file=sys.stderr )
     
     try:
-        args.json_dns_index = int(args.json_dns_index)
+        args.dns_index = int(args.dns_index)
 
     except ValueError:
-        print("... domain index must be an int {}".format(args.json_dns_index), file=sys.stderr )
+        print("... domain index must be an int {}".format(args.dns_index), file=sys.stderr )
         return 1
     
     fetchDNS = Fetch_DNS()
-    jsonObj= fetchDNS.checkJsonArrayDNS(lines, arrayHostIndex=args.json_dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
+    jsonObj= fetchDNS.checkJsonArrayDNS(lines, arrayHostIndex=args.dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
     
     printResponse(jsonObj,JSONOutput=True)
     thread.join()

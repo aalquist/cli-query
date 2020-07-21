@@ -47,7 +47,7 @@ class Doh_Test(unittest.TestCase):
 
     @patch('requests.Session')
     @patch('bin.parse_commands.getArgFromSTDIN')
-    def testCommandLine_checkjsondns_configsWithoutCNAME_jsonDnsIndex(self, getArgFromSTDIN, mockSessionObj):
+    def testCommandLine_checkjsondns_configsWithoutCNAME_DnsIndex(self, getArgFromSTDIN, mockSessionObj):
 
         stdin = []
         stdin.append('["property_1", "dummy1", "www.alquist.nl"]')
@@ -72,7 +72,7 @@ class Doh_Test(unittest.TestCase):
         response.status_code = 200
         response.headers = {}
 
-        args = [ "checkjsondns", "configsWithoutCNAME", "--json-dns-index", "2" ]
+        args = [ "checkjsondns", "configsWithoutCNAME", "--dns-index", "2" ]
 
         commandTester = CommandTester(self)
         stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
