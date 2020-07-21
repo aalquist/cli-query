@@ -420,13 +420,13 @@ class Fetch_DNS():
 
             else:
 
-                if requireAnyAkamai == True and dnsResults["anyAkamai"] :
-                    returnList.append(obj)
-
-                elif requireAllAkamai == True and dnsResults["allAkamai"] :
+                if requireAllAkamai == True and dnsResults["allAkamai"] :
                     returnList.append(obj)
                 
-                elif requireAnyAkamai == False and requireAnyAkamai == dnsResults["anyAkamai"] :
+                elif requireAnyAkamai == True and dnsResults["anyAkamai"] :
+                    returnList.append(obj)
+
+                elif requireAllAkamai == False and requireAnyAkamai == False and requireAnyAkamai == dnsResults["anyAkamai"] :
                     returnList.append(obj)
 
         return returnList
