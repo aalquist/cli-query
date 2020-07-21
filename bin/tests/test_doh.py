@@ -46,6 +46,101 @@ class Doh_Test(unittest.TestCase):
         self.basedir = os.path.abspath(os.path.dirname(__file__))
 
     @patch('requests.Session')
+    def testCommandLine(self, mockSessionObj):
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),
+            
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir)
+            
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        
+
+        args = [
+               "checkdnshost",
+                "www.alquist.nl",
+                "akamai1.alquist.nl",
+                "akamai2.alquist.nl"
+        ]
+
+        commandTester = CommandTester(self)
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        
+        self.assertEquals( len(stdOutResultArray), 4 )
+        
+        row = json.loads(stdOutResultArray[0])
+        self.assertEquals( len(row), 3 )
+        header = ["isAkamai", "domain", "resolution"]
+
+        self.assertIn(row[0],header)
+        self.assertIn(row[1],header)
+        self.assertIn(row[2],header)
+
+        row = json.loads(stdOutResultArray[1])
+        self.assertFalse(  row[0] )
+        self.assertEquals( row[1], "www.alquist.nl" )
+        self.assertEquals( row[2], "d2c99t9e0sxfl6.cloudfront.net.,2600:9000:21da:7800:c:1662:4a80:93a1,2600:9000:21da:5800:c:1662:4a80:93a1,2600:9000:21da:9800:c:1662:4a80:93a1,2600:9000:21da:ea00:c:1662:4a80:93a1,2600:9000:21da:6600:c:1662:4a80:93a1,2600:9000:21da:ee00:c:1662:4a80:93a1,2600:9000:21da:4c00:c:1662:4a80:93a1,2600:9000:21da:3e00:c:1662:4a80:93a1" )
+        
+        row = json.loads(stdOutResultArray[2])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai1.alquist.nl" )
+        self.assertEquals( row[2], "akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+        row = json.loads(stdOutResultArray[3])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai2.alquist.nl" )
+        self.assertEquals( row[2], "s528007553.sc.qa01en25.com.alquist.nl.,akamai2.cdn.alquist.nl.,akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+        args = [
+               "checkdnshost",
+               "www.alquist.nl,akamai1.alquist.nl,akamai2.alquist.nl"
+        ]
+
+        commandTester = CommandTester(self)
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        
+        self.assertEquals( len(stdOutResultArray), 4 )
+        
+        row = json.loads(stdOutResultArray[0])
+        self.assertEquals( len(row), 3 )
+        header = ["isAkamai", "domain", "resolution"]
+
+        self.assertIn(row[0],header)
+        self.assertIn(row[1],header)
+        self.assertIn(row[2],header)
+
+        row = json.loads(stdOutResultArray[1])
+        self.assertFalse(  row[0] )
+        self.assertEquals( row[1], "www.alquist.nl" )
+        self.assertEquals( row[2], "d2c99t9e0sxfl6.cloudfront.net.,2600:9000:21da:7800:c:1662:4a80:93a1,2600:9000:21da:5800:c:1662:4a80:93a1,2600:9000:21da:9800:c:1662:4a80:93a1,2600:9000:21da:ea00:c:1662:4a80:93a1,2600:9000:21da:6600:c:1662:4a80:93a1,2600:9000:21da:ee00:c:1662:4a80:93a1,2600:9000:21da:4c00:c:1662:4a80:93a1,2600:9000:21da:3e00:c:1662:4a80:93a1" )
+        
+        row = json.loads(stdOutResultArray[2])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai1.alquist.nl" )
+        self.assertEquals( row[2], "akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+        row = json.loads(stdOutResultArray[3])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai2.alquist.nl" )
+        self.assertEquals( row[2], "s528007553.sc.qa01en25.com.alquist.nl.,akamai2.cdn.alquist.nl.,akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+
+    @patch('requests.Session')
     def testJsonParseOutputFilter(self, mockSessionObj): 
 
         session = mockSessionObj()
