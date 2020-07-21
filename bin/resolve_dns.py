@@ -403,11 +403,15 @@ class Fetch_DNS():
             if returnAkamaiHosts is not None :
                 #modify the hostnames returned to only show the ones that are CNAMEd to Akamai or not
                 returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts, dnsResults["resolution"]))
+                NXDomainList = list(filter(lambda x : x["NXDomain"] == returnAkamaiHosts, dnsResults["resolution"]))
 
                 returnedHostTypeText = "CNAMED" if returnAkamaiHosts else "Non-CNAMED"
             
                 if len(hosts) != len(returnToList):
                     print("  ... {} had {} hosts that were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+
+                    if len(NXDomainList) > 0:
+                        print("  ...... {} hosts retured NXDomain (not found)!".format( len(NXDomainList) ), file=sys.stderr )
                 else:
                     print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
 
