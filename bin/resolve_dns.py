@@ -402,16 +402,14 @@ class Fetch_DNS():
             
             if returnAkamaiHosts is not None :
                 #modify the hostnames returned to only show the ones that are CNAMEd to Akamai or not
-                returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts, dnsResults["resolution"]))
-                NXDomainList = list(filter(lambda x : x["NXDomain"] == returnAkamaiHosts, dnsResults["resolution"]))
+                returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts or (returnAkamaiHosts == False and x["NXDomain"] == True), dnsResults["resolution"]))
 
                 returnedHostTypeText = "CNAMED" if returnAkamaiHosts else "Non-CNAMED"
             
                 if len(hosts) != len(returnToList):
                     print("  ... {} had {} hosts that were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+                    self.printNXDomainErrMsg(dnsResults)
 
-                    if len(NXDomainList) > 0:
-                        print("  ...... {} hosts retured NXDomain (not found)!".format( len(NXDomainList) ), file=sys.stderr )
                 else:
                     print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
 
@@ -437,21 +435,25 @@ class Fetch_DNS():
                     returnList.append(obj)
                 
                 elif dnsResults["anyNXDomain"] == True:
-                    NXDomainList = list(filter(lambda x : x["NXDomain"] == True, dnsResults["resolution"]))
-                    NXDomainList = list(map(lambda x : x["domain"], NXDomainList))
-                    NXDomainListCount = len(NXDomainList)
-
-                    if NXDomainListCount > 3:
-                        NXDomainList = NXDomainList[0:3]
-
-                    hostsText = "host" if NXDomainListCount == 1 else "hosts"
-                    truncatedHostsText = "Truncated NXDomain list" if NXDomainListCount > 3 else "NXDomain list"
-                    truncatedHostsTrainingText = " ... more" if NXDomainListCount > 3 else ""
-
-                    print("  ... {} {} returned NXDomain".format(NXDomainListCount, hostsText), file=sys.stderr )
-                    print("  ... {}: {}{}".format(truncatedHostsText,NXDomainList,truncatedHostsTrainingText), file=sys.stderr )
+                    self.printNXDomainErrMsg(dnsResults)
 
         return returnList
+
+    def printNXDomainErrMsg(self, dnsResults):
+        NXDomainList = list(filter(lambda x : x["NXDomain"] == True, dnsResults["resolution"]))
+        NXDomainList = list(map(lambda x : x["domain"], NXDomainList))
+        NXDomainListCount = len(NXDomainList)
+
+        if NXDomainListCount > 3:
+            NXDomainList = NXDomainList[0:3]
+
+        hostsText = "host" if NXDomainListCount == 1 else "hosts"
+        truncatedHostsText = "Truncated NXDomain list" if NXDomainListCount > 3 else "NXDomain list"
+        truncatedHostsTrainingText = " ... more" if NXDomainListCount > 3 else ""
+
+        print("  ... {} {} returned NXDomain".format(NXDomainListCount, hostsText), file=sys.stderr )
+        print("  ... {}: {}{}".format(truncatedHostsText,NXDomainList,truncatedHostsTrainingText), file=sys.stderr )
+
 
     def loadDNSfromHostList(self, domainList, recoredType="AAAA", debug=False):
         hostCheck = self.compositeCheck(domainList, recoredType=recoredType, debug=debug)
