@@ -444,15 +444,16 @@ class Fetch_DNS():
         NXDomainList = list(map(lambda x : x["domain"], NXDomainList))
         NXDomainListCount = len(NXDomainList)
 
-        if NXDomainListCount > 3:
-            NXDomainList = NXDomainList[0:3]
+        if NXDomainListCount > 0:
+            if NXDomainListCount > 3:
+                NXDomainList = NXDomainList[0:3]
 
-        hostsText = "host" if NXDomainListCount == 1 else "hosts"
-        truncatedHostsText = "Truncated NXDomain list" if NXDomainListCount > 3 else "NXDomain list"
-        truncatedHostsTrainingText = " ... more" if NXDomainListCount > 3 else ""
+            hostsText = "host" if NXDomainListCount == 1 else "hosts"
+            truncatedHostsText = "Truncated NXDomain list" if NXDomainListCount > 3 else "NXDomain list"
+            truncatedHostsTrainingText = " ... more" if NXDomainListCount > 3 else ""
 
-        print("  ... {} {} returned NXDomain".format(NXDomainListCount, hostsText), file=sys.stderr )
-        print("  ... {}: {}{}".format(truncatedHostsText,NXDomainList,truncatedHostsTrainingText), file=sys.stderr )
+            print("   ... {} {} were NXDomain".format(NXDomainListCount, hostsText), file=sys.stderr )
+            print("   ... {}: {}{}".format(truncatedHostsText,NXDomainList,truncatedHostsTrainingText), file=sys.stderr )
 
 
     def loadDNSfromHostList(self, domainList, recoredType="AAAA", debug=False):
