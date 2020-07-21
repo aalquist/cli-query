@@ -435,6 +435,21 @@ class Fetch_DNS():
 
                 elif requireAllAkamai == False and requireAnyAkamai == False and requireAnyAkamai == dnsResults["anyAkamai"] :
                     returnList.append(obj)
+                
+                elif dnsResults["anyNXDomain"] == True:
+                    NXDomainList = list(filter(lambda x : x["NXDomain"] == True, dnsResults["resolution"]))
+                    NXDomainList = list(map(lambda x : x["domain"], NXDomainList))
+                    NXDomainListCount = len(NXDomainList)
+
+                    if NXDomainListCount > 3:
+                        NXDomainList = NXDomainList[0:3]
+
+                    hostsText = "host" if NXDomainListCount == 1 else "hosts"
+                    truncatedHostsText = "Truncated NXDomain list" if NXDomainListCount > 3 else "NXDomain list"
+                    truncatedHostsTrainingText = " ... more" if NXDomainListCount > 3 else ""
+
+                    print("  ... {} {} returned NXDomain".format(NXDomainListCount, hostsText), file=sys.stderr )
+                    print("  ... {}: {}{}".format(truncatedHostsText,NXDomainList,truncatedHostsTrainingText), file=sys.stderr )
 
         return returnList
 
