@@ -395,12 +395,15 @@ class Fetch_DNS():
                 if len(obj) > 0: 
                     print(" ... checking dns for {} hosts on {}".format( len(hosts), obj[0] ), file=sys.stderr )
 
+                originalHostLength = len(hosts)
                 hosts = list(filter(lambda domain : "." in domain, hosts) )
 
                 if len(hosts) < 1:
-                    print("  ... no domains were valid so skipping".format( len(hosts) ), file=sys.stderr )
-                    
+                    print("  ... no domains were valid so skipping".format( len(hosts) ), file=sys.stderr )    
                     continue
+                
+                elif len(hosts) != originalHostLength:
+                    print("  ... some domains were not valid so skipped them".format( len(hosts) ), file=sys.stderr )    
 
                 dnsResults = self.checkDNSMetadata(hosts, debug=debug)
             
