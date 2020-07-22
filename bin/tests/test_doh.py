@@ -366,9 +366,6 @@ class Doh_Test(unittest.TestCase):
         self.assertEquals( row[0], "property_2" )
         self.assertEquals( row[1], "akamai1.alquist.nl,akamai2.alquist.nl" )
 
-        
-
-
     @patch('requests.Session')
     @patch('bin.parse_commands.getArgFromSTDIN')
     def testCommandLine_checkjsondns_hostsNotCNAMED(self, getArgFromSTDIN, mockSessionObj):
@@ -456,7 +453,7 @@ class Doh_Test(unittest.TestCase):
 
     @patch('requests.Session')
     @patch('bin.parse_commands.getArgFromSTDIN')
-    def testCommandLine_checkdnshostStdIn(self, getArgFromSTDIN, mockSessionObj):
+    def testCommandLine_checkhostdnsStdIn(self, getArgFromSTDIN, mockSessionObj):
 
         stdin = []
         stdin.append('www.alquist.nl')
@@ -487,7 +484,7 @@ class Doh_Test(unittest.TestCase):
         response.headers = {}
 
         args = [
-               "checkdnshost"
+               "checkhostdns"
         ]
 
         commandTester = CommandTester(self)
@@ -520,7 +517,7 @@ class Doh_Test(unittest.TestCase):
           
 
     @patch('requests.Session')
-    def testCommandLine_checkdnshost(self, mockSessionObj):
+    def testCommandLine_checkhostdns(self, mockSessionObj):
 
         session = mockSessionObj()
         response = MockResponse()
@@ -546,7 +543,7 @@ class Doh_Test(unittest.TestCase):
         
 
         args = [
-               "checkdnshost",
+               "checkhostdns",
                 "www.alquist.nl",
                 "akamai1.alquist.nl",
                 "akamai2.alquist.nl"
@@ -581,7 +578,7 @@ class Doh_Test(unittest.TestCase):
         self.assertEquals( row[2], "s528007553.sc.qa01en25.com.alquist.nl.,akamai2.cdn.alquist.nl.,akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
         
         args = [
-               "checkdnshost",
+               "checkhostdns",
                "www.alquist.nl,akamai1.alquist.nl,akamai2.alquist.nl"
         ]
 
