@@ -401,7 +401,7 @@ class Fetch_DNS():
                 if len(hosts) < 1:
                     print("  ... no domains were valid so skipping".format( len(hosts) ), file=sys.stderr )    
                     continue
-                
+
                 elif len(hosts) != originalHostLength:
                     print("  ... some domains were not valid so skipped them".format( len(hosts) ), file=sys.stderr )    
 
@@ -462,8 +462,7 @@ class Fetch_DNS():
             truncatedHostsText = "Truncated NXDomain list" if NXDomainListCount > 3 else "NXDomain list"
             truncatedHostsTrainingText = " ... more" if NXDomainListCount > 3 else ""
 
-            print("   ... {} {} were NXDomain".format(NXDomainListCount, hostsText), file=sys.stderr )
-            print("   ... {}: {}{}".format(truncatedHostsText,NXDomainList,truncatedHostsTrainingText), file=sys.stderr )
+            print("   ... {} {} were NXDomain {} {}".format(NXDomainListCount, hostsText, NXDomainList, truncatedHostsTrainingText), file=sys.stderr )
 
 
     def loadDNSfromHostList(self, domainList, recoredType="AAAA", debug=False):
