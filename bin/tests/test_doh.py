@@ -287,7 +287,7 @@ class Doh_Test(unittest.TestCase):
         dnsResponses = [
             "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
             "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
-            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),  
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir)  
         ]   
 
         for mockJson in dnsResponses:
@@ -314,7 +314,7 @@ class Doh_Test(unittest.TestCase):
 
         stdin = []
         stdin.append('["Header1", "Property"]')
-        
+        stdin.append('["property_2", "akamai1.alquist.nl,akamai2.alquist.nl"]')
 
         getArgFromSTDIN.return_value = "\n".join(stdin)
 
@@ -323,7 +323,8 @@ class Doh_Test(unittest.TestCase):
         response.reset()
 
         dnsResponses = [
-            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir)
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir)
         ]   
 
         for mockJson in dnsResponses:
@@ -338,7 +339,32 @@ class Doh_Test(unittest.TestCase):
         commandTester = CommandTester(self)
         stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args, assertMinStdOutLines=0)
         
-        self.assertEquals( len(stdOutResultArray), 0 )
+        session = mockSessionObj()
+        response = MockResponse()
+        response.reset()
+
+        dnsResponses = [
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir)
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        args = [ "checkjsondns", "hostsCNAMED" ]
+
+        commandTester = CommandTester(self)
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
+        
+        self.assertEquals( len(stdOutResultArray), 1 )
+
+        row = json.loads(stdOutResultArray[0])
+        self.assertEquals( row[0], "property_2" )
+        self.assertEquals( row[1], "akamai1.alquist.nl,akamai2.alquist.nl" )
 
         
 

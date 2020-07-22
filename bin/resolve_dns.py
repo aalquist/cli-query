@@ -398,7 +398,7 @@ class Fetch_DNS():
                 hosts = list(filter(lambda domain : "." in domain, hosts) )
 
                 if len(hosts) < 1:
-                    return returnList
+                    continue
 
                 dnsResults = self.checkDNSMetadata(hosts, debug=debug)
             
