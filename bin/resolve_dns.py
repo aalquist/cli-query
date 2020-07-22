@@ -444,7 +444,10 @@ class Fetch_DNS():
                 returnAkamaiHostsOnly = True
                 returnToList = self.countAkamaizedHosts(returnAkamaiHostsOnly, dnsResults)
                 
-                print(" ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+                if len(hosts) == 1:
+                    print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+                else:
+                    print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
 
                 if requireAllAkamai == True and dnsResults["allAkamai"] :
                     self.printNXDomainErrMsg(dnsResults)
@@ -476,7 +479,10 @@ class Fetch_DNS():
             truncatedHostsText = "Truncated NXDomain list" if NXDomainListCount > 3 else "NXDomain list"
             truncatedHostsTrainingText = " ... more" if NXDomainListCount > 3 else ""
 
-            print("   ... {} {} were NXDomain {} {}".format(NXDomainListCount, hostsText, NXDomainList, truncatedHostsTrainingText), file=sys.stderr )
+            if NXDomainListCount == 1:
+                print("   ... {} {} was NXDomain {} {}".format(NXDomainListCount, hostsText, NXDomainList, truncatedHostsTrainingText), file=sys.stderr )
+            else:
+                print("   ... {} {} were NXDomain {} {}".format(NXDomainListCount, hostsText, NXDomainList, truncatedHostsTrainingText), file=sys.stderr )
 
 
     def loadDNSfromHostList(self, domainList, recoredType="AAAA", debug=False):

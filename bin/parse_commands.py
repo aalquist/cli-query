@@ -482,7 +482,10 @@ def checkhostdns(args):
         splitCharFound = [e for e in split if e in dns]
 
         if len(splitCharFound) > 0:
-            updatedLines = list()
+
+            if updatedLines is None:
+                updatedLines = list()
+
             for split in splitCharFound:
 
                 
