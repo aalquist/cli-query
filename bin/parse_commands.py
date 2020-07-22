@@ -298,7 +298,7 @@ def setupCommands(subparsers):
         subparsers, "bulksearch", "bulk search property manager configurations",
         optional_arguments=combineArgs(bulkSearchQueryArgs, [
                                                             {"name": "contractId", "help": "limit the bulk search scope to a specific contract"},
-                                                            {"name": "network", "help": "filter the bulk search result to a specific network (staging or production)"},
+                                                            {"name": "network", "default" : "Production", "help": "filter the bulk search result to a specific network (staging, production, all)"},
                                                             {"name": "use-searchstdin", "help": "get bulksearch json from stdin"}, 
                                                             {"name": "searchfile", "help": "get bulksearch from json file"}, 
                                                             {"name": "searchname", "help": "get bulksearch by name"}, 
@@ -689,6 +689,10 @@ def bulksearch(args):
         postdata = queryresult.loadTemplate("default.json", serverside=serverside)
 
     checkFilterArgs(args, queryresult)
+
+
+    if args.network is not None and ( not args.network.startswith("p") and not args.network.startswith("P") and not args.network.startswith("s") and not args.network.startswith("S") ) :
+        args.network = None
 
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network, debug=args.debug)  
 
