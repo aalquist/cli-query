@@ -370,6 +370,9 @@ class Fetch_DNS():
         if len(containsNotAllowed) > 0:
             raise ValueError("... domain {} has wrong char {}".format(dns, containsNotAllowed))
 
+    def countAkamaizedHosts(self, returnAkamaiHosts, dnsResults):
+        returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts or (returnAkamaiHosts == False and x["NXDomain"] == True), dnsResults["resolution"]))
+        return returnToList
 
     def checkJsonArrayDNS(self, jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None, debug=False):
 
@@ -381,6 +384,9 @@ class Fetch_DNS():
 
             if arrayHostIndex >= len(obj):
                 raise ValueError("index {} is >= size {}. choose a smaller number. line:\n{}".format(arrayHostIndex, len(obj) , obj))
+
+            if len(obj) < 2:
+                pass
 
             elif isinstance(obj, list):
 
@@ -411,13 +417,13 @@ class Fetch_DNS():
                 requireAnyAkamai = False
             
             if returnAkamaiHosts is not None :
-                #modify the hostnames returned to only show the ones that are CNAMEd to Akamai or not
-                returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts or (returnAkamaiHosts == False and x["NXDomain"] == True), dnsResults["resolution"]))
+                
+                returnToList = self.countAkamaizedHosts( returnAkamaiHosts, dnsResults)
 
-                returnedHostTypeText = "CNAMED" if returnAkamaiHosts else "Non-CNAMED"
-            
+                
                 if len(hosts) != len(returnToList):
-                    print("  ... {} had {} hosts that were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+                    returnedHostTypeText = "CNAMED" if returnAkamaiHosts else "Non-CNAMED"
+                    print("  ... {} had {} hosts which were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
                     self.printNXDomainErrMsg(dnsResults)
 
                 else:
@@ -435,13 +441,21 @@ class Fetch_DNS():
 
             else:
 
+                returnAkamaiandNXDoaminList = True
+                returnToList = self.countAkamaizedHosts(returnAkamaiandNXDoaminList, dnsResults)
+                
+                print(" ... {} had {} hosts and found {} {} hosts".format( obj[0], len(hosts), len(returnToList), "CNAMED" if (requireAllAkamai or requireAnyAkamai) else "Non-CNAMED" ), file=sys.stderr )
+
                 if requireAllAkamai == True and dnsResults["allAkamai"] :
+                    self.printNXDomainErrMsg(dnsResults)
                     returnList.append(obj)
                 
                 elif requireAnyAkamai == True and dnsResults["anyAkamai"] :
+                    self.printNXDomainErrMsg(dnsResults)
                     returnList.append(obj)
 
                 elif requireAllAkamai == False and requireAnyAkamai == False and requireAnyAkamai == dnsResults["anyAkamai"] :
+                    self.printNXDomainErrMsg(dnsResults)
                     returnList.append(obj)
                 
                 elif dnsResults["anyNXDomain"] == True:
