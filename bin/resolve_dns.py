@@ -398,6 +398,8 @@ class Fetch_DNS():
                 hosts = list(filter(lambda domain : "." in domain, hosts) )
 
                 if len(hosts) < 1:
+                    print("  ... no domains were valid so skipping".format( len(hosts) ), file=sys.stderr )
+                    
                     continue
 
                 dnsResults = self.checkDNSMetadata(hosts, debug=debug)
