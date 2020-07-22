@@ -441,10 +441,10 @@ class Fetch_DNS():
 
             else:
 
-                returnAkamaiandNXDoaminList = True
-                returnToList = self.countAkamaizedHosts(returnAkamaiandNXDoaminList, dnsResults)
+                returnAkamaiHostsOnly = True
+                returnToList = self.countAkamaizedHosts(returnAkamaiHostsOnly, dnsResults)
                 
-                print(" ... {} had {} hosts and found {} {} hosts".format( obj[0], len(hosts), len(returnToList), "CNAMED" if (requireAllAkamai or requireAnyAkamai) else "Non-CNAMED" ), file=sys.stderr )
+                print(" ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
 
                 if requireAllAkamai == True and dnsResults["allAkamai"] :
                     self.printNXDomainErrMsg(dnsResults)
