@@ -329,7 +329,7 @@ def setupCommands(subparsers):
         actions=actions)
 
     create_sub_command(
-        subparsers, "checkdnshost", "dns filtering tool",
+        subparsers, "checkhostdns", "dns filtering tool",
         
         optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '*'}]),
@@ -455,7 +455,7 @@ def checkjsondns(args):
     thread.join()
     return 0   
 
-def checkdnshost(args):
+def checkhostdns(args):
     path = inspect.getframeinfo(inspect.currentframe()).function
     thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
