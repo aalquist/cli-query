@@ -491,6 +491,12 @@ def checkhostdns(args):
                 
                 newDns = str.strip(dns)
                 updatedLines.extend( newDns.split(split) ) 
+        else:
+            if updatedLines is None:
+                updatedLines = list()
+                
+            updatedLines.append(dns)
+
 
     if updatedLines is not None:
         lines = updatedLines

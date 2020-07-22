@@ -459,6 +459,9 @@ class Doh_Test(unittest.TestCase):
         stdin.append('www.alquist.nl')
         stdin.append('akamai1.alquist.nl')
         stdin.append('akamai2.alquist.nl')
+        stdin.append('akamai1.alquist.nl,akamai2.alquist.nl')
+        stdin.append('akamai1.alquist.nl,akamai2.alquist.nl')
+        stdin.append('akamai1.alquist.nl,akamai2.alquist.nl')
 
         getArgFromSTDIN.return_value = "\n".join(stdin)
 
@@ -469,8 +472,13 @@ class Doh_Test(unittest.TestCase):
             "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
             "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
             "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),
-            
-            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),
+
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),
+
             "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
             "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir)
             
@@ -490,7 +498,7 @@ class Doh_Test(unittest.TestCase):
         commandTester = CommandTester(self)
         stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
         
-        self.assertEquals( len(stdOutResultArray), 4 )      
+        self.assertEquals( len(stdOutResultArray), 10 )      
 
         row = json.loads(stdOutResultArray[0])
         self.assertEquals( len(row), 3 )
@@ -514,7 +522,37 @@ class Doh_Test(unittest.TestCase):
         self.assertTrue(  row[0] )
         self.assertEquals( row[1], "akamai2.alquist.nl" )
         self.assertEquals( row[2], "s528007553.sc.qa01en25.com.alquist.nl.,akamai2.cdn.alquist.nl.,akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
-          
+
+        row = json.loads(stdOutResultArray[4])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai1.alquist.nl" )
+        self.assertEquals( row[2], "akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+        row = json.loads(stdOutResultArray[5])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai2.alquist.nl" )
+        self.assertEquals( row[2], "s528007553.sc.qa01en25.com.alquist.nl.,akamai2.cdn.alquist.nl.,akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+        row = json.loads(stdOutResultArray[6])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai1.alquist.nl" )
+        self.assertEquals( row[2], "akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+        row = json.loads(stdOutResultArray[7])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai2.alquist.nl" )
+        self.assertEquals( row[2], "s528007553.sc.qa01en25.com.alquist.nl.,akamai2.cdn.alquist.nl.,akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+
+        row = json.loads(stdOutResultArray[8])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai1.alquist.nl" )
+        self.assertEquals( row[2], "akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+        
+        row = json.loads(stdOutResultArray[9])
+        self.assertTrue(  row[0] )
+        self.assertEquals( row[1], "akamai2.alquist.nl" )
+        self.assertEquals( row[2], "s528007553.sc.qa01en25.com.alquist.nl.,akamai2.cdn.alquist.nl.,akamai.alquist.nl.edgekey.net.,e12284.x.akamaiedge.net." )
+                
 
     @patch('requests.Session')
     def testCommandLine_checkhostdns(self, mockSessionObj):
