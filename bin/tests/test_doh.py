@@ -371,8 +371,8 @@ class Doh_Test(unittest.TestCase):
     def testCommandLine_checkjsondns_hostsNotCNAMED(self, getArgFromSTDIN, mockSessionObj):
 
         stdin = []
-        stdin.append('["property_1", "www.alquist.nl,notfound.alquist.nl"]')
-        stdin.append('["property_2", "akamai1.alquist.nl,akamai2.alquist.nl,notfound.alquist.nl"]')
+        stdin.append('["property_3", "www.alquist.nl,notfound.alquist.nl"]')
+        stdin.append('["property_4", "akamai1.alquist.nl,akamai2.alquist.nl,notfound.alquist.nl"]')
 
         getArgFromSTDIN.return_value = "\n".join(stdin)
 
@@ -400,14 +400,14 @@ class Doh_Test(unittest.TestCase):
         commandTester = CommandTester(self)
         stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
         
-        self.assertEquals( len(stdOutResultArray), 2 )
+        self.assertEquals( len(stdOutResultArray), 2,  "\n".join(stdOutResultArray))
 
         row = json.loads(stdOutResultArray[0])
-        self.assertEquals( row[0], "property_1" )
+        self.assertEquals( row[0], "property_3" )
         self.assertEquals( row[1], "www.alquist.nl,notfound.alquist.nl" )
 
         row = json.loads(stdOutResultArray[1])
-        self.assertEquals( row[0], "property_2" )
+        self.assertEquals( row[0], "property_4" )
         self.assertEquals( row[1], "notfound.alquist.nl" )
 
     @patch('requests.Session')

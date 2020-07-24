@@ -449,7 +449,13 @@ def checkjsondns(args):
         return 1
     
     fetchDNS = Fetch_DNS()
-    jsonObj= fetchDNS.checkJsonArrayDNS(lines, arrayHostIndex=args.dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
+
+    if args.filterby == "hostsNotCNAMED":
+        jsonObj = fetchDNS.prepareInput(lines, fetchDNS.hostsNotCNAMED)
+    
+    else:
+        
+        jsonObj= fetchDNS.checkJsonArrayDNS(lines, arrayHostIndex=args.dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
     
     printResponse(jsonObj,JSONOutput=True)
     thread.join()

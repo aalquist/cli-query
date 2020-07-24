@@ -373,6 +373,74 @@ class Fetch_DNS():
     def countAkamaizedHosts(self, returnAkamaiHosts, dnsResults):
         returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts or (returnAkamaiHosts == False and x["NXDomain"] == True), dnsResults["resolution"]))
         return returnToList
+    
+    def getHosts_v2(self, dnsResults, returnAkamai=True):
+        returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamai , dnsResults["resolution"]))
+        return returnToList
+
+    def prepareInput(self, jsonObj, func, arrayHostIndex=1, debug=False):
+
+        returnList = list()
+        objList = list(map(lambda x : json.loads(x), jsonObj))
+
+        for obj in objList:
+
+            if arrayHostIndex >= len(obj):
+                raise ValueError("index {} is >= size {}. choose a smaller number. line:\n{}".format(arrayHostIndex, len(obj) , obj))
+
+            if len(obj) < 2:
+                pass
+
+            elif isinstance(obj, list):
+
+                hostIndex = obj[arrayHostIndex]
+
+                #check if input is a string, otherwise assume its a list
+                if isinstance(hostIndex, str):
+                    hosts = hostIndex.split(",")
+                else:
+                    hosts = hostIndex
+
+                if len(obj) > 0: 
+                    print(" ... checking dns for {} hosts on {}".format( len(hosts), obj[0] ), file=sys.stderr )
+
+                originalHostLength = len(hosts)
+                hosts = list(filter(lambda domain : "." in domain, hosts) )
+
+                if len(hosts) < 1:
+                    print("  ... no domains were valid so skipping".format( len(hosts) ), file=sys.stderr )    
+                    continue
+
+                elif len(hosts) != originalHostLength:
+                    print("  ... some domains were not valid so skipped them".format( len(hosts) ), file=sys.stderr )    
+        
+                func(obj, hosts, hostIndex, returnList, arrayHostIndex=arrayHostIndex, debug=debug)
+                
+
+        return returnList
+
+    def hostsNotCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+        
+        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        returnToList = self.getHosts_v2(dnsResults, returnAkamai=False)
+        
+        if len(hosts) != len(returnToList):
+            returnedHostTypeText = "Non-CNAMED"
+            print("  ... {} had {} hosts which were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+            self.printNXDomainErrMsg(dnsResults)
+
+        else:
+            print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
+
+        returnToList = list(map(lambda x : x["domain"], returnToList))
+        
+        if isinstance(hostIndex, str):
+            returnToList = ",".join(returnToList)
+
+        obj[arrayHostIndex] = returnToList
+
+        if len(returnToList ) > 0:
+            returnList.append(obj)
 
     def checkJsonArrayDNS(self, jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None, debug=False):
 
