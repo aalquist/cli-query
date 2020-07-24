@@ -451,10 +451,22 @@ def checkjsondns(args):
     fetchDNS = Fetch_DNS()
 
     if args.filterby == "hostsNotCNAMED":
-        jsonObj = fetchDNS.prepareInput(lines, fetchDNS.hostsNotCNAMED)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsNotCNAMED, arrayHostIndex=args.dns_index)
     
+    elif args.filterby == "hostsCNAMED":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsCNAMED, arrayHostIndex=args.dns_index)
+
+    elif args.filterby == "configsWithCNAME":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithCNAME, arrayHostIndex=args.dns_index)
+    
+    elif args.filterby == "configsWithoutCNAME":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithoutCNAME, arrayHostIndex=args.dns_index)
+
+    elif args.filterby == "configsFullyCNAME":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsFullyCNAME, arrayHostIndex=args.dns_index)
+
     else:
-        
+        #should be dead code 
         jsonObj= fetchDNS.checkJsonArrayDNS(lines, arrayHostIndex=args.dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
     
     printResponse(jsonObj,JSONOutput=True)

@@ -378,7 +378,7 @@ class Fetch_DNS():
         returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamai , dnsResults["resolution"]))
         return returnToList
 
-    def prepareInput(self, jsonObj, func, arrayHostIndex=1, debug=False):
+    def filterDNSInput(self, jsonObj, func, arrayHostIndex=1, debug=False):
 
         returnList = list()
         objList = list(map(lambda x : json.loads(x), jsonObj))
@@ -440,6 +440,75 @@ class Fetch_DNS():
         obj[arrayHostIndex] = returnToList
 
         if len(returnToList ) > 0:
+            returnList.append(obj)
+    
+    def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+        
+        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        returnToList = self.getHosts_v2(dnsResults, returnAkamai=True)
+        
+        if len(hosts) != len(returnToList):
+            returnedHostTypeText = "CNAMED"
+            print("  ... {} had {} hosts which were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+            self.printNXDomainErrMsg(dnsResults)
+
+        else:
+            print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
+
+        returnToList = list(map(lambda x : x["domain"], returnToList))
+        
+        if isinstance(hostIndex, str):
+            returnToList = ",".join(returnToList)
+
+        obj[arrayHostIndex] = returnToList
+
+        if len(returnToList ) > 0:
+            returnList.append(obj)
+
+    def configsWithCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+
+        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        returnToList = self.getHosts_v2(dnsResults, returnAkamai=True)
+        
+        if len(hosts) == 1:
+            print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+        else:
+            print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+
+        self.printNXDomainErrMsg(dnsResults)
+
+        if dnsResults["anyAkamai"] :    
+            returnList.append(obj)
+
+    def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+
+        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        returnToList = self.getHosts_v2(dnsResults, returnAkamai=True)
+        
+        if len(hosts) == 1:
+            print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+        else:
+            print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+
+        self.printNXDomainErrMsg(dnsResults)
+
+        if not dnsResults["allAkamai"] :    
+            returnList.append(obj)
+
+
+    def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+
+        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        returnToList = self.getHosts_v2(dnsResults, returnAkamai=False)
+        
+        if len(hosts) == 1:
+            print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+        else:
+            print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+
+        self.printNXDomainErrMsg(dnsResults)
+
+        if not dnsResults["anyAkamai"] :    
             returnList.append(obj)
 
     def checkJsonArrayDNS(self, jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None, debug=False):
