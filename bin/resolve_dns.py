@@ -492,7 +492,7 @@ class Fetch_DNS():
 
         self.printNXDomainErrMsg(dnsResults)
 
-        if not dnsResults["allAkamai"] :    
+        if dnsResults["allAkamai"] :    
             returnList.append(obj)
 
 

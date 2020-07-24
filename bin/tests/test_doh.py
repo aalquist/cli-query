@@ -677,12 +677,16 @@ class Doh_Test(unittest.TestCase):
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
         fetchDNS = Fetch_DNS()
-        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, returnAkamaiHosts=True)
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.configsWithCNAME, arrayHostIndex=1)
 
         self.assertEqual( 2, len(returnList) )
         self.assertEqual("configname_ion3", returnList[0][0][0])
-        self.assertEqual("akamai1.alquist.nl", returnList[0][1][0])
+
+        self.assertEqual( 2, len(returnList[0]) )
+        self.assertEqual("www.alquist.nl", returnList[0][1][0])
+        self.assertEqual("akamai1.alquist.nl", returnList[0][1][1])
         
+        self.assertEqual( 2, len(returnList[1]) )
         self.assertEqual("configname_ion4", returnList[1][0][0])
         self.assertEqual("akamai3.alquist.nl", returnList[1][1][0])
         self.assertEqual("akamai4.alquist.nl", returnList[1][1][1])
@@ -718,13 +722,18 @@ class Doh_Test(unittest.TestCase):
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl", "akamai1.alquist.nl"]]' )
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
         fetchDNS = Fetch_DNS()
-        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
+        
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.configsWithCNAME, arrayHostIndex=1)
+        #returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
 
         self.assertEqual( 2, len(returnList) )
         self.assertEqual("configname_ion3", returnList[0][0][0])
+        
+        self.assertEqual( 2, len(returnList[0]) )
         self.assertEqual("www.alquist.nl", returnList[0][1][0])
         self.assertEqual("akamai1.alquist.nl", returnList[0][1][1])
 
+        self.assertEqual( 2, len(returnList[1]) )
         self.assertEqual("configname_ion4", returnList[1][0][0])
         self.assertEqual("akamai3.alquist.nl", returnList[1][1][0])
         self.assertEqual("akamai4.alquist.nl", returnList[1][1][1])
@@ -758,7 +767,7 @@ class Doh_Test(unittest.TestCase):
 
         jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl"]]' )
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
-        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAnyAkamai=True)
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.hostsCNAMED, arrayHostIndex=1)
 
         self.assertEqual( 1, len(returnList) )
         self.assertEqual("configname_ion4", returnList[0][0][0])
@@ -795,7 +804,7 @@ class Doh_Test(unittest.TestCase):
         jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
 
         fetchDNS = Fetch_DNS()
-        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1, requireAllAkamai=True)
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.configsFullyCNAME, arrayHostIndex=1)
 
         self.assertEqual( 1, len(returnList) )
         self.assertEqual("configname_ion4", returnList[0][0][0])
@@ -832,17 +841,13 @@ class Doh_Test(unittest.TestCase):
         jsonObjArray.append('["configname_ion2", "akamai2.alquist.nl,akamai3.alquist.nl"]' )
 
         fetchDNS = Fetch_DNS()
-        returnList = fetchDNS.checkJsonArrayDNS(jsonObjArray, arrayHostIndex=1)
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.hostsNotCNAMED, arrayHostIndex=1)
 
-        self.assertEqual( 2, len(returnList) )
+        self.assertEqual( 1, len(returnList) )
 
+        self.assertEqual( 2, len(returnList[0]) )
         self.assertEqual("configname_ion1", returnList[0][0])
-        self.assertEqual("www.alquist.nl", returnList[0][1].split(",")[0])
-        self.assertEqual("akamai1.alquist.nl", returnList[0][1].split(",")[1])
-
-        self.assertEqual("configname_ion2", returnList[1][0].split(",")[0])
-        self.assertEqual("akamai2.alquist.nl", returnList[1][1].split(",")[0])
-        self.assertEqual("akamai3.alquist.nl", returnList[1][1].split(",")[1])        
+        self.assertEqual("www.alquist.nl", returnList[0][1].split(",")[0])           
 
 
     def testLookup(self):
