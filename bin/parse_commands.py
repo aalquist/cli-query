@@ -375,7 +375,7 @@ def bulksearchtemplate(args):
 
 def checkjsondns(args):
 
-    configFilters = [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME"]
+    configFilters = [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME", "configsAllNXDomain", "configsAnyNXDomain"]
     hostFilters = [ "hostsCNAMED", "hostsNotCNAMED" ]
     
     filterbychoices = []
@@ -386,58 +386,14 @@ def checkjsondns(args):
         print("... filterby positional arg must be one of {}...".format(filterbychoices), file=sys.stderr )
         return 1
     
-
     path = inspect.getframeinfo(inspect.currentframe()).function
     thread = Analytics().async_send_analytics(path=path, debug=args.debug)
-
-    #default values
-    requireAnyAkamai=True
-    requireAllAkamai=False
-    returnAkamaiHosts=None
-
-    if args.filterby in configFilters:
-        print("... preparing to filter listed configurations with {}...".format(args.filterby), file=sys.stderr )
-        
-        if args.filterby == "configsWithCNAME":
-            requireAnyAkamai = True
-            requireAllAkamai = False
-            returnAkamaiHosts = None
-
-        elif args.filterby == "configsWithoutCNAME":
-            requireAnyAkamai = False
-            requireAllAkamai = False
-            returnAkamaiHosts = None
-
-        elif args.filterby == "configsFullyCNAMED":
-            requireAnyAkamai = False
-            requireAllAkamai = True
-            returnAkamaiHosts = None
-
-    elif args.filterby in hostFilters:
-
-        print("... preparing to modify listed hosts with setting {}...".format(args.filterby), file=sys.stderr )
-
-        if args.filterby == "hostsCNAMED":
-            requireAnyAkamai = True
-            requireAllAkamai = False
-            returnAkamaiHosts=True
-
-        elif args.filterby == "hostsNotCNAMED":
-            requireAnyAkamai = True
-            requireAllAkamai = False
-            returnAkamaiHosts = False
-
-    else:
-        print("... invalid setting. skipping filter {}...".format(args.filterby), file=sys.stderr )
-        return 1
-
 
     print("... waiting for domain list or json docs from stdin...", file=sys.stderr )
     stdinStr = getArgFromSTDIN()
     print("... got list from user input...", file=sys.stderr )
     stdinStr = str.rstrip(stdinStr)
     lines = stdinStr.split(os.linesep)
-
 
     print("... accepting JSON input and skipping any template output", file=sys.stderr )
     
@@ -464,6 +420,12 @@ def checkjsondns(args):
 
     elif args.filterby == "configsFullyCNAMED":
         jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsFullyCNAME, arrayHostIndex=args.dns_index)
+    
+    elif args.filterby == "configsAllNXDomain":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAllNXDomain, arrayHostIndex=args.dns_index)
+    
+    elif args.filterby == "configsAnyNXDomain":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAnyNXDomain, arrayHostIndex=args.dns_index)
 
     else:
         print("Error filterby mapping not setup. Got: {}".format(args.filterby), file=sys.stderr)

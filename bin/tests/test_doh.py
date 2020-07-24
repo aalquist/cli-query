@@ -692,6 +692,103 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("akamai4.alquist.nl", returnList[1][1][1])
 
     @patch('requests.Session')
+    def testJsonParseOutputFilter_NXDomain(self, mockSessionObj): 
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        jsonObjArray = list()
+       
+        jsonObjArray.append(' [["configname_ion3"], ["notfound.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
+        fetchDNS = Fetch_DNS()
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.configsAllNXDomain, arrayHostIndex=1)
+
+        self.assertEqual( 1, len(returnList) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+
+        self.assertEqual( 2, len(returnList[0]) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+        self.assertEqual("notfound.alquist.nl", returnList[0][1][0])
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        jsonObjArray = list()
+       
+        jsonObjArray.append(' [["configname_ion3"], ["notfound.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
+        fetchDNS = Fetch_DNS()
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.configsAnyNXDomain, arrayHostIndex=1)
+
+        self.assertEqual( 1, len(returnList) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+
+        self.assertEqual( 2, len(returnList[0]) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+        self.assertEqual("notfound.alquist.nl", returnList[0][1][0])
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir),
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        jsonObjArray = list()
+       
+        jsonObjArray.append(' [["configname_ion3"], ["notfound.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["notfound.alquist.nl", "akamai4.alquist.nl"]]' )
+        fetchDNS = Fetch_DNS()
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.configsAnyNXDomain, arrayHostIndex=1)
+
+        self.assertEqual( 2, len(returnList) )
+
+        self.assertEqual( 2, len(returnList[0]) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+        self.assertEqual("notfound.alquist.nl", returnList[0][1][0])
+
+        self.assertEqual( 2, len(returnList[1]) )
+        self.assertEqual("configname_ion4", returnList[1][0][0])
+        self.assertEqual("notfound.alquist.nl", returnList[1][1][0])
+
+
+    @patch('requests.Session')
     def testJsonParseNestedArrays(self, mockSessionObj): 
 
         session = mockSessionObj()
