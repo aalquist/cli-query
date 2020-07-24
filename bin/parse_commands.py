@@ -462,12 +462,13 @@ def checkjsondns(args):
     elif args.filterby == "configsWithoutCNAME":
         jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithoutCNAME, arrayHostIndex=args.dns_index)
 
-    elif args.filterby == "configsFullyCNAME":
+    elif args.filterby == "configsFullyCNAMED":
         jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsFullyCNAME, arrayHostIndex=args.dns_index)
 
     else:
-        #should be dead code 
-        jsonObj= fetchDNS.checkJsonArrayDNS(lines, arrayHostIndex=args.dns_index, requireAnyAkamai=requireAnyAkamai, requireAllAkamai=requireAllAkamai, returnAkamaiHosts=returnAkamaiHosts)
+        print("Error filterby mapping not setup. Got: {}".format(args.filterby), file=sys.stderr)
+        thread.join()
+        return 1
     
     printResponse(jsonObj,JSONOutput=True)
     thread.join()

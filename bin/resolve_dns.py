@@ -369,10 +369,6 @@ class Fetch_DNS():
 
         if len(containsNotAllowed) > 0:
             raise ValueError("... domain {} has wrong char {}".format(dns, containsNotAllowed))
-
-    def countAkamaizedHosts(self, returnAkamaiHosts, dnsResults):
-        returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamaiHosts or (returnAkamaiHosts == False and x["NXDomain"] == True), dnsResults["resolution"]))
-        return returnToList
     
     def getHosts_v2(self, dnsResults, returnAkamai=True):
         returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamai , dnsResults["resolution"]))
@@ -510,98 +506,6 @@ class Fetch_DNS():
 
         if not dnsResults["anyAkamai"] :    
             returnList.append(obj)
-
-    def checkJsonArrayDNS(self, jsonObj, arrayHostIndex=1, requireAnyAkamai=True, requireAllAkamai=False, returnAkamaiHosts=None, debug=False):
-
-        objList = list(map(lambda x : json.loads(x), jsonObj))
-
-        returnList = list()
-
-        for obj in objList:
-
-            if arrayHostIndex >= len(obj):
-                raise ValueError("index {} is >= size {}. choose a smaller number. line:\n{}".format(arrayHostIndex, len(obj) , obj))
-
-            if len(obj) < 2:
-                pass
-
-            elif isinstance(obj, list):
-
-                hostIndex = obj[arrayHostIndex]
-
-                #check if input is a string, otherwise assume its a list
-                if isinstance(hostIndex, str):
-                    hosts = hostIndex.split(",")
-                else:
-                    hosts = hostIndex
-
-                if len(obj) > 0: 
-                    print(" ... checking dns for {} hosts on {}".format( len(hosts), obj[0] ), file=sys.stderr )
-
-                originalHostLength = len(hosts)
-                hosts = list(filter(lambda domain : "." in domain, hosts) )
-
-                if len(hosts) < 1:
-                    print("  ... no domains were valid so skipping".format( len(hosts) ), file=sys.stderr )    
-                    continue
-
-                elif len(hosts) != originalHostLength:
-                    print("  ... some domains were not valid so skipped them".format( len(hosts) ), file=sys.stderr )    
-
-                dnsResults = self.checkDNSMetadata(hosts, debug=debug)
-            
-            if requireAllAkamai:
-                requireAnyAkamai = False
-            
-            if returnAkamaiHosts is not None :
-                
-                returnToList = self.countAkamaizedHosts( returnAkamaiHosts, dnsResults)
-
-                
-                if len(hosts) != len(returnToList):
-                    returnedHostTypeText = "CNAMED" if returnAkamaiHosts else "Non-CNAMED"
-                    print("  ... {} had {} hosts which were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
-                    self.printNXDomainErrMsg(dnsResults)
-
-                else:
-                    print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
-
-                returnToList = list(map(lambda x : x["domain"], returnToList))
-                
-                if isinstance(hostIndex, str):
-                    returnToList = ",".join(returnToList)
-
-                obj[arrayHostIndex] = returnToList
-
-                if len(returnToList ) > 0:
-                    returnList.append(obj)
-
-            else:
-
-                returnAkamaiHostsOnly = True
-                returnToList = self.countAkamaizedHosts(returnAkamaiHostsOnly, dnsResults)
-                
-                if len(hosts) == 1:
-                    print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
-                else:
-                    print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
-
-                if requireAllAkamai == True and dnsResults["allAkamai"] :
-                    self.printNXDomainErrMsg(dnsResults)
-                    returnList.append(obj)
-                
-                elif requireAnyAkamai == True and dnsResults["anyAkamai"] :
-                    self.printNXDomainErrMsg(dnsResults)
-                    returnList.append(obj)
-
-                elif requireAllAkamai == False and requireAnyAkamai == False and requireAnyAkamai == dnsResults["anyAkamai"] :
-                    self.printNXDomainErrMsg(dnsResults)
-                    returnList.append(obj)
-                
-                elif dnsResults["anyNXDomain"] == True:
-                    self.printNXDomainErrMsg(dnsResults)
-
-        return returnList
 
     def printNXDomainErrMsg(self, dnsResults):
         NXDomainList = list(filter(lambda x : x["NXDomain"] == True, dnsResults["resolution"]))
