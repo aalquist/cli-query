@@ -324,7 +324,7 @@ def setupCommands(subparsers):
 
         optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "dns-index", "help": "zero based index where hostname lookup should be performed", "default" : 1},
-                {"name": "filterby", "help": "choose configsWithCNAME, configsFullyCNAMED, configsWithoutCNAME, hostsCNAMED, or hostsNotCNAMED", "positional" : True}]),
+                {"name": "filterby", "help": "choose configsWithCNAME, configsFullyCNAMED, configsWithoutCNAME, hostsCNAMED, hostsNotCNAMED, configsAllNXDomain, configsAnyNXDomain", "positional" : True}]),
         required_arguments=None,
         actions=actions)
 
