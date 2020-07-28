@@ -374,8 +374,8 @@ class Fetch_DNS():
         returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamai , dnsResults["resolution"]))
         return returnToList
     
-    def filterHosts_v2(self, dnsResults, filterText="isAkamai"):
-        returnToList = list(filter(lambda x : x[filterText] , dnsResults["resolution"]))
+    def filterHosts_v2(self, dnsResults, filterText="isAkamai", checkResultTrue=True):
+        returnToList = list(filter(lambda x : x[filterText] == checkResultTrue , dnsResults["resolution"]))
         return returnToList
 
     def filterDNSInput(self, jsonObj, func, arrayHostIndex=1, debug=False):
@@ -468,13 +468,11 @@ class Fetch_DNS():
     def configsWithCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         dnsResults = self.checkDNSMetadata(hosts, debug=debug)
-        returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
         
-        if len(hosts) == 1:
-            print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
-        else:
-            print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
-
+        #returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
+        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai" )
+        
+        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
         if dnsResults["anyAkamai"] :    
@@ -483,29 +481,22 @@ class Fetch_DNS():
     def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         dnsResults = self.checkDNSMetadata(hosts, debug=debug)
-        returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
-        
-        if len(hosts) == 1:
-            print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
-        else:
-            print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
+        #returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
+        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai" )
 
+        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
         if dnsResults["allAkamai"] :    
             returnList.append(obj)
 
-
     def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         dnsResults = self.checkDNSMetadata(hosts, debug=debug)
-        returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=False)
+        #returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=False)
+        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai", checkResultTrue=False )
         
-        if len(hosts) == 1:
-            print("  ... {} had {} host and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
-        else:
-            print("  ... {} had {} hosts and found {} CNAMED hosts".format( obj[0], len(hosts), len(returnToList) ), file=sys.stderr )
-
+        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
         if not dnsResults["anyAkamai"] :    
@@ -517,13 +508,7 @@ class Fetch_DNS():
         dnsResults = self.checkDNSMetadata(hosts, debug=debug)
         returnToList = self.filterHosts_v2(dnsResults, filterText=filterText)
         
-
-        if len(hosts) == 1:
-            print("  ... {} had {} host and found {} {} hosts".format( obj[0], len(hosts), len(returnToList), filterText ), file=sys.stderr )
-        else:
-            print("  ... {} had {} hosts and found {} {} hosts".format( obj[0], len(hosts), len(returnToList), filterText ), file=sys.stderr )
-
-        self.printNXDomainErrMsg(dnsResults)
+        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
 
         if dnsResults["allNXDomain"] :    
             returnList.append(obj)
@@ -534,16 +519,22 @@ class Fetch_DNS():
         dnsResults = self.checkDNSMetadata(hosts, debug=debug)
         returnToList = self.filterHosts_v2(dnsResults, filterText=filterText)
         
-
-        if len(hosts) == 1:
-            print("  ... {} had {} host and found {} {} hosts".format( obj[0], len(hosts), len(returnToList), filterText ), file=sys.stderr )
-        else:
-            print("  ... {} had {} hosts and found {} {} hosts".format( obj[0], len(hosts), len(returnToList), filterText ), file=sys.stderr )
-
-        self.printNXDomainErrMsg(dnsResults)
+        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
 
         if dnsResults["anyNXDomain"] :    
             returnList.append(obj)
+
+    def printFilterStatusMsg(self, obj, hosts, returnToList, filterTypeName=None):
+
+        if filterTypeName is None:
+            filterTypeName = ""
+        else:
+            filterTypeName = " {} ".format(filterTypeName)
+
+        if len(hosts) == 1:
+            print("  ... {} had {} host and found {}{}hosts".format( obj[0], len(hosts), len(returnToList), filterTypeName ), file=sys.stderr )
+        else:
+            print("  ... {} had {} hosts and found {}{}hosts".format( obj[0], len(hosts), len(returnToList),filterTypeName ), file=sys.stderr )
 
 
     def printNXDomainErrMsg(self, dnsResults):
