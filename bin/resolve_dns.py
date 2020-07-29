@@ -166,7 +166,7 @@ class Fetch_DNS():
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False)
         
         if len(hosts) != len(returnToList) and len(returnToList) == 0:
-            print("  ... {} had {} hosts and no hosts were filtered".format( obj[0], len(hosts) ), file=sys.stderr )
+            print("  ... {} had {} hosts and none were filtered".format( obj[0], len(hosts) ), file=sys.stderr )
 
         elif len(hosts) != len(returnToList):
             returnedHostTypeText = "Non-CNAMED"
@@ -192,7 +192,7 @@ class Fetch_DNS():
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=True)
         
         if len(hosts) != len(returnToList) and len(returnToList) == 0:
-            print("  ... {} had {} hosts and no hosts were filtered".format( obj[0], len(hosts) ), file=sys.stderr )
+            print("  ... {} had {} hosts and none were filtered".format( obj[0], len(hosts) ), file=sys.stderr )
 
         elif len(hosts) != len(returnToList):
             returnedHostTypeText = "CNAMED"
