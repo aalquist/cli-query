@@ -1013,7 +1013,8 @@ class Doh_Test(unittest.TestCase):
         response.headers = {}
         
         fetchDNS = Fetch_DNS()
-        result = fetchDNS.checkDNSMetadata(["notfound.alquist.nl"])
+        
+        result = fetchDNS.loadDNSfromHostList(["notfound.alquist.nl"])
         
         self.assertFalse(result["anyAkamai"])
         self.assertFalse(result["allAkamai"])

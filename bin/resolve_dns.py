@@ -304,7 +304,7 @@ class Fetch_DNS():
         else:
             return False
 
-    def getDomainJson(self, domain, recoredType="AAAA", debug=False):
+    def getDomainJson(self, domain, recoredType=None, debug=False):
 
         self.checkInvalidDNSChars(domain)
 
@@ -335,7 +335,8 @@ class Fetch_DNS():
             dnsResponse["Answer"] = updatedList
 
     def answerFound(self, dnsResponse):
-        return "Answer" in dnsResponse and len(dnsResponse["Answer"])> 0
+        answer ="Answer" in dnsResponse and len(dnsResponse["Answer"])> 0
+        return answer
 
     def checkSingleDNSDomainJson(self, domainJson, func=None):
         
@@ -346,7 +347,7 @@ class Fetch_DNS():
         else:
             return False
 
-    def compositeCheck(self, domainList, recoredType="AAAA", debug=False):
+    def compositeCheck(self, domainList, recoredType=None, debug=False):
 
         jsonMap = list(map(lambda domain : {"domain": domain, "dnsJson" : self.getDomainJson(domain, recoredType=recoredType, debug=debug) }, domainList ))
 
@@ -421,7 +422,8 @@ class Fetch_DNS():
 
     def hostsNotCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
         
-        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        #dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=False)
         
         if len(hosts) != len(returnToList):
@@ -444,7 +446,8 @@ class Fetch_DNS():
     
     def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
         
-        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        #dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
         
         if len(hosts) != len(returnToList):
@@ -467,9 +470,7 @@ class Fetch_DNS():
 
     def configsWithCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
-        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
-        
-        #returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
+        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai" )
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -480,8 +481,7 @@ class Fetch_DNS():
 
     def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
-        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
-        #returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
+        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai" )
 
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -492,8 +492,7 @@ class Fetch_DNS():
 
     def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
-        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
-        #returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=False)
+        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai", checkResultTrue=False )
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -505,7 +504,7 @@ class Fetch_DNS():
     def configsAllNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         filterText="NXDomain"
-        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterHosts_v2(dnsResults, filterText=filterText)
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
@@ -516,7 +515,8 @@ class Fetch_DNS():
     def configsAnyNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         filterText="NXDomain"
-        dnsResults = self.checkDNSMetadata(hosts, debug=debug)
+
+        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterHosts_v2(dnsResults, filterText=filterText)
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
@@ -556,7 +556,7 @@ class Fetch_DNS():
                 print("   ... {} {} were NXDomain {} {}".format(NXDomainListCount, hostsText, NXDomainList, truncatedHostsTrainingText), file=sys.stderr )
 
 
-    def loadDNSfromHostList(self, domainList, recoredType="AAAA", debug=False):
+    def loadDNSfromHostList(self, domainList, recoredType=None, debug=False):
         hostCheck = self.compositeCheck(domainList, recoredType=recoredType, debug=debug)
 
         isAkamai = list(map(lambda domain : domain["isAkamai"], hostCheck) )
@@ -575,12 +575,3 @@ class Fetch_DNS():
 
         return DNSInfo
 
-    def checkDNSMetadata(self,inputList, inputIsJSON=False, recoredType="AAAA", debug=False):
-
-        if inputIsJSON == False:
-            return self.loadDNSfromHostList(inputList, recoredType="AAAA", debug=debug)
-
-        else:
-            raise ValueError("inputIsJSON=True is no longer supported - refactored away and not used anymore.")
-
-    
