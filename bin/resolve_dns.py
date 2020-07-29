@@ -166,9 +166,8 @@ class Fetch_DNS():
 
     def hostsNotCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
         
-        #dnsResults = self.checkDNSMetadata(hosts, debug=debug)
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=False)
+        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai", checkResultTrue=False)
         
         if len(hosts) != len(returnToList):
             returnedHostTypeText = "Non-CNAMED"
@@ -190,9 +189,8 @@ class Fetch_DNS():
     
     def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
         
-        #dnsResults = self.checkDNSMetadata(hosts, debug=debug)
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterAkamaiHosts_v2(dnsResults, returnAkamai=True)
+        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai", checkResultTrue=True)
         
         if len(hosts) != len(returnToList):
             returnedHostTypeText = "CNAMED"
