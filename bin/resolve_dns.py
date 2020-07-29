@@ -115,11 +115,7 @@ class Fetch_DNS():
         if len(containsNotAllowed) > 0:
             raise ValueError("... domain {} has wrong char {}".format(dns, containsNotAllowed))
     
-    def filterAkamaiHosts_v2(self, dnsResults, returnAkamai=True):
-        returnToList = list(filter(lambda x : x["isAkamai"] == returnAkamai , dnsResults["resolution"]))
-        return returnToList
-    
-    def filterHosts_v2(self, dnsResults, filterText="isAkamai", checkResultTrue=True):
+    def filterHosts(self, dnsResults, filterText="isAkamai", checkResultTrue=True):
         returnToList = list(filter(lambda x : x[filterText] == checkResultTrue , dnsResults["resolution"]))
         return returnToList
 
@@ -167,7 +163,7 @@ class Fetch_DNS():
     def hostsNotCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
         
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai", checkResultTrue=False)
+        returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False)
         
         if len(hosts) != len(returnToList):
             returnedHostTypeText = "Non-CNAMED"
@@ -190,7 +186,7 @@ class Fetch_DNS():
     def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
         
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai", checkResultTrue=True)
+        returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=True)
         
         if len(hosts) != len(returnToList):
             returnedHostTypeText = "CNAMED"
@@ -213,7 +209,7 @@ class Fetch_DNS():
     def configsWithCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai" )
+        returnToList = self.filterHosts(dnsResults, filterText="isAkamai" )
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
@@ -224,7 +220,7 @@ class Fetch_DNS():
     def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai" )
+        returnToList = self.filterHosts(dnsResults, filterText="isAkamai" )
 
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
@@ -235,7 +231,7 @@ class Fetch_DNS():
     def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
 
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterHosts_v2(dnsResults, filterText="isAkamai", checkResultTrue=False )
+        returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False )
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
@@ -247,7 +243,7 @@ class Fetch_DNS():
 
         filterText="NXDomain"
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterHosts_v2(dnsResults, filterText=filterText)
+        returnToList = self.filterHosts(dnsResults, filterText=filterText)
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
 
@@ -259,7 +255,7 @@ class Fetch_DNS():
         filterText="NXDomain"
 
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
-        returnToList = self.filterHosts_v2(dnsResults, filterText=filterText)
+        returnToList = self.filterHosts(dnsResults, filterText=filterText)
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
 
