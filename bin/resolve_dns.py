@@ -165,6 +165,9 @@ class Fetch_DNS():
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False)
         
+        if len(hosts) != len(returnToList) and len(returnToList) == 0:
+            print("  ... {} had {} hosts and no hosts were filtered".format( obj[0], len(hosts) ), file=sys.stderr )
+
         if len(hosts) != len(returnToList):
             returnedHostTypeText = "Non-CNAMED"
             print("  ... {} had {} hosts which were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
@@ -188,7 +191,10 @@ class Fetch_DNS():
         dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=True)
         
-        if len(hosts) != len(returnToList):
+        if len(hosts) != len(returnToList) and len(returnToList) == 0:
+            print("  ... {} had {} hosts and no hosts were filtered".format( obj[0], len(hosts) ), file=sys.stderr )
+
+        elif len(hosts) != len(returnToList):
             returnedHostTypeText = "CNAMED"
             print("  ... {} had {} hosts which were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
             self.printNXDomainErrMsg(dnsResults)
