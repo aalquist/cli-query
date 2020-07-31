@@ -486,12 +486,17 @@ def checkhostdns(args):
 
     if len(lines) > 1:
         print(" ... querying {} domains ".format( len(lines) ), file=sys.stderr, end= "" )
+        sys.stderr.flush()
 
     elif len(lines) == 1:
         print(" ... querying {} domain ".format( len(lines) ), file=sys.stderr, end= "" )
+        sys.stderr.flush()
 
+    def printStatus():
+        print(".", end= "", file=sys.stderr)
+        sys.stderr.flush()
 
-    jsonObj = fetchDNS.loadDNSfromHostList(lines, recoredType=None, progressTickHandler=lambda: print(".", end= "", file=sys.stderr) )
+    jsonObj = fetchDNS.loadDNSfromHostList(lines, recoredType=None, progressTickHandler=printStatus )
     print("", file=sys.stderr)
 
     if "resolution" in jsonObj:
