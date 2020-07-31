@@ -488,6 +488,9 @@ def checkhostdns(args):
 
     fetchDNS = Fetch_DNS()
 
+    if args.debug:
+        print(" ... debug: domain list: {}".format( lines ), file=sys.stderr )
+
     if len(lines) > 1:
         print(" ... querying {} domains ".format( len(lines) ), file=sys.stderr, end= "" )
         sys.stderr.flush()

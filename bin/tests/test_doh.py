@@ -52,6 +52,7 @@ class Doh_Test(unittest.TestCase):
         stdin = []
         stdin.append('["property_1", "dummy1", "www.alquist.nl"]')
         stdin.append('["property_2", "dummy2", "akamai1.alquist.nl,akamai2.alquist.nl"]')
+        stdin.append('["property_3", "dummy3", "notfound.alquist.nl"]')
 
         getArgFromSTDIN.return_value = "\n".join(stdin)
 
@@ -63,6 +64,7 @@ class Doh_Test(unittest.TestCase):
             "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
             "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
             "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir),  
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir),
         ]   
 
         for mockJson in dnsResponses:
@@ -77,12 +79,17 @@ class Doh_Test(unittest.TestCase):
         commandTester = CommandTester(self)
         stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args)
         
-        self.assertEquals( len(stdOutResultArray), 1 )
+        self.assertEquals( len(stdOutResultArray), 2 )
 
         row = json.loads(stdOutResultArray[0])
         self.assertEquals( row[0], "property_1" )
         self.assertEquals( row[1], "dummy1" )
         self.assertEquals( row[2], "www.alquist.nl" )
+
+        row = json.loads(stdOutResultArray[1])
+        self.assertEquals( row[0], "property_3" )
+        self.assertEquals( row[1], "dummy3" )
+        self.assertEquals( row[2], "notfound.alquist.nl" )
 
     @patch('requests.Session')
     @patch('bin.parse_commands.getArgFromSTDIN')

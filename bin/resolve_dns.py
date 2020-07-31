@@ -263,7 +263,8 @@ class Fetch_DNS():
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
-        if not dnsResults["anyAkamai"] :    
+        #fix bug to == False
+        if False == dnsResults["anyAkamai"] :    
             returnList.append(obj)
     
     def configsAllNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
