@@ -245,7 +245,7 @@ class Fetch_DNS():
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False )
         
-        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="non CNAME")
+        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="non-CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
         if False == dnsResults["anyAkamai"] :    
