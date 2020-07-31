@@ -389,7 +389,7 @@ def checkjsondns(args):
     path = inspect.getframeinfo(inspect.currentframe()).function
     thread = Analytics().async_send_analytics(path=path, debug=args.debug)
 
-    print("... waiting for domain list or json docs from stdin...", file=sys.stderr )
+    print("... waiting for json docs from stdin...", file=sys.stderr )
     stdinStr = getArgFromSTDIN()
     print("... got list from user input...", file=sys.stderr )
     stdinStr = str.rstrip(stdinStr)
