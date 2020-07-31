@@ -404,28 +404,32 @@ def checkjsondns(args):
         print("... domain index must be an int {}".format(args.dns_index), file=sys.stderr )
         return 1
     
+    def printStatus():
+        print(".", end= "", file=sys.stderr)
+        sys.stderr.flush()
+
     fetchDNS = Fetch_DNS()
 
     if args.filterby == "hostsNotCNAMED":
-        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsNotCNAMED, arrayHostIndex=args.dns_index)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsNotCNAMED, arrayHostIndex=args.dns_index, progressTickHandler=printStatus)
     
     elif args.filterby == "hostsCNAMED":
-        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsCNAMED, arrayHostIndex=args.dns_index)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsCNAMED, arrayHostIndex=args.dns_index, progressTickHandler=printStatus)
 
     elif args.filterby == "configsWithCNAME":
-        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithCNAME, arrayHostIndex=args.dns_index)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithCNAME, arrayHostIndex=args.dns_index, progressTickHandler=printStatus)
     
     elif args.filterby == "configsWithoutCNAME":
-        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithoutCNAME, arrayHostIndex=args.dns_index)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithoutCNAME, arrayHostIndex=args.dns_index, progressTickHandler=printStatus)
 
     elif args.filterby == "configsFullyCNAMED":
-        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsFullyCNAME, arrayHostIndex=args.dns_index)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsFullyCNAME, arrayHostIndex=args.dns_index, progressTickHandler=printStatus)
     
     elif args.filterby == "configsAllNXDomain":
-        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAllNXDomain, arrayHostIndex=args.dns_index)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAllNXDomain, arrayHostIndex=args.dns_index, progressTickHandler=printStatus)
     
     elif args.filterby == "configsAnyNXDomain":
-        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAnyNXDomain, arrayHostIndex=args.dns_index)
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAnyNXDomain, arrayHostIndex=args.dns_index, progressTickHandler=printStatus)
 
     else:
         print("Error filterby mapping not setup. Got: {}".format(args.filterby), file=sys.stderr)

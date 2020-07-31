@@ -122,7 +122,7 @@ class Fetch_DNS():
         returnToList = list(filter(lambda x : x[filterText] == checkResultTrue , dnsResults["resolution"]))
         return returnToList
 
-    def filterDNSInput(self, jsonObj, func, arrayHostIndex=1, debug=False):
+    def filterDNSInput(self, jsonObj, func, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         returnList = list()
         objList = list(map(lambda x : json.loads(x), jsonObj))
@@ -158,14 +158,20 @@ class Fetch_DNS():
                 elif len(hosts) != originalHostLength:
                     print("  ... some domains were not valid so skipped them".format( len(hosts) ), file=sys.stderr )    
         
-                func(obj, hosts, hostIndex, returnList, arrayHostIndex=arrayHostIndex, debug=debug)
+                if progressTickHandler is not None:
+                    print("  ...", end="", file=sys.stderr)
+                func(obj, hosts, hostIndex, returnList, arrayHostIndex=arrayHostIndex, progressTickHandler=progressTickHandler, debug=debug)
+                
                 
 
         return returnList
 
-    def hostsNotCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+    def hostsNotCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
         
-        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
+
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False)
         
         if len(hosts) != len(returnToList) and len(returnToList) == 0:
@@ -189,9 +195,12 @@ class Fetch_DNS():
         if len(returnToList ) > 0:
             returnList.append(obj)
     
-    def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+    def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
         
-        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
+
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=True)
         
         if len(hosts) != len(returnToList) and len(returnToList) == 0:
@@ -215,9 +224,12 @@ class Fetch_DNS():
         if len(returnToList ) > 0:
             returnList.append(obj)
 
-    def configsWithCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+    def configsWithCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
-        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
+
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai" )
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -226,9 +238,12 @@ class Fetch_DNS():
         if dnsResults["anyAkamai"] :    
             returnList.append(obj)
 
-    def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+    def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
-        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
+
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai" )
 
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -237,9 +252,12 @@ class Fetch_DNS():
         if dnsResults["allAkamai"] :    
             returnList.append(obj)
 
-    def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+    def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
-        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
+
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False )
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -248,10 +266,14 @@ class Fetch_DNS():
         if not dnsResults["anyAkamai"] :    
             returnList.append(obj)
     
-    def configsAllNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+    def configsAllNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         filterText="NXDomain"
-        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
+        
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
+
         returnToList = self.filterHosts(dnsResults, filterText=filterText)
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
@@ -259,11 +281,15 @@ class Fetch_DNS():
         if dnsResults["allNXDomain"] :    
             returnList.append(obj)
 
-    def configsAnyNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, debug=False):
+    def configsAnyNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         filterText="NXDomain"
 
-        dnsResults = self.loadDNSfromHostList(hosts, debug=debug)
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
+            
         returnToList = self.filterHosts(dnsResults, filterText=filterText)
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
