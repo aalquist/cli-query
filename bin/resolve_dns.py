@@ -48,7 +48,7 @@ class Fetch_DNS():
         else:
             return False
 
-    def getDomainJson(self, domain, recoredType=None, debug=False):
+    def getDomainJson(self, domain, recoredType=None, debug=False, progressTickHandler=None):
 
         self.checkInvalidDNSChars(domain)
 
@@ -63,6 +63,9 @@ class Fetch_DNS():
             response = s.get(url)
 
         dnsResponse = response.json()
+
+        if progressTickHandler is not None:
+            progressTickHandler()
         
         if debug:
             print(json.dumps( dnsResponse, indent=1), file=sys.stderr )
@@ -91,9 +94,9 @@ class Fetch_DNS():
         else:
             return False
 
-    def compositeCheck(self, domainList, recoredType=None, debug=False):
+    def compositeCheck(self, domainList, recoredType=None, progressTickHandler=None, debug=False):
 
-        jsonMap = list(map(lambda domain : {"domain": domain, "dnsJson" : self.getDomainJson(domain, recoredType=recoredType, debug=debug) }, domainList ))
+        jsonMap = list(map(lambda domain : {"domain": domain, "dnsJson" : self.getDomainJson(domain, recoredType=recoredType, progressTickHandler=progressTickHandler, debug=debug) }, domainList ))
 
         def mapDomainMeta(jsonDict):
             jsonDict["isAkamai"] = self.checkSingleDNSDomainJson(jsonDict["dnsJson"], self.isAkamai)
@@ -300,8 +303,8 @@ class Fetch_DNS():
                 print("   ... {} {} were NXDomain {} {}".format(NXDomainListCount, hostsText, NXDomainList, truncatedHostsTrainingText), file=sys.stderr )
 
 
-    def loadDNSfromHostList(self, domainList, recoredType=None, debug=False):
-        hostCheck = self.compositeCheck(domainList, recoredType=recoredType, debug=debug)
+    def loadDNSfromHostList(self, domainList, recoredType=None, progressTickHandler=None, debug=False):
+        hostCheck = self.compositeCheck(domainList, recoredType=recoredType, progressTickHandler=progressTickHandler, debug=debug)
 
         isAkamai = list(map(lambda domain : domain["isAkamai"], hostCheck) )
         #isIPV6 = list(map(lambda domain : domain["isIPV6"], hostCheck) )
