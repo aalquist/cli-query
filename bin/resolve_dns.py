@@ -169,9 +169,6 @@ class Fetch_DNS():
     def hostsNotCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
         
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
-        if progressTickHandler is not None:
-            print(" done", file=sys.stderr)
-
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False)
         
         if len(hosts) != len(returnToList) and len(returnToList) == 0:
@@ -198,9 +195,6 @@ class Fetch_DNS():
     def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
         
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
-        if progressTickHandler is not None:
-            print(" done", file=sys.stderr)
-
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=True)
         
         if len(hosts) != len(returnToList) and len(returnToList) == 0:
@@ -227,9 +221,6 @@ class Fetch_DNS():
     def configsWithCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
-        if progressTickHandler is not None:
-            print(" done", file=sys.stderr)
-
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai" )
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -241,9 +232,6 @@ class Fetch_DNS():
     def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
-        if progressTickHandler is not None:
-            print(" done", file=sys.stderr)
-
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai" )
 
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
@@ -255,12 +243,9 @@ class Fetch_DNS():
     def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
-        if progressTickHandler is not None:
-            print(" done", file=sys.stderr)
-
         returnToList = self.filterHosts(dnsResults, filterText="isAkamai", checkResultTrue=False )
         
-        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
+        self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="non CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
         if False == dnsResults["anyAkamai"] :    
@@ -269,11 +254,7 @@ class Fetch_DNS():
     def configsAllNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         filterText="NXDomain"
-        
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
-        if progressTickHandler is not None:
-            print(" done", file=sys.stderr)
-
         returnToList = self.filterHosts(dnsResults, filterText=filterText)
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
@@ -284,7 +265,6 @@ class Fetch_DNS():
     def configsAnyNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
 
         filterText="NXDomain"
-
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
 
         if progressTickHandler is not None:
@@ -345,6 +325,9 @@ class Fetch_DNS():
             "allNXDomain" : all(NXDomain),
             "resolution" : hostCheck
         }
+
+        if progressTickHandler is not None:
+            print(" done", file=sys.stderr)
 
         return DNSInfo
 
