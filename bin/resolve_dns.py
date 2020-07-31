@@ -285,7 +285,7 @@ class Fetch_DNS():
             filterTypeName = " {} ".format(filterTypeName)
 
         if len(hosts) == 1:
-            print("  ... {} had {} host and found {}{}hosts".format( obj[0], len(hosts), len(returnToList), filterTypeName ), file=sys.stderr )
+            print("  ... {} had {} host and found {}{}host".format( obj[0], len(hosts), len(returnToList), filterTypeName ), file=sys.stderr )
         else:
             print("  ... {} had {} hosts and found {}{}hosts".format( obj[0], len(hosts), len(returnToList),filterTypeName ), file=sys.stderr )
 
