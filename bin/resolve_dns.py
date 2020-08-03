@@ -210,7 +210,7 @@ class Fetch_DNS():
 
         elif len(hosts) != len(returnToList):
             returnedHostTypeText = "Non-CNAMED"
-            print("  ... {} had {} hosts which were reduced to {} {} hosts".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+            print("  ... {} had {} hosts which were reduced to {} {} host(s)".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
             self.printNXDomainErrMsg(dnsResults)
 
         else:
