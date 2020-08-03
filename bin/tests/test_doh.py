@@ -879,6 +879,43 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
     
     @patch('requests.Session')
+    def testJsonParseNestedArrays_AnyAkamaiWithWeakMatch(self, mockSessionObj): 
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir)
+
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        jsonObjArray = list()
+       
+        fetchDNS = Fetch_DNS()
+
+        jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["*akamai3.alquist.nl", "akamai4.alquist.nl"]]' )
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.hostsCNAMED, arrayHostIndex=1)
+
+        self.assertEqual( 1, len(returnList) )
+        self.assertEqual("configname_ion4", returnList[0][0][0])
+        self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
+        self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
+    
+
+    @patch('requests.Session')
     def testJsonParseNestedArrays_All_Akamai(self, mockSessionObj): 
 
         session = mockSessionObj()
@@ -953,14 +990,24 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("configname_ion1", returnList[0][0])
         self.assertEqual("www.alquist.nl", returnList[0][1].split(",")[0])           
 
-
-    def testLookup(self):
+    def testWeakmatchConversion(self):
         fetchDNS = Fetch_DNS()
         valueCNAME = fetchDNS.lookupCode(5)
         self.assertEqual("CNAME", valueCNAME)
 
+
+    def testIsWeakHost(self):
+        fetchDNS = Fetch_DNS()
+        self.assertEqual(False, fetchDNS.isWeakHost("www.hostname.com"))
+        self.assertEqual(False, fetchDNS.isWeakHost("*.www.hostname.com"))
+        self.assertEqual(True, fetchDNS.isWeakHost("*www.hostname.com"))
+
+        self.assertEqual("www.hostname.com", fetchDNS.convertWeakMatchtoHost("*www.hostname.com"))
+        self.assertEqual("www.hostname.com", fetchDNS.convertWeakMatchtoHost("www.hostname.com"))
+        self.assertEqual("*.www.hostname.com", fetchDNS.convertWeakMatchtoHost("*.www.hostname.com"))
+
     @patch('requests.Session')
-    def test_MockDNSResponse(self, mockSessionObj):
+    def testMockDNSResponse(self, mockSessionObj):
         session = mockSessionObj()
         response = MockResponse()
 
@@ -977,12 +1024,10 @@ class Doh_Test(unittest.TestCase):
         response.headers = {}
         
         fetchDNS = Fetch_DNS()
-        result = fetchDNS.checkDNSMetadata(["www.alquist.nl", "www.akamai.com" ])
+        result = fetchDNS.loadDNSfromHostList(["www.alquist.nl", "www.akamai.com" ])
         
         self.assertTrue(result["anyAkamai"])
         self.assertFalse(result["allAkamai"])
-        self.assertFalse(result["allIPv6"])
-        self.assertTrue(result["anyIPv6"])
         self.assertFalse(result["anyNXDomain"])
 
         self.assertEqual("www.alquist.nl", result["resolution"][0]["domain"])
@@ -998,12 +1043,48 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual(False, result["resolution"][0]["isAkamai"])
         self.assertEqual(True, result["resolution"][1]["isAkamai"])
 
-        self.assertEqual(False, result["resolution"][0]["isIPV6"])
-        self.assertEqual(True, result["resolution"][1]["isIPV6"])
+        
+    @patch('requests.Session')
+    def testMockDNSResponseWithWeakMatch(self, mockSessionObj):
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/www.akamai.com_AAAA.json".format(self.basedir)
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+        
+        fetchDNS = Fetch_DNS()
+        result = fetchDNS.loadDNSfromHostList(["*www.alquist.nl", "www.akamai.com" ])
+        
+        self.assertTrue(result["anyAkamai"])
+        self.assertFalse(result["allAkamai"])
+        self.assertFalse(result["anyNXDomain"])
+
+        self.assertEqual("www.alquist.nl", result["resolution"][0]["domain"])
+        self.assertEqual("CNAME", result["resolution"][0]["dnsJson"]["Answer"][0]["typeName"])
+        self.assertEqual("A", result["resolution"][0]["dnsJson"]["Answer"][1]["typeName"])
+        
+        self.assertEqual("www.akamai.com", result["resolution"][1]["domain"])
+        self.assertEqual("CNAME", result["resolution"][1]["dnsJson"]["Answer"][0]["typeName"])
+        self.assertEqual("CNAME", result["resolution"][1]["dnsJson"]["Answer"][1]["typeName"])
+        self.assertEqual("CNAME", result["resolution"][1]["dnsJson"]["Answer"][2]["typeName"])
+        self.assertEqual("AAAA", result["resolution"][1]["dnsJson"]["Answer"][3]["typeName"])
+        
+        self.assertEqual(False, result["resolution"][0]["isAkamai"])
+        self.assertEqual(True, result["resolution"][1]["isAkamai"])
+
         
 
     @patch('requests.Session')
-    def test_MockDNSResponse(self, mockSessionObj):
+    def testMockDNSResponse(self, mockSessionObj):
         session = mockSessionObj()
         response = MockResponse()
 
@@ -1025,8 +1106,6 @@ class Doh_Test(unittest.TestCase):
         
         self.assertFalse(result["anyAkamai"])
         self.assertFalse(result["allAkamai"])
-        #self.assertFalse(result["allIPv6"])
-        #self.assertFalse(result["anyIPv6"])
         self.assertTrue(result["anyNXDomain"])
         
     

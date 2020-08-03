@@ -503,7 +503,7 @@ def checkhostdns(args):
         print(".", end= "", file=sys.stderr)
         sys.stderr.flush()
 
-    jsonObj = fetchDNS.loadDNSfromHostList(lines, recoredType=None, progressTickHandler=printStatus )
+    jsonObj = fetchDNS.loadDNSfromHostList(lines, recoredType=None, progressTickHandler=printStatus, convertWeakHosts=True )
     print("", file=sys.stderr)
 
     if "resolution" in jsonObj:
