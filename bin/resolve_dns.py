@@ -356,6 +356,9 @@ class Fetch_DNS():
         if convertWeakHosts:
             domainList = self.convertWeakHosts(domainList)
 
+        if skipWildcardDomains:
+            domainList = self.removeWildcardHosts(domainList)
+
         hostCheck = self.compositeCheck(domainList, recoredType=recoredType, progressTickHandler=progressTickHandler, debug=debug)
 
         isAkamai = list(map(lambda domain : domain["isAkamai"], hostCheck) )
