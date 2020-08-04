@@ -271,7 +271,7 @@ class Fetch_DNS():
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
-        if dnsResults["anyAkamai"] :    
+        if len(hosts) > 0 and dnsResults["anyAkamai"] :    
             returnList.append(obj)
 
     def configsFullyCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
@@ -282,7 +282,7 @@ class Fetch_DNS():
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
-        if dnsResults["allAkamai"] :    
+        if len(hosts) > 0 and dnsResults["allAkamai"] :    
             returnList.append(obj)
 
     def configsWithoutCNAME(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
@@ -293,7 +293,7 @@ class Fetch_DNS():
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName="non-CNAME")
         self.printNXDomainErrMsg(dnsResults)
 
-        if False == dnsResults["anyAkamai"] :    
+        if len(hosts) > 0 and False == dnsResults["anyAkamai"] :    
             returnList.append(obj)
     
     def configsAllNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
@@ -304,7 +304,7 @@ class Fetch_DNS():
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
 
-        if dnsResults["allNXDomain"] :    
+        if len(hosts) > 0 and dnsResults["allNXDomain"] :    
             returnList.append(obj)
 
     def configsAnyNXDomain(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
@@ -316,7 +316,7 @@ class Fetch_DNS():
         
         self.printFilterStatusMsg(obj,hosts,returnToList,filterTypeName=filterText)
 
-        if dnsResults["anyNXDomain"] :    
+        if len(hosts) > 0 and dnsResults["anyNXDomain"] :    
             returnList.append(obj)
 
     def printFilterStatusMsg(self, obj, hosts, returnToList, filterTypeName=None):

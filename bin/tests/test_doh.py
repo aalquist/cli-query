@@ -279,6 +279,42 @@ class Doh_Test(unittest.TestCase):
 
     @patch('requests.Session')
     @patch('bin.parse_commands.getArgFromSTDIN')
+    def testCommandLine_checkjsondns_hostsNotCNAMED_SkipWildcards(self, getArgFromSTDIN, mockSessionObj):
+
+        stdin = []
+        stdin.append('["property_1", "*.www.alquist.nl"]')
+        stdin.append('["property_2", "akamai1.alquist.nl,akamai2.alquist.nl"]')
+
+        getArgFromSTDIN.return_value = "\n".join(stdin)
+
+        session = mockSessionObj()
+        response = MockResponse()
+        response.reset()
+
+        dnsResponses = [
+            
+            "{}/json/doh/akamai1.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai2.alquist.nl_A.json".format(self.basedir)
+            
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        args = [ "checkjsondns", "hostsNotCNAMED", "--skip-wildcards"]
+
+        commandTester = CommandTester(self)
+        stdOutResultArray = commandTester.wrapSuccessCommandStdOutOnly(func=main, args=args,assertMinStdOutLines=0)
+        
+        self.assertEquals( len(stdOutResultArray), 0 )
+
+
+    @patch('requests.Session')
+    @patch('bin.parse_commands.getArgFromSTDIN')
     def testCommandLine_checkjsondns_hostsNotCNAMED(self, getArgFromSTDIN, mockSessionObj):
 
         stdin = []
@@ -948,6 +984,7 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual( 1, len(returnList) )
         self.assertEqual("configname_ion4", returnList[0][0][0])
         self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
+    
         
 
     @patch('requests.Session')
@@ -986,6 +1023,36 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("configname_ion4", returnList[0][0][0])
         self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
         self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir),
+
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/akamai4.alquist.nl_A.json".format(self.basedir)
+
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        jsonObjArray = list()
+       
+        fetchDNS = Fetch_DNS()
+
+        jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["*.akamai4.alquist.nl"]]' )
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.hostsCNAMED, arrayHostIndex=1, skipWildcardDomains=True)
+
+        self.assertEqual( 0, len(returnList) )
 
     @patch('requests.Session')
     def testJsonParseArray(self, mockSessionObj):
