@@ -27,13 +27,13 @@ akamai install https://github.com/aalquist/cli-query
 
 ``` 
 usage: akamai query help [command]
-                                   {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate,checkjsondns,checkdnshost}
+                                   {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate,checkjsondns,checkhostdns}
                                    ...
 
 Akamai Query CLI
 
 positional arguments:
-  {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate,checkjsondns,checkdnshost}
+  {help,version,ldslist,netstoragelist,netstorageuser,datastream_agg,datastream_raw,groupcpcodelist,filtertemplate,bulksearch,bulksearchtemplate,checkjsondns,checkhostdns}
                         commands
     help                Show available help
     version             display the version number
@@ -47,7 +47,7 @@ positional arguments:
     bulksearch          bulk search property manager configurations
     bulksearchtemplate  prints a bulksearch template
     checkjsondns        dns filtering tool for json objects
-    checkdnshost        dns filtering tool
+    checkhostdns        dns filtering tool
 
 ``` 
 ## Querying Log Delivery Service (LDS)
@@ -242,7 +242,7 @@ optional arguments:
   --contractId CONTRACTID
                         limit the bulk search scope to a specific contract
   --network NETWORK     filter the bulk search result to a specific network
-                        (staging or production)
+                        (staging, production, all)
   --use-searchstdin     get bulksearch json from stdin
   --searchfile SEARCHFILE
                         get bulksearch from json file
