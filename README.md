@@ -651,3 +651,97 @@ Both Output:
 
 ```
 
+### DNS Validation with Bulk Search
+
+JSON Array parsing tool to extract hostnames and filter output by DNS status
+
+``` 
+akamai query help checkjsondns 
+
+usage: akamai query checkjsondns [--show-json] [--dns-index DNS_INDEX]
+                                 [--skip-wildcards] [--edgerc EDGERC]
+                                 [--section SECTION] [--debug]
+                                 [--account-key ACCOUNT_KEY]
+                                 dns_filter
+
+optional arguments:
+  --show-json           output json
+  --dns-index DNS_INDEX
+                        zero based index where hostname lookup should be
+                        performed
+  --skip-wildcards      Ignore wildcard domains: *.example.com
+  dns_filter            choose configsWithCNAME, configsFullyCNAMED,
+                        configsWithoutCNAME, hostsCNAMED, hostsNotCNAMED,
+                        configsAllNXDomain, configsAnyNXDomain
+  --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
+  --section SECTION     Section of the credentials file
+                        [$AKAMAI_EDGERC_SECTION]
+  --debug               DEBUG mode to generate additional logs for
+                        troubleshooting
+  --account-key ACCOUNT_KEY
+                        Account Switch Key
+
+``` 
+Access underlying DNS-over-HTTP API used by checkjsondns
+
+``` 
+akamai query help checkhostdns 
+
+usage: akamai query checkhostdns [--show-json] [--skip-wildcards]
+                                 [--edgerc EDGERC] [--section SECTION]
+                                 [--debug] [--account-key ACCOUNT_KEY]
+                                 [domain [domain ...]]
+
+optional arguments:
+  --show-json           output json
+  --skip-wildcards      Ignore wildcard domains: *.example.com
+  domain                a list of domains
+  --edgerc EDGERC       Location of the credentials file [$AKAMAI_EDGERC]
+  --section SECTION     Section of the credentials file
+                        [$AKAMAI_EDGERC_SECTION]
+  --debug               DEBUG mode to generate additional logs for
+                        troubleshooting
+  --account-key ACCOUNT_KEY
+                        Account Switch Key
+
+``` 
+### Pairing Bulk Search and DNS Validation
+Here are a few examples how you can pair bulk search and dns
+
+
+Pipe bulk search results with their hostnames to checkjsondns which will filter search results with a modified set of hosts that are CNAMEd to Akamai
+
+```
+akamai query bulksearch --filtername property-hostnames.json | akamai query checkjsondns hostsCNAMED 
+
+```
+
+Output of configurations and their CNAMED hosts:
+
+```
+["configuration_1", "hostname1-cnamed.akamai.com,hostname2-cnamed.akamai.com"]
+["configuration_2", "hostname3-cnamed.akamai.com"]
+
+
+```
+
+
+Pipe bulk search results with their hostnames to checkjsondns which will filter search results with a modified set of configurations that have at least one host CNAMED to Akamai
+
+```
+akamai query bulksearch --filtername property-hostnames.json | akamai query checkjsondns configsWithCNAME 
+
+```
+
+
+Output of configurations with at least one host CNAMEd to Akamai
+
+```
+["configuration_1", "hostname1-cnamed.akamai.com,hostname2-cnamed.akamai.com"]
+["configuration_2", "hostname3-cnamed.akamai.com, hostname4-notcnamed.akamai.com"]
+
+
+```
+
+
+
