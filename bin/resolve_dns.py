@@ -188,7 +188,12 @@ class Fetch_DNS():
                     hosts = self.convertWeakHosts(hosts)
 
                 if skipWildcardDomains:
+                    priorHostCount = len(hosts)
                     hosts = self.removeWildcardHosts(hosts)
+
+                    if len(hosts) < priorHostCount and func == self.configsWithoutCNAME:
+                        print("  ... wildcard found with configsWithoutCNAME filter so skipping entire configuration", file=sys.stderr )    
+                        continue
 
                 if progressTickHandler is not None:
                     print("  ...", end="", file=sys.stderr)

@@ -951,7 +951,7 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual("akamai4.alquist.nl", returnList[0][1][1])
     
     @patch('requests.Session')
-    def testJsonParseNestedArrays_AnyAkamaiWithWildcards(self, mockSessionObj): 
+    def testJsonParseNestedArrays_WithWildcards(self, mockSessionObj): 
 
         session = mockSessionObj()
         response = MockResponse()
@@ -984,6 +984,39 @@ class Doh_Test(unittest.TestCase):
         self.assertEqual( 1, len(returnList) )
         self.assertEqual("configname_ion4", returnList[0][0][0])
         self.assertEqual("akamai3.alquist.nl", returnList[0][1][0])
+
+        session = mockSessionObj()
+        response = MockResponse()
+
+        dnsResponses = [
+            "{}/json/doh/www.alquist.nl_AAAA.json".format(self.basedir),
+
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir),
+
+            "{}/json/doh/akamai3.alquist.nl_A.json".format(self.basedir),
+            "{}/json/doh/notfound.alquist.nl_NXDomain.json".format(self.basedir)
+            
+        ]   
+
+        for mockJson in dnsResponses:
+            response.appendResponse(response.getJSONFromFile(mockJson))
+
+        session.get.return_value = response
+        response.status_code = 200
+        response.headers = {}
+
+        jsonObjArray = list()
+       
+        fetchDNS = Fetch_DNS()
+
+        jsonObjArray.append(' [["configname_ion3"], ["www.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion4"], ["notfound.alquist.nl", "*.akamai4.alquist.nl"]]' )
+        jsonObjArray.append(' [["configname_ion5"], ["akamai3.alquist.nl", "*.akamai4.alquist.nl"]]' )
+        returnList = fetchDNS.filterDNSInput(jsonObjArray, fetchDNS.configsWithoutCNAME, arrayHostIndex=1, skipWildcardDomains=True)
+
+        self.assertEqual( 1, len(returnList) )
+        self.assertEqual("configname_ion3", returnList[0][0][0])
+        self.assertEqual("www.alquist.nl", returnList[0][1][0])
     
         
 
