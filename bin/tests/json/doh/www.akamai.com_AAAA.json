@@ -1,0 +1,47 @@
+{
+  "Status": 0,
+  "TC": false,
+  "RD": true,
+  "RA": true,
+  "AD": false,
+  "CD": false,
+  "Question": [
+    {
+      "name": "www.akamai.com.",
+      "type": 28
+    }
+  ],
+  "Answer": [
+    {
+      "name": "www.akamai.com.",
+      "type": 5,
+      "TTL": 269,
+      "data": "www.akamai.com.edgekey.net."
+    },
+    {
+      "name": "www.akamai.com.edgekey.net.",
+      "type": 5,
+      "TTL": 12162,
+      "data": "www.akamai.com.edgekey.net.globalredir.akadns.net."
+    },
+    {
+      "name": "www.akamai.com.edgekey.net.globalredir.akadns.net.",
+      "type": 5,
+      "TTL": 3599,
+      "data": "e1699.dscx.akamaiedge.net."
+    },
+    {
+      "name": "e1699.dscx.akamaiedge.net.",
+      "type": 28,
+      "TTL": 19,
+      "data": "2600:141b:800:29d::6a3"
+    },
+    {
+      "name": "e1699.dscx.akamaiedge.net.",
+      "type": 28,
+      "TTL": 19,
+      "data": "2600:141b:800:2b6::6a3"
+    }
+  ],
+  "Comment": "Response from 72.247.37.50."
+}

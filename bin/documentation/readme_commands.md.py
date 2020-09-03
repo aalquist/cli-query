@@ -156,6 +156,23 @@ class GenerateReadMeCommands():
 
         print(self.readFile(os.path.join(SCRIPT_DIR, "bulk-search-examples.md")) )
 
+        print("### DNS Validation with Bulk Search")
+        print()
+
+        print("JSON Array parsing tool to extract hostnames and filter output by DNS status")
+        args = ["help", "checkjsondns"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()}"
+        self.printHelpTest(result)
+
+        print("Access underlying DNS-over-HTTP API used by checkjsondns")
+        args = ["help", "checkhostdns"]
+        result, _ = self.redirectOutputToArray(lambda args : main(args) , args, False)
+        result = f"{akamaiCMD} {' '.join(args)} \n\n{result.getvalue()}"
+        self.printHelpTest(result)
+
+        print(self.readFile(os.path.join(SCRIPT_DIR, "bulk-search-dns-examples.md")) )
+
 
     def printHelpTest(self, value):
         print()

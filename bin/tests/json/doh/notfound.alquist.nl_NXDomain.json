@@ -1,0 +1,23 @@
+{
+ "Status": 3,
+ "TC": false,
+ "RD": true,
+ "RA": true,
+ "AD": false,
+ "CD": false,
+ "Question": [
+  {
+   "name": "notfound.alquist.nl.",
+   "type": 28
+  }
+ ],
+ "Authority": [
+  {
+   "name": "alquist.nl.",
+   "type": 6,
+   "TTL": 899,
+   "data": "ns-1658.awsdns-15.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 1200"
+  }
+ ],
+ "Comment": "Response from 2600:9000:5301:d300::1."
+}

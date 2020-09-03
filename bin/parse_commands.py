@@ -31,6 +31,8 @@ from bin.query_result import QueryResult
 
 from bin.send_analytics import Analytics 
 
+from bin.resolve_dns import Fetch_DNS
+
 import inspect
 
 
@@ -39,8 +41,10 @@ import json
 PACKAGE_VERSION = "0.0.1"
 
 class MyArgumentParser(argparse.ArgumentParser):
+
     def error(self, message):
         self.print_help(sys.stderr)
+        thing = self._get_args
         self.exit(0, '%s: error: %s\n' % (self.prog, message))
 
 def get_prog_name():
@@ -59,9 +63,13 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
         for arg in required_arguments:
             name = arg["name"]
             del arg["name"]
-            required.add_argument("--" + name,
-                                  required=True,
-                                  **arg)
+
+            if "positional" in arg and arg["positional"] == True:
+                positional = arg["positional"]
+                del arg["positional"]
+                required.add_argument(name, **arg)
+            else:
+                required.add_argument("--" + name, required=True, **arg)
 
     optional = action.add_argument_group("optional arguments")
 
@@ -71,7 +79,7 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             name = arg["name"]
             del arg["name"]
 
-            if name.startswith("skip-") or name.startswith("skip_") or name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or ("-use-" in name ) or ("_use_" in name ):
+            if name.startswith("require-") or name.startswith("require_") or name.startswith("skip-") or name.startswith("skip_") or name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or name.startswith("is-") or name.startswith("is_") or ("-use-" in name ) or ("_use_" in name ) or ("-is-" in name ) or ("_is_" in name ):
                 
                 #enable boolean/flags
                 optional.add_argument(
@@ -90,7 +98,13 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
 
             else:
 
-                optional.add_argument("--" + name,
+                if "positional" in arg and arg["positional"] == True:
+                    positional = arg["positional"]
+                    del arg["positional"]
+                    optional.add_argument(name, **arg)
+
+                else:
+                    optional.add_argument("--" + name,
                                       required=False,
                                       **arg)
 
@@ -210,6 +224,10 @@ def setupCommands(subparsers):
 
     actions = {}
 
+    basicQueryArgs = [ 
+                            {"name": "show-json", "help": "output json"}
+                     ]
+
     defaultQueryArgs = [ 
                             {"name": "show-json", "help": "output json"},
                             {"name": "use-filterstdin", "help": "use stdin for query"},
@@ -280,7 +298,7 @@ def setupCommands(subparsers):
         subparsers, "bulksearch", "bulk search property manager configurations",
         optional_arguments=combineArgs(bulkSearchQueryArgs, [
                                                             {"name": "contractId", "help": "limit the bulk search scope to a specific contract"},
-                                                            {"name": "network", "help": "filter the bulk search result to a specific network (staging or production)"},
+                                                            {"name": "network", "default" : "Production", "help": "filter the bulk search result to a specific network (staging, production, all)"},
                                                             {"name": "use-searchstdin", "help": "get bulksearch json from stdin"}, 
                                                             {"name": "searchfile", "help": "get bulksearch from json file"}, 
                                                             {"name": "searchname", "help": "get bulksearch by name"}, 
@@ -301,6 +319,24 @@ def setupCommands(subparsers):
         required_arguments=None,
         actions=actions)
 
+    create_sub_command(
+        subparsers, "checkjsondns", "dns filtering tool for json objects",
+
+        optional_arguments=combineArgs(basicQueryArgs, [ 
+                {"name": "dns-index", "help": "zero based index where hostname lookup should be performed", "default" : 1},
+                {"name": "skip-wildcards", "help": "Ignore wildcard domains: *.example.com", "default" : False},
+                {"name": "dns_filter", "help": "choose configsWithCNAME, configsFullyCNAMED, configsWithoutCNAME, hostsCNAMED, hostsNotCNAMED, configsAllNXDomain, configsAnyNXDomain", "positional" : True}]),
+        required_arguments=None,
+        actions=actions)
+
+    create_sub_command(
+        subparsers, "checkhostdns", "dns filtering tool",
+        
+        optional_arguments=combineArgs(basicQueryArgs, [ 
+                {"name": "skip-wildcards", "help": "Ignore wildcard domains: *.example.com", "default" : False},
+                {"name": "domain", "help": "a list of domains", "positional" : True, "nargs" : '*'}]),
+        required_arguments=None,
+        actions=actions)
     
 
     return actions
@@ -338,6 +374,147 @@ def bulksearchtemplate(args):
     print( json.dumps(obj,indent=1) )
     thread.join()
     return return_value
+
+def checkjsondns(args):
+
+    configFilters = [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME", "configsAllNXDomain", "configsAnyNXDomain"]
+    hostFilters = [ "hostsCNAMED", "hostsNotCNAMED" ]
+    
+    filterbychoices = []
+    filterbychoices.extend(configFilters)
+    filterbychoices.extend(hostFilters)
+    
+    if args.dns_filter not in filterbychoices:
+        print("... filterby positional arg must be one of {}...".format(filterbychoices), file=sys.stderr )
+        return 1
+    
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
+
+    print("... waiting for json docs from stdin...", file=sys.stderr )
+    stdinStr = getArgFromSTDIN()
+    print("... got list from user input...", file=sys.stderr )
+    stdinStr = str.rstrip(stdinStr)
+    lines = stdinStr.split(os.linesep)
+
+    print("... accepting JSON input and skipping any template output", file=sys.stderr )
+    
+    try:
+        args.dns_index = int(args.dns_index)
+
+    except ValueError:
+        print("... domain index must be an int {}".format(args.dns_index), file=sys.stderr )
+        return 1
+    
+    def printStatus():
+        print(".", end= "", file=sys.stderr)
+        sys.stderr.flush()
+
+    fetchDNS = Fetch_DNS()
+
+    if args.dns_filter == "hostsNotCNAMED":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsNotCNAMED, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards,  progressTickHandler=printStatus)
+    
+    elif args.dns_filter == "hostsCNAMED":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsCNAMED, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
+
+    elif args.dns_filter == "configsWithCNAME":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithCNAME, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
+    
+    elif args.dns_filter == "configsWithoutCNAME":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsWithoutCNAME, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
+
+    elif args.dns_filter == "configsFullyCNAMED":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsFullyCNAME, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
+    
+    elif args.dns_filter == "configsAllNXDomain":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAllNXDomain, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
+    
+    elif args.dns_filter == "configsAnyNXDomain":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAnyNXDomain, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
+
+    else:
+        print("Error filterby mapping not setup. Got: {}".format(args.filterby), file=sys.stderr)
+        thread.join()
+        return 1
+    
+    printResponse(jsonObj,JSONOutput=True)
+    thread.join()
+    return 0   
+
+def checkhostdns(args):
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
+
+    queryresult = QueryResult("doh")
+    
+    
+
+    if args.domain is None or len(args.domain) < 1:
+        print("... waiting for domain list or json docs from stdin...", file=sys.stderr )
+        stdinStr = getArgFromSTDIN()
+        print("... got list from user input...", file=sys.stderr )
+        stdinStr = str.rstrip(stdinStr)
+        lines = stdinStr.split(os.linesep)
+
+    else:
+        lines = args.domain
+
+
+    checkFilterArgs(args, queryresult)
+
+    updatedLines = None
+    for dns in lines:
+        split = [" ", ","]
+        splitCharFound = [e for e in split if e in dns]
+
+        if len(splitCharFound) > 0:
+
+            if updatedLines is None:
+                updatedLines = list()
+
+            for split in splitCharFound:
+
+                
+                newDns = str.strip(dns)
+                updatedLines.extend( newDns.split(split) ) 
+        else:
+            if updatedLines is None:
+                updatedLines = list()
+                
+            updatedLines.append(dns)
+
+
+    if updatedLines is not None:
+        lines = updatedLines
+
+    fetchDNS = Fetch_DNS()
+
+    if args.debug:
+        print(" ... debug: domain list: {}".format( lines ), file=sys.stderr )
+
+    if len(lines) > 1:
+        print(" ... querying {} domains ".format( len(lines) ), file=sys.stderr, end= "" )
+        sys.stderr.flush()
+
+    elif len(lines) == 1:
+        print(" ... querying {} domain ".format( len(lines) ), file=sys.stderr, end= "" )
+        sys.stderr.flush()
+
+    def printStatus():
+        print(".", end= "", file=sys.stderr)
+        sys.stderr.flush()
+
+    jsonObj = fetchDNS.loadDNSfromHostList(lines, recoredType=None, progressTickHandler=printStatus, skipWildcardDomains=args.skip_wildcards )
+    print("", file=sys.stderr)
+
+    if "resolution" in jsonObj:
+        jsonObj= jsonObj["resolution"]
+        thread.join()
+        return handleresponse(args, jsonObj, queryresult, enableSTDIN=False, RequireAll=False, Debug=args.debug)
+    else:
+        print("... something went wrong with response", file=sys.stderr )
+        return 1
 
 
 def filtertemplate(args):
@@ -387,6 +564,8 @@ def filtertemplate(args):
 
     thread.join()
     return return_value
+
+
 
 def version(args):
     
@@ -524,6 +703,10 @@ def bulksearch(args):
 
     checkFilterArgs(args, queryresult)
 
+
+    if args.network is not None and ( not args.network.startswith("p") and not args.network.startswith("P") and not args.network.startswith("s") and not args.network.startswith("S") ) :
+        args.network = None
+
     (_ , jsonObj) = fetch.bulksearch(edgerc = args.edgerc, section=args.section, account_key=args.account_key, postdata=postdata, contractId=args.contractId, network=args.network, debug=args.debug)  
 
     thread.join()
@@ -654,18 +837,22 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
             
             parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
 
-        for line in parsed:
-
-            if notJSONOutput:
-                print( line )
-            else:
-                print( json.dumps(line) )
+        printResponse(parsed, JSONOutput=(not notJSONOutput))
 
     else: 
         print( json.dumps( jsonObj, indent=1 ) )
 
 
     return 0   
+
+def printResponse(parsed, JSONOutput=False):
+    
+    for line in parsed:
+
+        if not JSONOutput:
+            print( line )
+        else:
+            print( json.dumps(line) )
 
 def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCSV=True, Debug=False):
 

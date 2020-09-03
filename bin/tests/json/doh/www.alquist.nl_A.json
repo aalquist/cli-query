@@ -1,0 +1,47 @@
+{
+    "Status": 0,
+    "TC": false,
+    "RD": true,
+    "RA": true,
+    "AD": false,
+    "CD": false,
+    "Question": [
+      {
+        "name": "www.alquist.nl.",
+        "type": 1
+      }
+    ],
+    "Answer": [
+      {
+        "name": "www.alquist.nl.",
+        "type": 5,
+        "TTL": 299,
+        "data": "d2c99t9e0sxfl6.cloudfront.net."
+      },
+      {
+        "name": "d2c99t9e0sxfl6.cloudfront.net.",
+        "type": 1,
+        "TTL": 59,
+        "data": "13.226.138.20"
+      },
+      {
+        "name": "d2c99t9e0sxfl6.cloudfront.net.",
+        "type": 1,
+        "TTL": 59,
+        "data": "13.226.138.9"
+      },
+      {
+        "name": "d2c99t9e0sxfl6.cloudfront.net.",
+        "type": 1,
+        "TTL": 59,
+        "data": "13.226.138.31"
+      },
+      {
+        "name": "d2c99t9e0sxfl6.cloudfront.net.",
+        "type": 1,
+        "TTL": 59,
+        "data": "13.226.138.126"
+      }
+    ],
+    "Comment": "Response from 205.251.194.167."
+  }
