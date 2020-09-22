@@ -79,7 +79,6 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
             offsetEnd = end - offset
             
             start = offsetEnd - delta
-            print("UTC Start: {} UTC End: {}".format(start, offsetEnd), file=sys.stderr )
             return (self.formatDatetoString(start), self.formatDatetoString(offsetEnd) )
 
     def buildStreamUrl(self, context, *, streamId=None, logType="raw", timerange=None, offsetMinutes=1):
