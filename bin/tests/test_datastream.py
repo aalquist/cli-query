@@ -164,25 +164,25 @@ class DataStream_Test(unittest.TestCase):
         delta_2m = timedelta(minutes=2)
         delta_2h = timedelta(hours=2)
         
-        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd)
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, offsetMinutes=0)
         self.assertEqual(currentEndStr, resultingEnd )
         expectedStart = currentEnd - delta_2m
         expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
         self.assertEqual(expectedStartStr, start )
 
-        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2m")
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2m", offsetMinutes=0)
         self.assertEqual(currentEndStr, resultingEnd )
         expectedStart = currentEnd - delta_2m
         expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
         self.assertEqual(expectedStartStr, start )
 
-        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2s")
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2s", offsetMinutes=0)
         self.assertEqual(currentEndStr, resultingEnd )
         expectedStart = currentEnd - delta_2s
         expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
         self.assertEqual(expectedStartStr, start )
 
-        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2h")
+        (start, resultingEnd) = dataStreamFetch.parseRange(currentEnd, "2h", offsetMinutes=0)
         self.assertEqual(currentEndStr, resultingEnd )
         expectedStart = currentEnd - delta_2h
         expectedStartStr = dataStreamFetch.formatDatetoString(expectedStart)
@@ -190,7 +190,7 @@ class DataStream_Test(unittest.TestCase):
 
         end = '2019-10-17T19:45:10Z'
         endDateObj = dataStreamFetch.createDatefromString(end)
-        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2h")
+        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2h", offsetMinutes=0)
         self.assertEqual(end, new_end)
 
         expectedStart = endDateObj - delta_2h
@@ -199,11 +199,11 @@ class DataStream_Test(unittest.TestCase):
 
         end = '2019-10-17T19:45:10Z'
         endDateObj = dataStreamFetch.createDatefromString(end)
-        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2s")
+        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2s", offsetMinutes=0)
         self.assertEqual(end, new_end)
 
         end = '2019-10-17T19:45:10Z'
-        (new_start, new_end) = dataStreamFetch.parseRange(end, "2s")
+        (new_start, new_end) = dataStreamFetch.parseRange(end, "2s", offsetMinutes=0)
         self.assertEqual(end, new_end)
 
         expectedStart = endDateObj - delta_2s
@@ -212,7 +212,7 @@ class DataStream_Test(unittest.TestCase):
 
         end = '2019-10-17T19:45:10Z'
         endDateObj = dataStreamFetch.createDatefromString(end)
-        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2m")
+        (new_start, new_end) = dataStreamFetch.parseRange(endDateObj, "2m", offsetMinutes=0)
         self.assertEqual(end, new_end)
 
         expectedStart = endDateObj - delta_2m

@@ -51,7 +51,7 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
         return utcDatefromString(start)
         
 
-    def parseRange(self, end=None, timerange="2m"):
+    def parseRange(self, end=None, timerange="2m", offsetMinutes=1):
         regex = r"(\d+)([msh])"
         matches = re.search(regex, timerange, re.IGNORECASE | re.DOTALL)
 
@@ -75,12 +75,14 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
             elif not isinstance(end, datetime.date) :
                 end = self.createDatefromString(end)
 
-            start = end - delta
+            offset = timedelta(minutes=offsetMinutes)
+            offsetEnd = end - offset
             
-            return (self.formatDatetoString(start), self.formatDatetoString(end) )
-            
+            start = offsetEnd - delta
+            print("UTC Start: {} UTC End: {}".format(start, offsetEnd), file=sys.stderr )
+            return (self.formatDatetoString(start), self.formatDatetoString(offsetEnd) )
 
-    def buildStreamUrl(self, context, *, streamId=None, logType="raw", timerange=None):
+    def buildStreamUrl(self, context, *, streamId=None, logType="raw", timerange=None, offsetMinutes=1):
         
         if streamId is None:
             raise ValueError("streamId is required")
@@ -92,10 +94,10 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.buildUrl("https://{}/datastream-pull-api/v1/streams/{}/{}-logs", context, streamId, logType)
 
         if timerange is None:
-            (startTime, endTime) = self.parseRange()
+            (startTime, endTime) = self.parseRange(offsetMinutes=offsetMinutes)
 
         else:
-            (startTime, endTime) = self.parseRange(timerange=timerange)
+            (startTime, endTime) = self.parseRange(timerange=timerange, offsetMinutes=offsetMinutes)
 
         queryArgs = [("start", startTime), ("end", endTime)]
 
@@ -116,12 +118,12 @@ class DataStreamFetch(Fetch_Akamai_OPENAPI_Response):
         returnedList = sorted(returnedList, key=lambda x : x[sortBy] )
         return returnedList
 
-    def fetchLogs(self, *, edgerc, section, streamId=None, startTime=None, timeRange=None, logType="raw", debug=False):
+    def fetchLogs(self, *, edgerc, section, streamId=None, startTime=None, timeRange=None, logType="raw", offsetMinutes=1, debug=False):
 
         factory = CredentialFactory()
         context = factory.load(edgerc, section, None)
         
-        url = self.buildStreamUrl(context, streamId=streamId, logType=logType, timerange=timeRange)
+        url = self.buildStreamUrl(context, streamId=streamId, logType=logType, timerange=timeRange, offsetMinutes=offsetMinutes)
         
         if debug:
             print(" ... Getting Url: {}".format(url), file=sys.stderr )

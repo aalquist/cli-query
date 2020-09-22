@@ -266,14 +266,14 @@ def setupCommands(subparsers):
     
     create_sub_command(
         subparsers, "datastream_agg", "Get aggregate datastream logs",
-        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Supported format: \d+[smh]. Eg: 2s, 2m, 2h"} ]),
+        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Supported format: \d+[smh]. Eg: 2s, 2m, 2h"}, {"name": "offset", "default" : 1, "help": "offset starting time in minutes"} ]),
         required_arguments=None,
         disableAccountSwitch=True,
         actions=actions)
 
     create_sub_command(
         subparsers, "datastream_raw", "Get raw datastream raw logs",
-        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Supported format: \d+[smh]. Eg: 2s, 2m, 2h"} ]),
+        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "streamId", "help": "Stream ID"}, {"name": "timeRange", "help": "Supported format: \d+[smh]. Eg: 2s, 2m, 2h"}, {"name": "offset", "default" : 1, "help": "offset starting time in minutes"} ]),
         required_arguments=None,
         disableAccountSwitch=True,
         actions=actions)
@@ -643,7 +643,7 @@ def datastream_agg(args):
     logType="aggregate"
 
     checkFilterArgs(args, queryresult)
-    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
+    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, offsetMinutes=args.offset, debug=args.debug)  
 
     thread.join()
     return handleresponse(args, jsonObj, queryresult, RequireAll=False, HideHeader=True, Debug=args.debug)
@@ -659,7 +659,7 @@ def datastream_raw(args):
     logType="raw"
 
     checkFilterArgs(args, queryresult)
-    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, debug=args.debug)  
+    (_ , jsonObj) = fetch.fetchLogs(edgerc = args.edgerc, section=args.section, streamId=args.streamId, timeRange=args.timeRange, logType=logType, offsetMinutes=args.offset, debug=args.debug)  
 
     thread.join()
     return handleresponse(args, jsonObj, queryresult, RequireAll=False, HideHeader=True,  Debug=args.debug)
