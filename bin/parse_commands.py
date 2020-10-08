@@ -325,7 +325,7 @@ def setupCommands(subparsers):
         optional_arguments=combineArgs(basicQueryArgs, [ 
                 {"name": "dns-index", "help": "zero based index where hostname lookup should be performed", "default" : 1},
                 {"name": "skip-wildcards", "help": "Ignore wildcard domains: *.example.com", "default" : False},
-                {"name": "dns_filter", "help": "choose configsWithCNAME, configsFullyCNAMED, configsWithoutCNAME, hostsCNAMED, hostsNotCNAMED, configsAllNXDomain, configsAnyNXDomain", "positional" : True}]),
+                {"name": "dns_filter", "help": "choose configsWithCNAME, configsFullyCNAMED, configsWithoutCNAME, hostsCNAMED, hostsNotCNAMED, hostsNXDOMAIN, configsAllNXDomain, configsAnyNXDomain", "positional" : True}]),
         required_arguments=None,
         actions=actions)
 
@@ -378,7 +378,7 @@ def bulksearchtemplate(args):
 def checkjsondns(args):
 
     configFilters = [ "configsWithCNAME", "configsFullyCNAMED", "configsWithoutCNAME", "configsAllNXDomain", "configsAnyNXDomain"]
-    hostFilters = [ "hostsCNAMED", "hostsNotCNAMED" ]
+    hostFilters = [ "hostsNXDOMAIN", "hostsCNAMED", "hostsNotCNAMED" ]
     
     filterbychoices = []
     filterbychoices.extend(configFilters)
@@ -415,6 +415,9 @@ def checkjsondns(args):
     if args.dns_filter == "hostsNotCNAMED":
         jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsNotCNAMED, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards,  progressTickHandler=printStatus)
     
+    elif args.dns_filter == "hostsNXDOMAIN":
+        jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsNXDOMAIN, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards,  progressTickHandler=printStatus)
+    
     elif args.dns_filter == "hostsCNAMED":
         jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.hostsCNAMED, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
 
@@ -434,7 +437,7 @@ def checkjsondns(args):
         jsonObj = fetchDNS.filterDNSInput(lines, fetchDNS.configsAnyNXDomain, arrayHostIndex=args.dns_index, skipWildcardDomains=args.skip_wildcards, progressTickHandler=printStatus)
 
     else:
-        print("Error filterby mapping not setup. Got: {}".format(args.filterby), file=sys.stderr)
+        print("Error filterby mapping not setup. Got: {}".format(args.dns_filter), file=sys.stderr)
         thread.join()
         return 1
     

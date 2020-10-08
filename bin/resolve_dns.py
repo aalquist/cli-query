@@ -242,6 +242,34 @@ class Fetch_DNS():
         if len(returnToList ) > 0:
             returnList.append(obj)
     
+    def hostsNXDOMAIN(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
+        
+        filterText="NXDomain"
+        dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
+        #returnToList = self.filterHosts(dnsResults, filterText=filterText, checkResultTrue=False)
+        returnToList = self.filterHosts(dnsResults, filterText=filterText)
+        
+        if len(hosts) != len(returnToList) and len(returnToList) == 0:
+            print("  ... {} had {} hosts and none were filtered".format( obj[0], len(hosts) ), file=sys.stderr )
+
+        elif len(hosts) != len(returnToList):
+            returnedHostTypeText = filterText
+            print("  ... {} had {} hosts which were reduced to {} {} host(s)".format( obj[0], len(hosts), len(returnToList), returnedHostTypeText ), file=sys.stderr )
+            self.printNXDomainErrMsg(dnsResults)
+
+        else:
+            print("  ... no hosts were filtered".format( len(hosts) ), file=sys.stderr )
+
+        returnToList = list(map(lambda x : x["domain"], returnToList))
+        
+        if isinstance(hostIndex, str):
+            returnToList = ",".join(returnToList)
+
+        obj[arrayHostIndex] = returnToList
+
+        if len(returnToList ) > 0:
+            returnList.append(obj)
+
     def hostsCNAMED(self, obj, hosts, hostIndex, returnList, arrayHostIndex=1, progressTickHandler=None, debug=False):
         
         dnsResults = self.loadDNSfromHostList(hosts, progressTickHandler=progressTickHandler, debug=debug)
