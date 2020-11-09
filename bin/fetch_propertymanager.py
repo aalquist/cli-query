@@ -156,7 +156,13 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                 result = context.session.get(locationURL )
                 code, headers, json = self.handleResponseWithHeaders(result, url, debug, retry=1, context=context)
                 status = json["searchTargetStatus"]
-                print(" ... Waiting for search results. {} attempt {} of {}".format(status, attempts, maxAttempts), file=sys.stderr )
+
+                if debug:
+                    print(" ... Waiting for search results. {} attempt {} of {} for {}".format(status, attempts, maxAttempts, locationURL), file=sys.stderr )
+                    print(" .... got HTTP code {} with headers: {}".format(code, jsonlib.dumps(dict(headers) ) ), file=sys.stderr)
+                    print(" .... got json: {}".format(jsonlib.dumps(json) ), file=sys.stderr)
+                else:
+                    print(" ... Waiting for search results. {} attempt {} of {}".format(status, attempts, maxAttempts), file=sys.stderr )
 
                 if status != "COMPLETE":
                     time.sleep(7)
