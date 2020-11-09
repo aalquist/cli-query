@@ -128,17 +128,25 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             status = json["searchTargetStatus"]
 
             attempts = 0
-            while status != "COMPLETE" and attempts < 550:
+            maxAttempts = 550
+
+            while status != "COMPLETE" and attempts < maxAttempts:
 
                 if status == "ERROR":
                     print(" ... Encountered error from bulksearch endpoint", file=sys.stderr )
-                    print(" ... fatalError message: {}".format(json["fatalError"]), file=sys.stderr )
-                    print(" ... Review your search post for possible errors:", file=sys.stderr )
+                    print(" ... fatalError message from API response: {}".format(json["fatalError"]), file=sys.stderr )
+                    print(" ... Error Bulksearch Request POST body:", file=sys.stderr )
+                    print(" ... {}".format( jsonlib.dumps(postdata) ), file=sys.stderr )
                     
-                    postJSON = jsonlib.dumps(postdata)
-                    print(postJSON, file=sys.stderr )
+
+                    if debug:
+                        print(" ... Error bulksearch POST JSON response:", file=sys.stderr )
+                        print(" ... {}".format( jsonlib.dumps(json) ), file=sys.stderr )
                     
-                    raise ValueError("fatal bulk search error: {}".format(json["fatalError"]))
+                    if "bulkSearchId" in json and "fatalError" in json:
+                        raise ValueError("Error bulksearch API response bulkSearchId: \"{}\" fatalError message: \"{}\"".format(json["bulkSearchId"], json["fatalError"]))
+                    else:
+                        raise ValueError("Error bulksearch API response. Unknown error. No bulkSearchId and fatalError json keys")
 
                 attempts = attempts + 1
 
@@ -148,7 +156,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                 result = context.session.get(locationURL )
                 code, headers, json = self.handleResponseWithHeaders(result, url, debug, retry=1, context=context)
                 status = json["searchTargetStatus"]
-                print(" ... Waiting for search results. {}".format(status), file=sys.stderr )
+                print(" ... Waiting for search results. {} attempt {} of {}".format(status, attempts, maxAttempts), file=sys.stderr )
 
                 if status != "COMPLETE":
                     time.sleep(7)
