@@ -63,10 +63,15 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             self.cache = Cache()
             self.cache.clear()
         
-
-    def buildBulkSearchUrl(self, context, *, contractId=None, groupId=None):
+    def buildBulkSearchUrl(self, context, *, contractId=None, groupId=None, sync=False):
         
-        url = self.buildUrl("https://{}/papi/v1/bulk/rules-search-requests", context)
+        if sync:
+            url = "https://{}/papi/v1/bulk/rules-search-requests-synch"
+
+        else:
+            url = "https://{}/papi/v1/bulk/rules-search-requests"
+
+        url = self.buildUrl(url, context)
 
         queryArgs = [("contractId", contractId), ("groupdId", groupId)]
 
@@ -106,7 +111,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         factory = CredentialFactory()
         context = factory.load(edgerc, section, account_key)
-        url = self.buildBulkSearchUrl(context, contractId=contractId, groupId=groupId)
+        url = self.buildBulkSearchUrl(context, contractId=contractId, groupId=groupId, sync=True)
 
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
 
@@ -115,6 +120,14 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         if code in [200] and "results" in json:
             
+            if "fatalError" in json:
+
+                if debug:
+                    print(" ... Error bulksearch JSON response:", file=sys.stderr )
+                    print(" ... {}".format( jsonlib.dumps(json) ), file=sys.stderr )
+
+                raise ValueError("Error bulksearch API response fatalError message: \"{}\"".format( json["fatalError"]))
+                   
             print(" ... Found {} properties".format( len(json["results"])) , file=sys.stderr )
         
             json = self.getMatchLocationValues(json["results"], edgerc=edgerc, account_key=account_key, network=network, debug=debug)
@@ -135,12 +148,12 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                 if status == "ERROR":
                     print(" ... Encountered error from bulksearch endpoint", file=sys.stderr )
                     print(" ... fatalError message from API response: {}".format(json["fatalError"]), file=sys.stderr )
-                    print(" ... Error Bulksearch Request POST body:", file=sys.stderr )
+                    print(" ... Error Original Bulksearch Request POST body:", file=sys.stderr )
                     print(" ... {}".format( jsonlib.dumps(postdata) ), file=sys.stderr )
                     
 
                     if debug:
-                        print(" ... Error bulksearch POST JSON response:", file=sys.stderr )
+                        print(" ... Error bulksearch JSON response:", file=sys.stderr )
                         print(" ... {}".format( jsonlib.dumps(json) ), file=sys.stderr )
                     
                     if "bulkSearchId" in json and "fatalError" in json:
