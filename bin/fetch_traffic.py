@@ -193,7 +193,7 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
                     if date_time_obj >= endDate_Time:
                         return (code, json_obj)
                     else:
-                        return (code, {})
+                        return (code, json_obj)
 
 
             return (code, json)
