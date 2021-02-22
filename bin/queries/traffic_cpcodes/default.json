@@ -1,0 +1,8 @@
+{
+    "cpcode" : "$.data.cpcode",
+    "edgeHits" : "$.data.edgeHits",
+    "hitsOffload" : "$.data.hitsOffload",
+    "originHits" : "$.data.originHits"
+
+   
+}

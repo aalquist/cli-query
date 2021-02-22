@@ -279,6 +279,12 @@ def setupCommands(subparsers):
         actions=actions)
 
     create_sub_command(
+        subparsers, "traffic_cpcodes", "Traffic data on CPCODEs",
+        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "cpcodes", "help": "a list of domains", "positional" : True, "nargs" : '*'} ]),
+        required_arguments=None,
+        actions=actions)
+
+    create_sub_command(
         subparsers, "groupcpcodelist", "CPCODES assigned to groups",
         optional_arguments=combineArgs(defaultQueryArgs, [{"name": "only-contractIds", "help": "limit the query to specific contracts"} ]),
         required_arguments=None,
@@ -444,6 +450,33 @@ def checkjsondns(args):
     printResponse(jsonObj,JSONOutput=True)
     thread.join()
     return 0   
+
+def traffic_cpcodes(args):
+    path = inspect.getframeinfo(inspect.currentframe()).function
+    thread = Analytics().async_send_analytics(path=path, debug=args.debug)
+
+    from bin.fetch_traffic import TafficFetch
+
+    fetch = TafficFetch()
+    queryresult = QueryResult("traffic_cpcodes")
+    
+    checkFilterArgs(args, queryresult)
+
+    if args.cpcodes is None or len(args.cpcodes) < 1:
+        print("... waiting for cpcode list from stdin...", file=sys.stderr )
+        stdinStr = getArgFromSTDIN()
+        print("... got list from user input...", file=sys.stderr )
+        stdinStr = str.rstrip(stdinStr)
+        lines = stdinStr.split(os.linesep)
+
+    else:
+        lines = args.cpcodes
+
+    (_, jsonObj)  = fetch.fetchTrafficData(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIds=args.cpcodes)
+    
+    thread.join()
+    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
+
 
 def checkhostdns(args):
     path = inspect.getframeinfo(inspect.currentframe()).function

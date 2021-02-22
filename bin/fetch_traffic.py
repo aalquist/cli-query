@@ -151,7 +151,6 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.appendQueryStringTupple(url, queryArgs)
         return url
 
-
     def fetchTrafficData(self, *, edgerc, section, account_key=None, objectIds=[], startDate=None, endDate=None, debug=False):
 
         factory = CredentialFactory()
@@ -191,13 +190,13 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
                     endDate_Time = datetime.datetime.combine(endDate, datetime.time(0, 0))
 
                     if date_time_obj >= endDate_Time:
-                        return (code, json_obj)
+                        return (code, [json_obj])
                     else:
-                        return (code, json_obj)
+                        return (code, [json_obj])
 
 
-            return (code, json)
+            return (code, [json_obj])
         else:
-            return (code, json)
+            return (code, [json_obj])
 
     

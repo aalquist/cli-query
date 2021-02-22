@@ -42,9 +42,7 @@ class Traffic_Test(unittest.TestCase):
         
         fetch = TafficFetch()
 
-        #(start, end) = fetch.getPriorDayRange()
-        #(code, _json) = fetch.fetchTrafficData(edgerc=None,section=None, account_key="F-AC-2008431", objectIds=["367155"], startDate=start, endDate=end)
-        (code, _json) = fetch.fetchTrafficData(edgerc=None,section=None, account_key="F-AC-2008431", objectIds=["367155"])
+        (code, _json) = fetch.fetchTrafficData(edgerc=None,section=None, account_key=None, objectIds=["123456"])
         print(json.dumps(_json, indent=1))
         self.assertEquals(200, code)
             
