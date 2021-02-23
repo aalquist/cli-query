@@ -517,10 +517,7 @@ def traffic_cpcodes(args):
         lines = args.cpcodes
         lines = parseInputLinestoMatrix(lines)
 
-    #concatForJQCSV = False
     concatForJQCSV = not args.show_nested_list
-
-    
 
     (_, jsonObj)  = fetch.fetchTrafficDataList(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIdMatrix=lines, debug=args.debug)
     
