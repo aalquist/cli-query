@@ -151,6 +151,32 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.appendQueryStringTupple(url, queryArgs)
         return url
 
+    def fetchTrafficDataList(self, *, edgerc, section, account_key=None, objectIdMatrix=[], startDate=None, endDate=None, debug=False):
+
+        returnTupleList = list()
+
+        for objectId in objectIdMatrix:
+
+            if isinstance(objectId, list):
+                (code, _json) = self.fetchTrafficData(edgerc=edgerc, section=section, account_key=account_key, objectIds=objectId, startDate=startDate, endDate=endDate, debug=debug)
+                returnTupleList.append( (code, _json) )
+            
+            else:
+                (code, _json) = self.fetchTrafficData(edgerc=edgerc, section=section, account_key=account_key, objectIds=[objectId], startDate=startDate, endDate=endDate, debug=debug)
+                returnTupleList.append( (code, _json) )
+
+        all200 = all(list(map(lambda x : x[0] == 200, returnTupleList)))
+        results = list(map(lambda x : x[1], returnTupleList))
+
+        if all200:
+            responseCode = 200
+        else:
+            responseCode = 500
+
+        return (responseCode, results)
+           
+
+
     def fetchTrafficData(self, *, edgerc, section, account_key=None, objectIds=[], startDate=None, endDate=None, debug=False):
 
         factory = CredentialFactory()
@@ -173,7 +199,8 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
             for data in json_obj["data"]:
                 self.convert_strings_to_numbers(data)
 
-            if len(json_obj["data"]) == 1:
+            enableDataTruncate = False
+            if enableDataTruncate and len(json_obj["data"]) == 1:
                 json_obj["data"] = json_obj["data"][0]
 
                 if "objectIds" in json_obj:
@@ -190,13 +217,13 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
                     endDate_Time = datetime.datetime.combine(endDate, datetime.time(0, 0))
 
                     if date_time_obj >= endDate_Time:
-                        return (code, [json_obj])
+                        return (code, json_obj)
                     else:
-                        return (code, [json_obj])
+                        return (code, json_obj)
 
 
-            return (code, [json_obj])
+            return (code, json_obj)
         else:
-            return (code, [json_obj])
+            return (code, json_obj)
 
     

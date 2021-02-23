@@ -280,7 +280,10 @@ def setupCommands(subparsers):
 
     create_sub_command(
         subparsers, "traffic_cpcodes", "Traffic data on CPCODEs",
-        optional_arguments=combineArgs(defaultQueryArgs, [{"name": "cpcodes", "help": "a list of domains", "positional" : True, "nargs" : '*'} ]),
+        optional_arguments=combineArgs(defaultQueryArgs, [
+                {"name": "cpcodes", "help": "a list of domains", "positional" : True, "nargs" : '*'}, 
+                {"name": "inputfile", "help": "text file input"},
+                {"name": "show-nested-list", "help": "disable JSON Array to String concatenation for JQ @CSV"} ]),
         required_arguments=None,
         actions=actions)
 
@@ -451,6 +454,37 @@ def checkjsondns(args):
     thread.join()
     return 0   
 
+def parseInputLinestoMatrix(lines):
+
+    assert isinstance(lines, list)
+
+    updatedLines = None
+
+    for singleline in lines:
+        split = [" ", ","]
+        splitCharFound = [e for e in split if e in singleline]
+
+        if len(splitCharFound) > 0:
+
+            if updatedLines is None:
+                updatedLines = list()
+
+            for split in splitCharFound:
+
+                
+                newDns = str.strip(singleline)
+                updatedLines.extend( newDns.split(split) ) 
+        else:
+            if updatedLines is None:
+                updatedLines = list()
+                
+            updatedLines.append(singleline)
+
+    if updatedLines is not None:
+        lines = updatedLines
+    
+    return lines
+
 def traffic_cpcodes(args):
     path = inspect.getframeinfo(inspect.currentframe()).function
     thread = Analytics().async_send_analytics(path=path, debug=args.debug)
@@ -464,18 +498,35 @@ def traffic_cpcodes(args):
 
     if args.cpcodes is None or len(args.cpcodes) < 1:
         print("... waiting for cpcode list from stdin...", file=sys.stderr )
-        stdinStr = getArgFromSTDIN()
-        print("... got list from user input...", file=sys.stderr )
+
+        if args.inputfile is None:
+            print("... got list from user input...", file=sys.stderr )
+            stdinStr = getArgFromSTDIN()
+        else:
+            print("... got list from inputfile ...", file=sys.stderr )
+            stdinStr = getArgFromFile(args.inputfile)
+
+        
         stdinStr = str.rstrip(stdinStr)
         lines = stdinStr.split(os.linesep)
 
+        lines = list( map( lambda x : parseInputLinestoMatrix([x]), lines ) )
+        
+
     else:
         lines = args.cpcodes
+        lines = parseInputLinestoMatrix(lines)
 
-    (_, jsonObj)  = fetch.fetchTrafficData(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIds=args.cpcodes)
+    #concatForJQCSV = False
+    concatForJQCSV = not args.show_nested_list
+
+    
+
+    (_, jsonObj)  = fetch.fetchTrafficDataList(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIdMatrix=lines, debug=args.debug)
     
     thread.join()
-    return handleresponse(args, jsonObj, queryresult, Debug=args.debug)
+    return handleresponse(args, jsonObj, queryresult, concatForJQCSV=concatForJQCSV, Debug=args.debug)
+
 
 
 def checkhostdns(args):
