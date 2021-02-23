@@ -70,8 +70,8 @@ class Fetch_Akamai_OPENAPI_Response():
 
     def handleUnexpected(self, result, url, debug):
         if debug:
-            lds_json = result.json()
-            print(json.dumps(lds_json, indent=4 ), file=sys.stderr )
+            _json = result.json()
+            print(json.dumps(_json, indent=1 ), file=sys.stderr )
         
         raise Exception("Unexpected Reponse Code: {} for {}".format(result.status_code, url)  )
              
