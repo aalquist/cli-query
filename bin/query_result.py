@@ -165,11 +165,11 @@ class QueryResult():
         queryjson = self.getQueryPath(dir_path=dir_path, fileName="default.json")
         return self.getJsonQueryFile(queryjson)
     
-    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, Debug=False):
+    def parseCommandDefault(self, json, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, returnEmptyLines=False, Debug=False):
         defaultquery = self.getDefaultJsonQuery()
-        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
+        return self.parseCommandGeneric(json, defaultquery, RequireAll, JoinValues, ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, Debug=Debug)
 
-    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, Debug=False):
+    def parseCommandGeneric(self, json , dictObj, RequireAll = True, JoinValues = True, ReturnHeader=True, concatForJQCSV=True, returnEmptyLines=False, Debug=False):
         queries = list(dictObj.values() )
 
         returnList = []
@@ -181,13 +181,13 @@ class QueryResult():
         elif Debug:
             print( " ... printing of header excluded", file=sys.stderr )
 
-        result = self.parseElement(json, queries, RequireAll=RequireAll, JoinValues=JoinValues, returnList=returnList, concatForJQCSV=concatForJQCSV)
+        result = self.parseElement(json, queries, RequireAll=RequireAll, JoinValues=JoinValues, returnList=returnList, concatForJQCSV=concatForJQCSV,returnEmptyLines=returnEmptyLines)
 
         
 
         return result
 
-    def parseElement(self, json, paths, RequireAll=True, JoinValues=True, returnList=None, concatForJQCSV=True):
+    def parseElement(self, json, paths, RequireAll=True, JoinValues=True, returnList=None, concatForJQCSV=True, returnEmptyLines=False):
         
         if returnList is None:
             returnList = []
@@ -245,6 +245,10 @@ class QueryResult():
 
                 if(len(matchedArray) > 0):
                     returnList.append(matchedArray)
+                
+                elif returnEmptyLines:
+                    returnList.append([])
+                
 
         return returnList
 

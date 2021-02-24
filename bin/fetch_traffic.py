@@ -151,6 +151,45 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
         url = self.appendQueryStringTupple(url, queryArgs)
         return url
 
+    def fetchTrafficDataJsonArray(self, *, edgerc, section, account_key=None, jsonObjectList=[], cpCodeIndex=1, startDate=None, endDate=None, debug=False):
+        
+        returnTupleList = list()
+
+        for jsonObject in jsonObjectList:
+
+            if isinstance(jsonObject, list):
+
+                if len(jsonObject) >= cpCodeIndex:
+                    objectIds = jsonObject[cpCodeIndex]
+                    objectIds = list(map(lambda x : str(x), objectIds))
+                    (code, _json) = self.fetchTrafficData(edgerc=edgerc, section=section, account_key=account_key, objectIds=objectIds, startDate=startDate, endDate=endDate, debug=debug)
+                    returnTupleList.append( (code, _json) )
+
+                    if debug:
+                        print(f"  ... Got response code: {code}", file=sys.stderr )
+                else:
+                    (599, {"error" : "cpCodeIndex index out of bounds"}) 
+                    returnTupleList.append( (code, _json) )
+                    break
+
+            else:
+                (599, {"error" : "input not a list"}) 
+                returnTupleList.append( (code, _json) )
+                break
+
+
+        all200 = all(list(map(lambda x : x[0] == 200, returnTupleList)))
+        results = list(map(lambda x : (x[1]), returnTupleList))
+        
+        
+
+        if all200:
+            responseCode = 200
+        else:
+            responseCode = 500
+
+        return (responseCode, results)
+
     def fetchTrafficDataList(self, *, edgerc, section, account_key=None, objectIdMatrix=[], startDate=None, endDate=None, debug=False):
 
         returnTupleList = list()
@@ -204,7 +243,7 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
                 json_obj["data"] = json_obj["data"][0]
 
                 if "objectIds" in json_obj:
-                    del json["objectIds"]
+                    del json_obj["objectIds"]
 
             if "metadata" in json_obj and "columns" in json_obj["metadata"]:
                 del json_obj["metadata"]["columns"]
