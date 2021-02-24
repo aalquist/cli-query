@@ -496,6 +496,12 @@ def traffic_cpcodes(args):
     
     checkFilterArgs(args, queryresult)
 
+    jsonInput = True
+    detectHeader = True
+    cpcodeColumn = 1
+
+    
+
     if args.cpcodes is None or len(args.cpcodes) < 1:
         print("... waiting for cpcode list from stdin...", file=sys.stderr )
 
@@ -510,19 +516,39 @@ def traffic_cpcodes(args):
         stdinStr = str.rstrip(stdinStr)
         lines = stdinStr.split(os.linesep)
 
-        lines = list( map( lambda x : parseInputLinestoMatrix([x]), lines ) )
+        def parseJson(x):
+            return json.loads(x)
+
+        if jsonInput:
+            lines = list( map( parseJson, lines ) )
+
+            if detectHeader and len(lines) > 1 and len(lines[0]) >= cpcodeColumn:
+                firstPossibleCPCODE = lines[0][cpcodeColumn]
+
+                if isinstance(firstPossibleCPCODE, str) and "," not in firstPossibleCPCODE and not firstPossibleCPCODE.isdigit(): 
+                    lines = lines[1:]
+
+        else:
+            lines = list( map( lambda x : parseInputLinestoMatrix([x]), lines ) )
         
 
     else:
         lines = args.cpcodes
         lines = parseInputLinestoMatrix(lines)
 
-    concatForJQCSV = not args.show_nested_list
+    concatForJQCSV = args.show_nested_list
 
-    (_, jsonObj)  = fetch.fetchTrafficDataList(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIdMatrix=lines, debug=args.debug)
+    if jsonInput:
+        (_, jsonObj)  = fetch.fetchTrafficDataJsonArray(edgerc=args.edgerc,section=args.section, account_key=args.account_key, jsonObjectList=lines, cpCodeIndex=cpcodeColumn, debug=args.debug)
+
+    else:
+        (_, jsonObj)  = fetch.fetchTrafficDataList(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIdMatrix=lines, debug=args.debug)
     
     thread.join()
-    return handleresponse(args, jsonObj, queryresult, concatForJQCSV=concatForJQCSV, Debug=args.debug)
+    HideHeader = True
+    returnEmptyLines = True
+    response = handleresponse(args, jsonObj, queryresult, RequireAll=False, concatForJQCSV=concatForJQCSV, HideHeader=HideHeader, OriginalArray=lines, returnEmptyLines=returnEmptyLines, Debug=args.debug)
+    return response
 
 
 
@@ -890,7 +916,7 @@ def verifyInputTemplateFilter(args, queryresult, enableSTDIN = True):
     
     return (passedFilterCheck, template, templateJson, file, use_stdin)
 
-def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = True, HideHeader = False, concatForJQCSV = True, Debug=False):
+def handleresponse(args, jsonObj, queryresult, enableSTDIN=True, RequireAll=True, HideHeader=False, concatForJQCSV=True, returnEmptyLines=False, OriginalArray=None, Debug=False):
 
     notJSONOutput = False
     ReturnHeader = not HideHeader
@@ -919,9 +945,38 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN = True, RequireAll = 
             
         else:
             
-            parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
+            parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, Debug=Debug)
 
-        printResponse(parsed, JSONOutput=(not notJSONOutput))
+        if OriginalArray is None:
+            printResponse(parsed, JSONOutput=(not notJSONOutput))
+
+        elif OriginalArray is not None and len(parsed) == len(OriginalArray):
+
+            def joinOriginalArray(x):
+                leftSide = list(x[0])
+                rightSide = list(x[1])
+
+                allList = all(map(lambda x : isinstance(x, list), leftSide))
+
+                if allList:
+                    
+                    rightSide = list(map(lambda x : list([x]), rightSide))
+                else:
+                    rightSide = list(x[1])
+
+                leftSide.extend(rightSide)
+                return leftSide
+            
+            zippedParsed = zip(OriginalArray, parsed)
+
+            parsed = list(map(joinOriginalArray, zippedParsed))
+            printResponse(parsed, JSONOutput=(not notJSONOutput))
+
+        else:
+            errMsg = f"Error: output array length {len(parsed)} is not {len(OriginalArray)}"
+            print(errMsg, file=sys.stderr )
+            raise ValueError(errMsg)
+
 
     else: 
         print( json.dumps( jsonObj, indent=1 ) )
