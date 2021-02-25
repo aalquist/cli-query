@@ -166,7 +166,7 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
                     returnTupleList.append( (code, _json) )
 
                     if debug:
-                        print(f"  ... Got response code: {code}", file=sys.stderr )
+                        print("  ... Got response code: {}".format(code), file=sys.stderr )
                 else:
                     (599, {"error" : "cpCodeIndex index out of bounds"}) 
                     returnTupleList.append( (code, _json) )
