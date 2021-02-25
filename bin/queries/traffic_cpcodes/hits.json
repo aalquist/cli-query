@@ -1,4 +1,3 @@
 {
-    "cpcode" : "$.data[*].cpcode",
     "edgeHits" : "$.data[*].edgeHits"
 }
