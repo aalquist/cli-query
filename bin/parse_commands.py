@@ -283,6 +283,8 @@ def setupCommands(subparsers):
         optional_arguments=combineArgs(defaultQueryArgs, [
                 {"name": "cpcodes", "help": "a list of domains", "positional" : True, "nargs" : '*'}, 
                 {"name": "inputfile", "help": "text file input"},
+                {"name": "cpcode-index", "help": "zero based index where cpcode is located on json array", "default" : 1},
+                {"name": "use-json-input", "help": "each inputline is json array"},
                 {"name": "show-nested-list", "help": "disable JSON Array to String concatenation for JQ @CSV"} ]),
         required_arguments=None,
         actions=actions)
@@ -496,11 +498,12 @@ def traffic_cpcodes(args):
     
     checkFilterArgs(args, queryresult)
 
-    jsonInput = True
-    detectHeader = True
-    cpcodeColumn = 1
-
+    jsonInput = args.use_json_input
+    cpcodeColumn = int(args.cpcode_index)
     
+    detectHeader = True
+    HideHeader = True
+    returnEmptyLines = True
 
     if args.cpcodes is None or len(args.cpcodes) < 1:
         print("... waiting for cpcode list from stdin...", file=sys.stderr )
@@ -527,6 +530,7 @@ def traffic_cpcodes(args):
 
                 if isinstance(firstPossibleCPCODE, str) and "," not in firstPossibleCPCODE and not firstPossibleCPCODE.isdigit(): 
                     lines = lines[1:]
+                    HideHeader = True
 
         else:
             lines = list( map( lambda x : parseInputLinestoMatrix([x]), lines ) )
@@ -545,8 +549,7 @@ def traffic_cpcodes(args):
         (_, jsonObj)  = fetch.fetchTrafficDataList(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIdMatrix=lines, debug=args.debug)
     
     thread.join()
-    HideHeader = True
-    returnEmptyLines = True
+
     response = handleresponse(args, jsonObj, queryresult, RequireAll=False, concatForJQCSV=concatForJQCSV, HideHeader=HideHeader, OriginalArray=lines, returnEmptyLines=returnEmptyLines, Debug=args.debug)
     return response
 
