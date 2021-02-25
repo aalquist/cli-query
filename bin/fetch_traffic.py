@@ -146,7 +146,7 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
         if not isinstance(endDate, str):
             endDate = str(endDate)
 
-        queryArgs = [("start", f"{startDate}T00:00:00Z"), ("end", f"{endDate}T09:00:00Z")]
+        queryArgs = [("start", "{}T00:00:00Z".format(startDate)), ("end", "{}T09:00:00Z".format(endDate))]
 
         url = self.appendQueryStringTupple(url, queryArgs)
         return url
