@@ -1007,10 +1007,12 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN=True, RequireAll=True
                 
                 printResponse(parsed, JSONOutput=(not notJSONOutput))
 
-            errMsg = "Error: output array length {} is not {}".format(len(parsed), len(OriginalArray))
-            print(" ... {}".format( errMsg), file=sys.stderr )
-            raise ValueError(errMsg)
+                errMsg = "Error: output array length {} is not {}".format(len(parsed), len(OriginalArray))
+                print(" ... {}".format( errMsg), file=sys.stderr )
+                raise ValueError(errMsg)
             
+            else:
+                printResponse(parsed, JSONOutput=(not notJSONOutput))
             
 
 
