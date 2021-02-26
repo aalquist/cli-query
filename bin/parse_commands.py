@@ -79,7 +79,7 @@ def create_sub_command( subparsers, name, help, *, optional_arguments=None, requ
             name = arg["name"]
             del arg["name"]
 
-            if name.startswith("require-") or name.startswith("require_") or name.startswith("skip-") or name.startswith("skip_") or name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or name.startswith("is-") or name.startswith("is_") or ("-use-" in name ) or ("_use_" in name ) or ("-is-" in name ) or ("_is_" in name ):
+            if name.startswith("require-") or name.startswith("require_") or name.startswith("skip-") or name.startswith("skip_") or name.startswith("use-") or name.startswith("use_") or name.startswith("show-") or name.startswith("disable-") or name.startswith("disable-") or name.startswith("show_") or name.startswith("for-") or name.startswith("for_") or name.startswith("is-") or name.startswith("is_") or ("-use-" in name ) or ("_use_" in name ) or ("-is-" in name ) or ("_is_" in name ):
                 
                 #enable boolean/flags
                 optional.add_argument(
@@ -285,7 +285,10 @@ def setupCommands(subparsers):
                 {"name": "inputfile", "help": "text file input"},
                 {"name": "cpcode-index", "help": "zero based index where cpcode is located on json array", "default" : 1},
                 {"name": "use-json-input", "help": "each inputline is json array"},
-                {"name": "show-nested-list", "help": "disable JSON Array to String concatenation for JQ @CSV"} ]),
+                {"name": "disable-empty-lines", "help": "hide empty results"},
+                {"name": "show-nested-list", "help": "disable JSON Array to String concatenation for JQ @CSV"},
+                {"name": "filterfile", "help": "the json file to filter results from bulksearch"},
+                {"name": "filtername", "help": "template name to filter results from bulksearch"} ]),
         required_arguments=None,
         actions=actions)
 
@@ -503,7 +506,7 @@ def traffic_cpcodes(args):
     
     detectHeader = True
     HideHeader = True
-    returnEmptyLines = True
+    returnEmptyLines = not args.disable_empty_lines
 
     if args.cpcodes is None or len(args.cpcodes) < 1:
         print("... waiting for cpcode list from stdin...", file=sys.stderr )
@@ -549,8 +552,8 @@ def traffic_cpcodes(args):
         (_, jsonObj)  = fetch.fetchTrafficDataList(edgerc=args.edgerc,section=args.section, account_key=args.account_key, objectIdMatrix=lines, debug=args.debug)
     
     thread.join()
-
-    response = handleresponse(args, jsonObj, queryresult, RequireAll=False, concatForJQCSV=concatForJQCSV, HideHeader=HideHeader, OriginalArray=lines, returnEmptyLines=returnEmptyLines, Debug=args.debug)
+    RequireAll=False
+    response = handleresponse(args, jsonObj, queryresult, RequireAll=RequireAll, concatForJQCSV=concatForJQCSV, HideHeader=HideHeader, OriginalArray=lines, returnEmptyLines=returnEmptyLines, Debug=args.debug)
     return response
 
 
@@ -937,48 +940,78 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN=True, RequireAll=True
                 inputString = getArgFromFile(file)
 
             templateJson = queryresult.loadJson(inputString)
+
+            if Debug:
+                print("using template {}".format(template), file=sys.stderr)
+                print(json.dumps(templateJson), file=sys.stderr)
             
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
+            if OriginalArray is None:
+                (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
+            else:
+                #parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, Debug=Debug)
+                parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, RequireAll=RequireAll, Debug=Debug)
 
         elif template is not None :
 
             templateJson = queryresult.getQuerybyName(template, throwErrorIfNotFound=True)
-            
-            (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
+            if Debug:
+                print("using template {}".format(template), file=sys.stderr)
+                print(json.dumps(templateJson), file=sys.stderr)
+
+            if OriginalArray is None:
+                (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, RequireAll=RequireAll, Debug=Debug)
+            else:
+                parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, RequireAll=RequireAll, Debug=Debug)
+                #parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, Debug=Debug)
             
         else:
             
             parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, Debug=Debug)
 
-        if OriginalArray is None:
+        #OriginalArray is empty so nothing to merge
+        if OriginalArray is None and notJSONOutput:
             printResponse(parsed, JSONOutput=(not notJSONOutput))
 
-        elif OriginalArray is not None and len(parsed) == len(OriginalArray):
+        elif OriginalArray is not None and notJSONOutput and len(parsed) == len(OriginalArray):
+            print(" ... merging original dataset with text results:", file=sys.stderr)
+            def joinOriginalArray(x):
+                leftSide = list(x[0])
+                rightSide = x[1]
+                leftSide.append(rightSide)
+                return leftSide
+            
+            zippedParsed = list(zip(OriginalArray, parsed))
 
+            parsed = list(map(joinOriginalArray, zippedParsed))
+            printResponse(parsed, JSONOutput=True)
+
+        elif OriginalArray is not None and len(parsed) == len(OriginalArray):
+            print(" ... merging original dataset with json results:", file=sys.stderr)
             def joinOriginalArray(x):
                 leftSide = list(x[0])
                 rightSide = list(x[1])
 
-                allList = all(map(lambda x : isinstance(x, list), leftSide))
-
-                if allList:
-                    
-                    rightSide = list(map(lambda x : list([x]), rightSide))
-                else:
-                    rightSide = list(x[1])
-
                 leftSide.extend(rightSide)
                 return leftSide
             
-            zippedParsed = zip(OriginalArray, parsed)
+            zippedParsed = list(zip(OriginalArray, parsed))
 
             parsed = list(map(joinOriginalArray, zippedParsed))
             printResponse(parsed, JSONOutput=(not notJSONOutput))
 
         else:
+            
+            if OriginalArray is not None and (not returnEmptyLines):
+                print(" ... wasn't able to merge results with original input so just printing results", file=sys.stderr)
+                print(" ... try returning empty lines or results", file=sys.stderr)
+                
+                printResponse(parsed, JSONOutput=(not notJSONOutput))
+
             errMsg = "Error: output array length {} is not {}".format(len(parsed), len(OriginalArray))
-            print(errMsg, file=sys.stderr )
+            print(" ... {}".format( errMsg), file=sys.stderr )
             raise ValueError(errMsg)
+            
+            
 
 
     else: 
@@ -991,12 +1024,17 @@ def printResponse(parsed, JSONOutput=False):
     
     for line in parsed:
 
-        if not JSONOutput:
+        if line is None:
+            print()
+
+        elif not JSONOutput:
             print( line )
+
         else:
             print( json.dumps(line) )
 
-def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCSV=True, Debug=False):
+
+def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCSV=True, returnEmptyLines=False, RequireAll=True, Debug=False):
 
     notJSONOutput = False
     
@@ -1004,7 +1042,7 @@ def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCS
 
     if len(templateJson) == 1 : 
         notJSONOutput = True
-        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, JoinValues=False, ReturnHeader=False, concatForJQCSV=True, Debug=Debug)
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, JoinValues=False, ReturnHeader=False, concatForJQCSV=True, RequireAll=RequireAll, returnEmptyLines=returnEmptyLines, Debug=Debug)
         
         flattenedParsed = []
         for p in parsed:
@@ -1012,11 +1050,14 @@ def flatten(queryresult, jsonObj, templateJson, ReturnHeader=True, concatForJQCS
             if allValuesAreNotJsonInstances and len(p) == 1 and isinstance(p[0], dict):
                 allValuesAreNotJsonInstances = False
 
-            flattenedParsed.extend(p)
+            if len(p) > 0:
+                flattenedParsed.extend(p)
+            else:
+                flattenedParsed.append(None)
         parsed = flattenedParsed
 
     else:
-        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
+        parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, RequireAll=RequireAll, Debug=Debug)
 
     return (notJSONOutput and allValuesAreNotJsonInstances, parsed)
 
