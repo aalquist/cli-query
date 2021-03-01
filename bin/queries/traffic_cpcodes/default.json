@@ -1,4 +1,5 @@
 {
     "cpcode" : "$.data[*].cpcode",
-    "edgeHits" : "$.data[*].edgeHits"
+    "edgeHits" : "$.data[*].edgeHits",
+    "originHits" : "$.data[*].originHits"
 }
