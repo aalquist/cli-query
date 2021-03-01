@@ -23,22 +23,6 @@ import pytz
 import re
 import sys
 
-def utcDatefromString(start):
-    format = '%Y-%m-%dT%H:%M:%SZ'
-    d = datetime.datetime.strptime(start, format)
-    d.replace(tzinfo=pytz.UTC)
-    return d
-
-def daysSince(priorDate, now=None):
-    
-    priorDate = utcDatefromString(priorDate)
-
-    if now is None:
-        now = datetime.datetime.utcnow()
-    
-    delta = now - priorDate
-    days = delta.days
-    return days
 
 class TafficFetch(Fetch_Akamai_OPENAPI_Response):
 
@@ -77,45 +61,6 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
                 params[key] = self.convertNum(params[key])
         return params
 
-    def formatDatetoString(self, dateobj):
-        timeformat = "%Y-%m-%dT%H:%M:%SZ"
-        return dateobj.strftime(timeformat)
-
-    
-    def createDatefromString(self, start):
-        return utcDatefromString(start)
-        
-
-    def parseRange(self, end=None, timerange="2d", offsetMinutes=1):
-        regex = r"(\d+)([msh])"
-        matches = re.search(regex, timerange, re.IGNORECASE | re.DOTALL)
-
-        if matches:
-            g = matches.groups()
-            rangeVal = int(g[0])
-            rangeUnit = g[1]
-
-            if rangeUnit == "m" :
-                delta = timedelta(minutes=rangeVal)
-            elif rangeUnit == "s":
-                delta = timedelta(seconds=rangeVal)
-            elif rangeUnit == "h":
-                delta = timedelta(hours=rangeVal)
-            else:
-                raise ValueError("rangeUnit {} is not valid".format(rangeUnit) )
-
-            if end is None:
-                end = datetime.datetime.utcnow()
-
-            elif not isinstance(end, datetime.date) :
-                end = self.createDatefromString(end)
-
-            offset = timedelta(minutes=offsetMinutes)
-            offsetEnd = end - offset
-            
-            start = offsetEnd - delta
-            return (self.formatDatetoString(start), self.formatDatetoString(offsetEnd) )
-
     def getPriorDayRange(self):
         
         today = datetime.date.today()
@@ -130,8 +75,6 @@ class TafficFetch(Fetch_Akamai_OPENAPI_Response):
     
     def buildUrlTrafficUrl(self, context, objectIds=None, startDate=None, endDate=None):
         
-        #/reporting-api/v1/reports/hits-by-cpcode/versions/1/report-data objectIds==367155 start==2021-02-18T00:00:00Z end==2021-02-22T09:00:00Z
-
         assert objectIds is not None and len(objectIds) > 0
         objectIds = ",".join(objectIds)
 

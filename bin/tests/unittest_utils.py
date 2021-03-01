@@ -2,6 +2,7 @@ from io import StringIO
 import json
 import sys
 import os
+import traceback
 
 class CommandTester:
 
@@ -10,7 +11,7 @@ class CommandTester:
         self.edgeRc = "{}/bin/tests/other/.dummy_edgerc".format(os.getcwd())
     
 
-    def wrapSuccessCommandStdOutOnly(self, func=None, args=[], expectedReturnCode=0, assertMinStdOutLines=1):
+    def wrapSuccessCommandStdOutOnly(self, func=None, args=[], expectedReturnCode=0, assertMinStdOutLines=1, removeEmptyLines=True):
 
         saved_stdout = sys.stdout
         saved_sterr = sys.stdout
@@ -30,7 +31,11 @@ class CommandTester:
             self.unittester.assertEqual(returnVal, expectedReturnCode, "command args {} should return successcode. Error msg: {}".format(args,stdErrStr) )
 
             output = list(out.getvalue().split("\n"))
-            finaloutput = list(filter(lambda line: line != '', output))
+
+            if removeEmptyLines:
+                finaloutput = list(filter(lambda line: line != '', output))
+            else:
+                finaloutput = output
 
            
             self.unittester.assertGreater(len(finaloutput), assertMinStdOutLines-1, "command args {} and its output should be greater than zero".format(args) )
@@ -38,8 +43,10 @@ class CommandTester:
             #sys.stdout = saved_stdout
 
         finally:
+            
             sys.stdout = saved_stdout
             sys.stderr = saved_sterr
+
 
         self.unittester.assertIsNotNone(finaloutput)
 

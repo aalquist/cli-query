@@ -528,7 +528,7 @@ def traffic_cpcodes(args):
         if jsonInput:
             lines = list( map( parseJson, lines ) )
 
-            if detectHeader and len(lines) > 1 and len(lines[0]) >= cpcodeColumn:
+            if detectHeader and len(lines) > 1 and isinstance(lines[0], list) and len(lines[0]) >= cpcodeColumn:
                 firstPossibleCPCODE = lines[0][cpcodeColumn]
 
                 if isinstance(firstPossibleCPCODE, str) and "," not in firstPossibleCPCODE and not firstPossibleCPCODE.isdigit(): 
@@ -553,7 +553,13 @@ def traffic_cpcodes(args):
     
     thread.join()
     RequireAll=False
-    response = handleresponse(args, jsonObj, queryresult, RequireAll=RequireAll, concatForJQCSV=concatForJQCSV, HideHeader=HideHeader, OriginalArray=lines, returnEmptyLines=returnEmptyLines, Debug=args.debug)
+
+    if args.cpcodes is None or jsonInput:
+        response = handleresponse(args, jsonObj, queryresult, RequireAll=RequireAll, concatForJQCSV=concatForJQCSV, HideHeader=HideHeader, OriginalArray=lines, returnEmptyLines=returnEmptyLines, Debug=args.debug)
+
+    else:
+        response = handleresponse(args, jsonObj, queryresult, RequireAll=RequireAll, concatForJQCSV=concatForJQCSV, HideHeader=HideHeader, OriginalArray=None, returnEmptyLines=returnEmptyLines, Debug=args.debug)
+
     return response
 
 
@@ -972,18 +978,18 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN=True, RequireAll=True
         if OriginalArray is None and notJSONOutput:
             printResponse(parsed, JSONOutput=(not notJSONOutput))
 
-        elif OriginalArray is not None and notJSONOutput and len(parsed) == len(OriginalArray):
-            print(" ... merging original dataset with text results:", file=sys.stderr)
-            def joinOriginalArray(x):
-                leftSide = list(x[0])
-                rightSide = x[1]
-                leftSide.append(rightSide)
-                return leftSide
-            
-            zippedParsed = list(zip(OriginalArray, parsed))
+        #elif OriginalArray is not None and notJSONOutput and len(parsed) == len(OriginalArray):
+        #    print(" ... merging original dataset with text results:", file=sys.stderr)
+        #    def joinOriginalArray(x):
+        #        leftSide = list(x[0])
+        #        rightSide = x[1]
+        #        leftSide.append(rightSide)
+        #        return leftSide
+        #    
+        #    zippedParsed = list(zip(OriginalArray, parsed))
 
-            parsed = list(map(joinOriginalArray, zippedParsed))
-            printResponse(parsed, JSONOutput=True)
+        #    parsed = list(map(joinOriginalArray, zippedParsed))
+        #    printResponse(parsed, JSONOutput=True)
 
         elif OriginalArray is not None and len(parsed) == len(OriginalArray):
             print(" ... merging original dataset with json results:", file=sys.stderr)
@@ -1001,17 +1007,17 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN=True, RequireAll=True
 
         else:
             
-            if OriginalArray is not None and (not returnEmptyLines):
-                print(" ... wasn't able to merge results with original input so just printing results", file=sys.stderr)
-                print(" ... try returning empty lines or results", file=sys.stderr)
-                
-                printResponse(parsed, JSONOutput=(not notJSONOutput))
+            #if OriginalArray is not None and (not returnEmptyLines):
+            #    print(" ... wasn't able to merge results with original input so just printing results", file=sys.stderr)
+            #    print(" ... try returning empty lines or results", file=sys.stderr)
+            #    
+            #    printResponse(parsed, JSONOutput=(not notJSONOutput))
 
-                errMsg = "Error: output array length {} is not {}".format(len(parsed), len(OriginalArray))
-                print(" ... {}".format( errMsg), file=sys.stderr )
-                raise ValueError(errMsg)
+            #    errMsg = "Error: output array length {} is not {}".format(len(parsed), len(OriginalArray))
+            #    print(" ... {}".format( errMsg), file=sys.stderr )
+            #    raise ValueError(errMsg)
             
-            else:
+            #else:
                 printResponse(parsed, JSONOutput=(not notJSONOutput))
             
 
