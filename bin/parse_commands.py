@@ -224,6 +224,10 @@ def setupCommands(subparsers):
 
     actions = {}
 
+    minQueryArgs = [ 
+                            {"name": "show-json", "help": "output json"}
+                     ]
+
     basicQueryArgs = [ 
                             {"name": "show-json", "help": "output json"},
                             {"name": "filterfile", "help": "the json file to filter results"},
@@ -338,7 +342,7 @@ def setupCommands(subparsers):
     create_sub_command(
         subparsers, "checkjsondns", "dns filtering tool for json objects",
 
-        optional_arguments=combineArgs(basicQueryArgs, [ 
+        optional_arguments=combineArgs(minQueryArgs, [ 
                 {"name": "dns-index", "help": "zero based index where hostname lookup should be performed", "default" : 1},
                 {"name": "skip-wildcards", "help": "Ignore wildcard domains: *.example.com", "default" : False},
                 {"name": "dns_filter", "help": "choose configsWithCNAME, configsFullyCNAMED, configsWithoutCNAME, hostsCNAMED, hostsNotCNAMED, hostsNXDOMAIN, configsAllNXDomain, configsAnyNXDomain", "positional" : True}]),
