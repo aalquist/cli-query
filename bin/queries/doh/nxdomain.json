@@ -1,0 +1,5 @@
+{
+    "NXDomain" : "$.NXDomain",
+    "domain" : "$.domain",
+    "resolution" : "$.dnsJson.Answer"
+}
