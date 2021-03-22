@@ -954,7 +954,7 @@ def handleresponse(args, jsonObj, queryresult, enableSTDIN=True, RequireAll=True
                 print(json.dumps(templateJson), file=sys.stderr)
             
             if OriginalArray is None:
-                (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, Debug=Debug)
+                (notJSONOutput, parsed) = flatten(queryresult, jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, RequireAll=RequireAll, Debug=Debug)
             else:
                 #parsed = queryresult.parseCommandDefault(jsonObj,RequireAll=RequireAll, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, Debug=Debug)
                 parsed = queryresult.parseCommandGeneric(jsonObj, templateJson, ReturnHeader=ReturnHeader, concatForJQCSV=concatForJQCSV, returnEmptyLines=returnEmptyLines, RequireAll=RequireAll, Debug=Debug)
