@@ -225,7 +225,9 @@ def setupCommands(subparsers):
     actions = {}
 
     basicQueryArgs = [ 
-                            {"name": "show-json", "help": "output json"}
+                            {"name": "show-json", "help": "output json"},
+                            {"name": "filterfile", "help": "the json file to filter results"},
+                            {"name": "filtername", "help": "the built-in json file to filter results"}
                      ]
 
     defaultQueryArgs = [ 
@@ -237,8 +239,8 @@ def setupCommands(subparsers):
     bulkSearchQueryArgs = [ 
                             {"name": "show-json", "help": "output json"},
                             {"name": "use-filterstdin", "help": "get filter json from stdin"}, 
-                            {"name": "filterfile", "help": "the json file to filter results from bulksearch"},
-                            {"name": "filtername", "help": "template name to filter results from bulksearch"} ]
+                            {"name": "filterfile", "help": "the json file to filter results"},
+                            {"name": "filtername", "help": "the build-in json file to filter results"} ]
     
     create_sub_command(
         subparsers, "version", "display the version number",
