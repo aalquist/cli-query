@@ -111,7 +111,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
         factory = CredentialFactory()
         context = factory.load(edgerc, section, account_key)
-        url = self.buildBulkSearchUrl(context, contractId=contractId, groupId=groupId, sync=True)
+        url = self.buildBulkSearchUrl(context, contractId=contractId, groupId=groupId)
 
         headers={"Content-Type": "application/json", "Accept": "application/json, */*"}
 
