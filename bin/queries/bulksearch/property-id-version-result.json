@@ -1,0 +1,6 @@
+{
+    "propertyName": "$.propertyName",
+    "propertyId": "$.propertyId",
+    "propertyVersion": "$.propertyVersion",
+    "results": "$.matchLocationResults[*]"
+}
