@@ -1,0 +1,6 @@
+{
+    "bulkSearchQuery": {
+        "syntax": "JSONPATH",
+        "match": "$..behaviors[?(@.name == 'edgeConnect')]"
+    }
+}

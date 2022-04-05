@@ -135,7 +135,7 @@ class QueryResult():
                 if os.path.isdir(fullname):
                     returnlist.append(f)
             
-
+        returnlist.sort()
         return returnlist
 
     def listQuery(self, serverside=False):
@@ -152,7 +152,7 @@ class QueryResult():
             if os.path.isfile(fullname):
                 returnlist.append(f)
             
-
+        returnlist.sort()
         return returnlist
 
     def getNonDefaultQuery(self, name, serverside=False):
