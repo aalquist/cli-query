@@ -1,5 +1,5 @@
-jsonpath2==0.4.3
-antlr4-python3-runtime==4.7.2
+jsonpath2==0.4.4
+antlr4-python3-runtime<4.10
 edgegrid-python==1.1.1
 requests==2.22.0
 urllib3==1.25.3

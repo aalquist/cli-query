@@ -13,6 +13,8 @@ WORKDIR /cli-test
 
 RUN git init && git config user.email "aaalquis@akamai.com" && git config user.name "Aaron Alquist" && git add . && git commit -m "Initial"
 
+RUN pip3 install --upgrade pip
+
 RUN cat requirements.txt
 RUN pip3 install -r requirements.txt
 
