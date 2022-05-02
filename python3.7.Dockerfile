@@ -18,6 +18,12 @@ RUN pip3 install --upgrade pip
 RUN cat requirements.txt
 RUN pip3 install -r requirements.txt
 
+RUN pip3 freeze
+RUN ls
+
+RUN python3 --version
+RUN pip3 --version
+
 RUN akamai install file://$PWD
 
 RUN ls
