@@ -1,0 +1,7 @@
+{
+    "bulkSearchQuery": {
+        "syntax": "JSONPATH",
+        "match": "$..behaviors[?(@.name == 'origin')].options[?(@.hostname =~ /.*amazonaws.com$/i)].hostname"
+    }
+}
+
