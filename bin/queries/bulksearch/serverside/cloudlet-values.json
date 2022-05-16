@@ -1,0 +1,6 @@
+{
+    "bulkSearchQuery": {
+     "syntax": "JSONPATH",
+     "match": "$..behaviors[?(@.name == 'apiPrioritization' || @.name == 'applicationLoadBalancer' || @.name == 'audienceSegmentation' || @.name == 'edgeRedirector' || @.name == 'firstPartyMarketing' || @.name == 'forwardRewrite' || @.name == 'phasedRelease' || @.name == 'requestControl' || @.name == 'visitorPrioritization' || @.name == 'visitorPrioritizationFifo')]"
+    }
+}
