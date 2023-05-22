@@ -1,7 +1,7 @@
 jsonpath2==0.4.4
 antlr4-python3-runtime==4.7.2
 edgegrid-python==1.2.1
-requests==2.22.0
+requests==2.31.0
 urllib3==1.25.11
 jsonpointer==2.3
 diskcache==4.0.0
