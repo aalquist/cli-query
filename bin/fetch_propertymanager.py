@@ -32,6 +32,53 @@ from bin.fetch_datastream import daysSince
 
 from bin.decorator import cacheFunctionCall
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+def logOKHeader(strOut, end=None):
+    if end is None:
+        print(f"{bcolors.HEADER}{strOut}{bcolors.ENDC}", file=sys.stderr)
+    else:
+        print(f"{bcolors.HEADER}{strOut}{bcolors.ENDC}", file=sys.stderr, end=end)
+
+def logOKStatus(strOut, end=None):
+    if end is None:
+        print(f"{bcolors.OKGREEN}{strOut}{bcolors.ENDC}", file=sys.stderr)
+    else:
+        print(f"{bcolors.OKGREEN}{strOut}{bcolors.ENDC}", file=sys.stderr, end=end)
+
+def logWarnStatus(strOut, end=None):
+    if end is None:
+        print(f"{bcolors.WARNING}{strOut}{bcolors.ENDC}", file=sys.stderr)
+    else:
+        print(f"{bcolors.WARNING}{strOut}{bcolors.ENDC}", file=sys.stderr, end=end)
+        
+def logFailStatus(strOut, end=None):
+    if end is None:
+        print(f"{bcolors.FAIL}{strOut}{bcolors.ENDC}", file=sys.stderr)
+    else:
+        print(f"{bcolors.FAIL}{strOut}{bcolors.ENDC}", file=sys.stderr, end=end)
+
+def logStatus(strOut, end=None):
+    if end is None:
+        print(f"{bcolors.OKBLUE}{strOut}{bcolors.ENDC}", file=sys.stderr)
+    else:
+        print(f"{bcolors.OKBLUE}{strOut}{bcolors.ENDC}", file=sys.stderr, end=end)
+
+def logFYI(strOut, end=None):
+    if end is None:
+        print(strOut, file=sys.stderr)
+    else:
+        print(strOut, file=sys.stderr, end=end)
+
 class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
 
     forceTempCache = False
@@ -197,7 +244,7 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             printjson = jsonlib.dumps(json, indent=2)
             print(printjson, file=sys.stderr )
 
-        jobsize = len(json)
+        
 
         def manipulateSearchResults(matchJson, edgerc=None, account_key=None, propertyId=None, propertyVersion=None, cacheResponses=False, debug=None):
             
@@ -219,7 +266,14 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
                 if code in [200]:
                     self.mergeDigitalPropertiesVersionMeta(matchJson, versionMetaJson)
 
+        originalLen = len(json)
 
+        json = list( filter( lambda x : "propertyType" in x and x["propertyType"] == "TRADITIONAL", json  ) )
+        jobsize = len(json)
+
+        if originalLen > jobsize:
+            countChange = originalLen - jobsize
+            logWarnStatus(" ... {} non TRADITIONAL (includes) were filtered out".format(countChange ) )
 
         for match in json:
             count = count + 1
@@ -228,16 +282,17 @@ class PropertyManagerFetch(Fetch_Akamai_OPENAPI_Response):
             propertyName = match["propertyName"]
             productionStatus = match["productionStatus"]
             stagingStatus = match["stagingStatus"]
+            propertyType = match["propertyType"]
 
             if productionStatus in [ "ACTIVE", "DEACTIVATED" ] or stagingStatus in [ "ACTIVE", "DEACTIVATED" ]:
 
                 cacheResponses = True
-                print(" ... Getting Immutable Property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+                logStatus(" ... Getting Immutable {} Property {} of {}. {} v{} production={} staging={}".format( propertyType, count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus) )
                 manipulateSearchResults(match, edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
 
             else:    
                 cacheResponses = False
-                print(" ... Getting property {} of {}. {} v{} production={} staging={}".format( count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus), file=sys.stderr )
+                logWarnStatus(" ... Getting {} property {} of {}. {} v{} production={} staging={}".format( propertyType, count, jobsize, propertyName,propertyVersion, productionStatus, stagingStatus) )
                 manipulateSearchResults(match, edgerc=edgerc, account_key=account_key, propertyId=propertyId, propertyVersion=propertyVersion, cacheResponses=cacheResponses, debug=debug)
 
         return json
