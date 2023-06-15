@@ -73,16 +73,18 @@ class MockResponse:
             
             readPath = Path(jsonPath)
 
-            if os.name == 'nt':
-                print(readPath)
-
             with open(readPath, 'r') as myfile:
                 jsonStr = myfile.read()
             
-            if os.name == 'nt':
-                print(jsonStr)
+            try:
+                jsonObj = json.loads(jsonStr)
 
-            jsonObj = json.loads(jsonStr)
+            except Exception as ex:
+                print("error with json.loads")
+                print(readPath)
+                print(jsonStr)
+                raise ex
+
             return jsonObj
 
     def json(self):
