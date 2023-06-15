@@ -2,6 +2,7 @@ from io import StringIO
 import json
 import sys
 import os
+from pathlib import Path
 
 class CommandTester:
 
@@ -70,7 +71,9 @@ class MockResponse:
 
     def getJSONFromFile(self, jsonPath):
             
-            with open(jsonPath, 'r') as myfile:
+            readPath = Path(jsonPath)
+
+            with open(readPath, 'r') as myfile:
                 jsonStr = myfile.read()
             
             jsonObj = json.loads(jsonStr)
