@@ -1,11 +1,12 @@
 {
     "requirements": {
-      "python": "3.8.0"
+      "python": "3.9.0"
     },
     "commands": [
       {
         "name": "query",
-        "version": "0.0.16",
+        "version": "0.0.17",
+        "aliases": [],
         "description": "Generic querying CLI for multiple end points"
       }
     ]
