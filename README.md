@@ -12,6 +12,17 @@ akamai install https://github.com/aalquist/cli-query
 
 ```
 
+## run outside Akamai Cli
+If you're not able to install akamai-cli or akamai-cli has issues installing this plug-in you can run this directly. This shows how to install with python 3.10 in a virtual environment:
+
+```
+python3.10 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python3.10 bin/akamai-query
+
+```
+
 ## Table of Contents:
 
  * [Bulk Search](#querying-property-mangager-configurations)
